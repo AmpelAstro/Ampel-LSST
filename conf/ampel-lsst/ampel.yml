@@ -1,0 +1,10 @@
+unit:
+  admin:
+    - ampel.lsst.ingest.LSSTStockIngester
+    - ampel.lsst.ingest.LSSTPhotoIngester
+  base:
+    - ampel.lsst.ingest.LSSTPhotoCombiner
+  aux:
+    - ampel.lsst.alert.LSSTAlertSupplier
+    - ampel.lsst.util.LSSTIdMapper
+
