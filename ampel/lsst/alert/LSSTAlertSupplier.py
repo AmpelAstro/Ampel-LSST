@@ -8,15 +8,20 @@
 # Last Modified By  : vb <vbrinnel@physik.hu-berlin.de>
 
 from typing import Literal, List, Union, Callable, Any, Dict
-from ampel.lsst.util.LSSTIdMapper import to_ampel_id
-from ampel.alert.PhotoAlert import PhotoAlert
+from ampel.alert.AmpelAlert import AmpelAlert
 from ampel.abstract.AbsAlertSupplier import AbsAlertSupplier
+from ampel.view.ReadOnlyDict import ReadOnlyDict
 
+class DIAObjectMissingError(Exception):
+	"""
+	Raised when there is no DIAObject in the alert
+	"""
+	...
 
-class LSSTAlertSupplier(AbsAlertSupplier[PhotoAlert]):
+class LSSTAlertSupplier(AbsAlertSupplier[AmpelAlert]):
 	"""
 	Iterable class that, for each alert payload provided by the underlying alert_loader,
-	returns an PhotoAlert instance.
+	returns an AmpelAlert instance.
 	"""
 
 	# Override default
@@ -26,10 +31,9 @@ class LSSTAlertSupplier(AbsAlertSupplier[PhotoAlert]):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		self.stat_pps = 0
-		self.stat_uls = 0
 
 
-	def __next__(self) -> PhotoAlert:
+	def __next__(self) -> AmpelAlert:
 		"""
 		:returns: a dict with a structure that AlertProcessor understands
 		:raises StopIteration: when alert_loader dries out.
@@ -39,14 +43,24 @@ class LSSTAlertSupplier(AbsAlertSupplier[PhotoAlert]):
 			next(self.alert_loader) # type: ignore
 		)
 
-		# Return PhotoAlert
-		raise NotImplementedError()
-
+		if d['diaObject']:
+			diaObjectId = d['diaObject']['diaObjectId']
+			dps = [ReadOnlyDict(d['diaSource'])]
+			for prv_source in d['prvDiaSources']:
+				dps.append(ReadOnlyDict(prv_source))
+			for forced_source in d['prvDiaForcedSources']:
+				dps.append(ReadOnlyDict(forced_source))
+			return AmpelAlert(
+				id = d['alertId'], # alert id
+				stock_id = diaObjectId, # internal ampel id
+				dps = tuple(dps),
+			)
+		else:
+			raise DIAObjectMissingError
 
 	def get_stats(self, reset: bool = True) -> Dict[str, Any]:
 
-		ret = {'pps': self.stat_pps, 'uls': self.stat_uls}
+		ret = {'pps': self.stat_pps}
 		if reset:
 			self.stat_pps = 0
-			self.stat_uls = 0
 		return ret

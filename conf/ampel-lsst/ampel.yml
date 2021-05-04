@@ -6,5 +6,3 @@ unit:
     - ampel.lsst.ingest.LSSTPhotoCombiner
   aux:
     - ampel.lsst.alert.LSSTAlertSupplier
-    - ampel.lsst.util.LSSTIdMapper
-
