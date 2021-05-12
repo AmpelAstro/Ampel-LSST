@@ -4,8 +4,8 @@
 # License           : BSD-3-Clause
 # Author            : vb <vbrinnel@physik.hu-berlin.de>
 # Date              : 20.04.2021
-# Last Modified Date: 20.04.2021
-# Last Modified By  : vb <vbrinnel@physik.hu-berlin.de>
+# Last Modified Date: 12.05.2021
+# Last Modified By  : mf <mf@physik.hu-berlin.de>
 
 import itertools
 from pymongo import UpdateOne
@@ -38,6 +38,7 @@ class LSSTPhotoIngester(AbsAlertContentIngester[AmpelAlert, DataPoint]):
 		super().__init__(**kwargs)
 
 		self._photo_col = self.context.db.get_collection("t0")
+		self.stat_pps_reprocs = 0
 		self.stat_pps_inserts = 0
 		self._projection_spec = unflatten_dict(self.projection)
 

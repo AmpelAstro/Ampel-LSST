@@ -4,8 +4,8 @@
 # License           : BSD-3-Clause
 # Author            : vb <vbrinnel@physik.hu-berlin.de>
 # Date              : 20.04.2021
-# Last Modified Date: 20.04.2021
-# Last Modified By  : vb <vbrinnel@physik.hu-berlin.de>
+# Last Modified Date: 04.05.2021
+# Last Modified By  : mf <mf@physik.hu-berlin.de>
 
 from typing import Dict, List, Any, Iterable, Optional
 from ampel.abstract.AbsT0Unit import AbsT0Unit
@@ -60,10 +60,15 @@ class LSSTPhotoPointShaper(AbsT0Unit):
 			time.format = 'jd' # Todo: check timescale
 			setitem(photo_dict, 'fid', filter[photo_dict['filterName']])
 			setitem(photo_dict, 'jd', time.value)
-
+			if 'diaSourceId' in photo_dict:
+				id = photo_dict['diaSourceId']
+			elif 'diaForcedSourceId' in photo_dict:
+				id = photo_dict['diaForcedSourceId']
+			else:
+				raise NotImplementedError
 			ret_list.append(
 				{
-					'_id': photo_dict['diaObjectId'],
+					'_id': id,
 					'tag': ['LSST','LSST_' + photo_dict['filterName']],
 					'body': photo_dict
 				}
