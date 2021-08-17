@@ -23,7 +23,7 @@ class LSSTPhotoPointShaper(AbsT0Unit):
 	logger: Optional[LoggerProtocol] # type: ignore[assignment]
 
 	# Mandatory implementation
-	def ampelize(self, arg: Iterable[Dict[str, Any]]) -> List[DataPoint]:
+	def process(self, arg: Iterable[Dict[str, Any]]) -> List[DataPoint]:
 		"""
 		:param arg: sequence of unshaped pps
 		IMPORTANT:

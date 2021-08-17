@@ -35,7 +35,7 @@ class LSSTAlertSupplier(AbsAlertSupplier[AmpelAlert]):
 
 	def __next__(self) -> AmpelAlert:
 		"""
-		:returns: a dict with a structure that AlertProcessor understands
+		:returns: a dict with a structure that AlertConsumer understands
 		:raises StopIteration: when alert_loader dries out.
 		:raises AttributeError: if alert_loader was not set properly before this method is called
 		"""
