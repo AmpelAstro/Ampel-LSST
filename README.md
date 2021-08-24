@@ -1,6 +1,6 @@
 
 
-<img align="left" src="https://desycloud.desy.de/index.php/s/amdbxkCXoscYz96/preview" width="150" height="150"/>  
+<img align="left" src="https://desycloud.desy.de/index.php/s/25EwEzgpyFMd2bC/preview" width="150" height="150"/>  
 <br>
 
 # LSST plugin for AMPEL
