@@ -1,8 +1,8 @@
 unit:
-  admin:
-    - ampel.lsst.ingest.LSSTStockIngester
-    - ampel.lsst.ingest.LSSTPhotoIngester
-  base:
-    - ampel.lsst.ingest.LSSTPhotoCombiner
-  aux:
+#  base:
+    - ampel.lsst.ingest.LSSTDataPointShaper
+    - ampel.lsst.ingest.LSSTMongoMuxer
+    - ampel.lsst.ingest.LSSTCompilerOptions
+#  aux:
     - ampel.lsst.alert.LSSTAlertSupplier
+    - ampel.lsst.alert.MultiAvroAlertLoader
