@@ -6,7 +6,5 @@ unit:
 #  aux:
     - ampel.lsst.alert.LSSTAlertSupplier
     - ampel.lsst.alert.MultiAvroAlertLoader
-    - ampel.abstract.AbsSNCosmoTabulator
-    - ampel.abstract.AbsTabulatedT2Unit
-    - ampel.lsst.view.LSSTSNCosmoTabulator
-    - ampel.lsst.view.ZTFSNCosmoTabulator
+    - ampel.lsst.view.LSSTT2Tabulator
+    - ampel.lsst.view.ZTFT2Tabulator

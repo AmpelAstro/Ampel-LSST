@@ -13,7 +13,7 @@ from ampel.content.T1Document import T1Document
 from ampel.content.DataPoint import DataPoint
 from ampel.abstract.AbsStateT2Unit import AbsStateT2Unit
 from ampel.base.AuxUnitRegister import AuxUnitRegister
-from ampel.abstract.AbsSNCosmoTabulator import AbsSNCosmoTabulator
+from ampel.abstract.AbsT2Tabulator import AbsT2Tabulator
 from ampel.model.UnitModel import UnitModel
 
 
@@ -28,4 +28,5 @@ class AbsTabulatedT2Unit(AbsStateT2Unit, abstract=True):
     def __init__(self, **kwargs):
         self.tabulator = kwargs['tabulator']
         super().__init__(**kwargs)
-        self._tab_engines: Sequence[AbsSNCosmoTabulator] = [AuxUnitRegister.new_unit(model = el, sub_type = AbsSNCosmoTabulator) for el in self.tabulator]
+        self._tab_engines: Sequence[AbsT2Tabulator] = [AuxUnitRegister.new_unit(model = el, sub_type = AbsT2Tabulator) for el in self.tabulator]
+
