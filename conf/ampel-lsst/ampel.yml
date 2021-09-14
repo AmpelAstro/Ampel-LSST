@@ -4,6 +4,8 @@ unit:
     - ampel.lsst.ingest.LSSTMongoMuxer
     - ampel.lsst.ingest.LSSTCompilerOptions
 #  aux:
+    - ampel.lsst.t2.T2LightCurveFeatures
+    - ampel.lsst.t2.T2CatalogMatch
     - ampel.lsst.alert.LSSTAlertSupplier
     - ampel.lsst.alert.load.MultiAvroAlertLoader
     - ampel.lsst.view.LSSTT2Tabulator
