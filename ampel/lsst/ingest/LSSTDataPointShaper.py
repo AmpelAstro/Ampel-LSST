@@ -33,17 +33,19 @@ class LSSTDataPointShaper(AbsT0Unit):
 		popitem = dict.pop
 
 		for photo_dict in arg:
+			tags = ['LSST','LSST_' + photo_dict['filterName'].upper()]
 			if 'diaSourceId' in photo_dict:
 				id = photo_dict['diaSourceId']
 			elif 'diaForcedSourceId' in photo_dict:
 				id = photo_dict['diaForcedSourceId']
+				tags.append('LSST_FP')
 			else:
 				raise NotImplementedError
 			ret_list.append(
 				{
 					'id': id,
 					'stock': stock,
-					'tag': ['LSST','LSST_' + photo_dict['filterName'].upper()],
+					'tag': tags,
 					'body': photo_dict
 				}
 			)
