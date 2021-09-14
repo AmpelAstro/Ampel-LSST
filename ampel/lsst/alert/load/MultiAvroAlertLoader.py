@@ -1,19 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# File              : Ampel-LSST/ampel/lsst/alert/MultiAvroAlertLoader.py
+# File              : Ampel-LSST/ampel/lsst/alert/load/MultiAvroAlertLoader.py
 # License           : BSD-3-Clause
 # Author            : mf <mf@physik.hu-berlin.de>
 # Date              : 07.05.2021
-# Last Modified Date: 25.08.2021
+# Last Modified Date: 14.09.2021
 # Last Modified By  : mf <mf@physik.hu-berlin.de>
 
 from typing import Iterable
 from io import BytesIO, IOBase
 from ampel.model.UnitModel import UnitModel
-
-from ampel.base.AmpelBaseModel import AmpelBaseModel
 from ampel.base.AuxUnitRegister import AuxUnitRegister
-from ampel.abstract.AbsAlertLoader import AbsAlertLoader
 from ampel.abstract.AbsAlertLoader import AbsAlertLoader
 
 from fastavro import reader
@@ -46,7 +43,7 @@ class MultiAvroAlertLoader(AbsAlertLoader[BytesIO]):
 	def __iter__(self):
 		return self
 
-	def __next__(self) -> dict:
+	def __next__(self) -> BytesIO:
 		try:
 			return next(self.reader)
 		except StopIteration:

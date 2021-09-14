@@ -5,6 +5,6 @@ unit:
     - ampel.lsst.ingest.LSSTCompilerOptions
 #  aux:
     - ampel.lsst.alert.LSSTAlertSupplier
-    - ampel.lsst.alert.MultiAvroAlertLoader
+    - ampel.lsst.alert.load.MultiAvroAlertLoader
     - ampel.lsst.view.LSSTT2Tabulator
     - ampel.lsst.view.ZTFT2Tabulator
