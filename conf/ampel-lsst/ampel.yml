@@ -11,3 +11,5 @@ unit:
     - ampel.lsst.ingest.LSSTCompilerOptions
     - ampel.lsst.view.LSSTT2Tabulator
     - ampel.lsst.view.ZTFT2Tabulator
+    - ampel.lsst.t0.SimpleLSSTFilter
+
