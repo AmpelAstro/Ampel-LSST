@@ -1,8 +1,6 @@
 unit:
 # Context units
     - ampel.lsst.ingest.LSSTMongoMuxer
-    - ampel.lsst.t2.T2LightCurveFeatures
-    - ampel.lsst.t2.T2CatalogMatch
 # Logical units
     - ampel.lsst.ingest.LSSTDataPointShaper
 # Aux units
