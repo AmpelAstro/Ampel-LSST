@@ -1,12 +1,13 @@
 unit:
-#  base:
-    - ampel.lsst.ingest.LSSTDataPointShaper
+# Context units
     - ampel.lsst.ingest.LSSTMongoMuxer
-    - ampel.lsst.ingest.LSSTCompilerOptions
-#  aux:
     - ampel.lsst.t2.T2LightCurveFeatures
     - ampel.lsst.t2.T2CatalogMatch
+# Logical units
+    - ampel.lsst.ingest.LSSTDataPointShaper
+# Aux units
     - ampel.lsst.alert.LSSTAlertSupplier
     - ampel.lsst.alert.load.MultiAvroAlertLoader
+    - ampel.lsst.ingest.LSSTCompilerOptions
     - ampel.lsst.view.LSSTT2Tabulator
     - ampel.lsst.view.ZTFT2Tabulator
