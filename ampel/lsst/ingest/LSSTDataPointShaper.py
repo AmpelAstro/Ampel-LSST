@@ -26,7 +26,7 @@ class LSSTDataPointShaper(AbsT0Unit):
     digest_size: int = 8  # Byte width of datapoint ids
     # Mandatory implementation
 
-    def process(
+    def process(  # type: ignore[override]
         self, arg: Iterable[Dict[str, Any]], stock: StockId
     ) -> List[DataPoint]:
         """

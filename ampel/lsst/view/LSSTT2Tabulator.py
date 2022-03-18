@@ -61,9 +61,9 @@ class LSSTT2Tabulator(AbsT2Tabulator):
         return [date + 2400000.5 for date in dates]
 
     def get_stock_id(self, dps: List[DataPoint]) -> set[int]:
-        return set([el["stock"] for el in dps if "ZTF" in el["tag"]])
+        return set([el["stock"] for el in dps if "ZTF" in el["tag"]])  # type: ignore[misc]
 
-    def get_stock_name(self, dps: List[DataPoint]) -> set[int]:
+    def get_stock_name(self, dps: List[DataPoint]) -> set[int]:  # type: ignore[override]
         return self.get_stock_id(dps)
 
     @staticmethod

@@ -28,7 +28,7 @@ class AbsTabulatedT2Unit(AmpelABC, LogicalUnit, abstract=True):
     ingest: ClassVar[Dict[str, Any]]
     tabulator: Sequence[UnitModel] = []
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         self.tabulator = kwargs["tabulator"]
         super().__init__(**kwargs)
         self._tab_engines: Sequence[AbsT2Tabulator] = [
