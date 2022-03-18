@@ -11,5 +11,17 @@ unit:
     - ampel.lsst.ingest.LSSTCompilerOptions
     - ampel.lsst.view.LSSTT2Tabulator
     - ampel.lsst.view.ZTFT2Tabulator
+    - ampel.lsst.aux.LSSTDPFilter
+    - ampel.lsst.aux.LSSTFPFilter
     - ampel.lsst.t0.SimpleLSSTFilter
 
+alias:
+  t2:
+    '%FIRST_LSST_PHOTOPOINT':
+      filter: LSSTDPFilter
+      sort: midPointTai
+      select: first
+    '%FIRST_LSST_FP_POINT':
+      filter: LSSTFPFilter
+      sort: midPointTai
+      select: first
