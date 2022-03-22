@@ -11,7 +11,9 @@ unit:
     - ampel.lsst.view.ZTFT2Tabulator
     - ampel.lsst.aux.LSSTDPFilter
     - ampel.lsst.aux.LSSTFPFilter
+    - ampel.lsst.aux.LSSTObjFilter
     - ampel.lsst.t0.SimpleLSSTFilter
+    - ampel.lsst.t2.T2GetDiaObject
 
 alias:
   t2:
@@ -23,3 +25,7 @@ alias:
       filter: LSSTFPFilter
       sort: midPointTai
       select: first
+    '%LSST_Obj':
+      filter: LSSTObjFilter
+      sort: diaObjectId
+      select: last
