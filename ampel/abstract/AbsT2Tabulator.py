@@ -4,7 +4,7 @@
 # License           : BSD-3-Clause
 # Author            : Marcus Fenner <mf@physik.hu-berlin.de>
 # Date              : 25.05.2021
-# Last Modified Date: 17.03.2022
+# Last Modified Date: 21.03.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
 from typing import Any, List, Sequence, Tuple, Union
@@ -36,5 +36,5 @@ class AbsT2Tabulator(AmpelABC, AmpelBaseModel, abstract=True):
         ...
 
     @abstractmethod
-    def get_stock_name(self, dps: List[DataPoint]) -> set[Union[int, str]]:
+    def get_stock_name(self, dps: List[DataPoint]) -> list[str]:
         ...

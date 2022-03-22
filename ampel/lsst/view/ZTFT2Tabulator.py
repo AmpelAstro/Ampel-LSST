@@ -4,7 +4,7 @@
 # License           : BSD-3-Clause
 # Author            : Marcus Fenner <mf@physik.hu-berlin.de>
 # Date              : 26.05.2021
-# Last Modified Date: 15.09.2021
+# Last Modified Date: 21.03.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
 from typing import Any, List, Sequence, Tuple
@@ -66,12 +66,10 @@ class ZTFT2Tabulator(AbsT2Tabulator):
         return self.get_values(dps, "jd")[0]
 
     def get_stock_id(self, dps: List[DataPoint]) -> set[int]:  # type: ignore[override]
-        return set([el["stock"] for el in dps if "ZTF" in el["tag"]])  # type: ignore[misc]
+        return set([stock for el in dps if "ZTF" in el["tag"] for stock in el["stock"]])  # type: ignore[misc]
 
-    def get_stock_name(self, dps: List[DataPoint]) -> set[str]:  # type: ignore[override]
-        return set(
-            [ZTFIdMapper.to_ext_id(el) for el in self.get_stock_id(dps)]
-        )
+    def get_stock_name(self, dps: List[DataPoint]) -> list[str]:  # type: ignore[override]
+        return [ZTFIdMapper.to_ext_id(el) for el in self.get_stock_id(dps)]
 
     @staticmethod
     def get_values(

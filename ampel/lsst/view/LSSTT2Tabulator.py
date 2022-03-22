@@ -4,7 +4,7 @@
 # License           : BSD-3-Clause
 # Author            : Marcus Fenner <mf@physik.hu-berlin.de>
 # Date              : 25.05.2021
-# Last Modified Date: 13.09.2021
+# Last Modified Date: 21.03.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
 from typing import Any, List, Sequence, Tuple
@@ -61,10 +61,10 @@ class LSSTT2Tabulator(AbsT2Tabulator):
         return [date + 2400000.5 for date in dates]
 
     def get_stock_id(self, dps: List[DataPoint]) -> set[int]:
-        return set([el["stock"] for el in dps if "ZTF" in el["tag"]])  # type: ignore[misc]
+        return set([stock for el in dps if "LSST" in el["tag"] for stock in el["stock"]])  # type: ignore[misc]
 
-    def get_stock_name(self, dps: List[DataPoint]) -> set[int]:  # type: ignore[override]
-        return self.get_stock_id(dps)
+    def get_stock_name(self, dps: List[DataPoint]) -> list[str]:
+        return [str(stock) for stock in self.get_stock_id(dps)]
 
     @staticmethod
     def get_values(
@@ -77,7 +77,7 @@ class LSSTT2Tabulator(AbsT2Tabulator):
                     *(
                         [el["body"][param] for param in params]
                         for el in dps
-                        if "LSST" in el["tag"]
+                        if ("LSST_DP" in el["tag"] or "LSST_FP" in el["tag"])
                     )
                 ),
             )
