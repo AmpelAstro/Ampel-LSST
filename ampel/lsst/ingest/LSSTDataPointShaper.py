@@ -4,7 +4,7 @@
 # License           : BSD-3-Clause
 # Author            : vb <vbrinnel@physik.hu-berlin.de>
 # Date              : 20.04.2021
-# Last Modified Date: 13.09.2021
+# Last Modified Date: 21.03.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
 from typing import Any, Dict, Iterable, List
@@ -37,14 +37,27 @@ class LSSTDataPointShaper(AbsT0Unit):
         setitem = dict.__setitem__
 
         for photo_dict in arg:
-            tags = ["LSST", "LSST_" + photo_dict["filterName"].upper()]
-            setitem(photo_dict, "filterName", photo_dict["filterName"].lower())
+            tags = ["LSST"]
+            if "filterName" in photo_dict:
+                setitem(
+                    photo_dict, "filterName", photo_dict["filterName"].lower()
+                )
+                tags.append("LSST_" + photo_dict["filterName"].upper())
+            """
+            Non detection limit don't have an identifier.
+            """
+
             if "diaSourceId" in photo_dict:
                 id = photo_dict["diaSourceId"]
                 tags.append("LSST_DP")
             elif "diaForcedSourceId" in photo_dict:
                 id = photo_dict["diaForcedSourceId"]
                 tags.append("LSST_FP")
+            elif "diaObjectId" in photo_dict:  # DiaObject
+                # diaObjectId is also used in (prv)diaSource and diaForcedPhotometry
+                # if other fields are added, check if they contain diaObjectId
+                id = photo_dict["diaObjectId"]
+                tags.append("LSST_OBJ")
             else:
                 # Nondetection Limit
                 id = hash_payload(

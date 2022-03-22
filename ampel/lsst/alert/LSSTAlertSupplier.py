@@ -4,7 +4,7 @@
 # License           : BSD-3-Clause
 # Author            : vb <vbrinnel@physik.hu-berlin.de>
 # Date              : 20.04.2021
-# Last Modified Date: 14.09.2021
+# Last Modified Date: 21.03.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
 from typing import Literal, Optional
@@ -52,6 +52,8 @@ class LSSTAlertSupplier(BaseAlertSupplier):
             if d.get("diaNondetectionLimit"):
                 for non_det in d["diaNondetectionLimit"]:
                     dps.append(ReadOnlyDict(non_det))
+            if d.get("diaObject"):
+                dps.append(ReadOnlyDict(d["diaObject"]))
             return AmpelAlert(
                 id=d["alertId"],  # alert id
                 stock=diaObjectId,  # internal ampel id
