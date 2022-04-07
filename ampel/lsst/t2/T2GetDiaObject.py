@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# File:                Ampel-ZTF/ampel/lsst/t2/T2GetDiaObject.py
+# File:                Ampel-LSST/ampel/lsst/t2/T2GetDiaObject.py
 # License:             BSD-3-Clause
 # Author:              Marcus Fennner <mf@physik.hu-berlinn.de>
 # Date:                22.03.2022
@@ -23,5 +23,4 @@ class T2GetDiaObject(AbsPointT2Unit):
 
     def process(self, datapoint: DataPoint) -> Union[UBson, UnitResult]:
         r= {param: datapoint["body"].get(param) for param in self.params}
-        print(r)
         return r
