@@ -12,6 +12,7 @@ unit:
     - ampel.lsst.aux.LSSTDPFilter
     - ampel.lsst.aux.LSSTFPFilter
     - ampel.lsst.aux.LSSTObjFilter
+    - ampel.lsst.t0.ReallySimpleLSSTFilter
     - ampel.lsst.t0.SimpleLSSTFilter
     - ampel.lsst.t2.T2GetDiaObject
     - ampel.lsst.t2.T2GetAlertJournal
