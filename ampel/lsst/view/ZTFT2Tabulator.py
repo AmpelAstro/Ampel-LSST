@@ -65,10 +65,10 @@ class ZTFT2Tabulator(AbsT2Tabulator):
     ) -> Sequence[Any]:
         return self.get_values(dps, "jd")[0]
 
-    def get_stock_id(self, dps: List[DataPoint]) -> set[int]:  # type: ignore[override]
-        return set([stock for el in dps if "ZTF" in el["tag"] for stock in el["stock"]])  # type: ignore[misc]
+    def get_stock_id(self, dps: List[DataPoint]) -> set[int]:
+        return set(sum([el["stock"] if isinstance(el["stock"], list) else [el["stock"]] for el in dps if "ZTF" in el["tag"] ],[]))
 
-    def get_stock_name(self, dps: List[DataPoint]) -> list[str]:  # type: ignore[override]
+    def get_stock_name(self, dps: List[DataPoint]) -> list[str]:
         return [ZTFIdMapper.to_ext_id(el) for el in self.get_stock_id(dps)]
 
     @staticmethod
