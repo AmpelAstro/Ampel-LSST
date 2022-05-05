@@ -4,7 +4,7 @@
 # License           : BSD-3-Clause
 # Author            : Marcus Fenner <mf@physik.hu-berlin.de>
 # Date              : 25.05.2021
-# Last Modified Date: 21.03.2022
+# Last Modified Date: 05.05.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
 from typing import Any, List, Sequence, Tuple
@@ -50,18 +50,34 @@ class LSSTT2Tabulator(AbsT2Tabulator):
             dtype=("float64", "float64", "float64", "str", "int64", "str"),
         )
 
-    def get_pos(self, dps: List[DataPoint]) -> Sequence[Tuple[float, float]]:
-        return tuple(zip(*self.get_values(dps, ["ra", "decl"])))
+    def get_positions(
+        self, dps: List[DataPoint]
+    ) -> Sequence[Tuple[float, float, float]]:
+        return tuple(
+            zip(self.get_jd(dps), *self.get_values(dps, ["ra", "decl"]))
+        )
 
     def get_jd(self, dps: List[DataPoint]) -> Sequence[float]:
-        return self._to_jd(self.get_values(dps, "midPointTai")[0])
+        return self._to_jd(self.get_values(dps, ["midPointTai"])[0])
 
     @staticmethod
     def _to_jd(dates: Sequence[Any]) -> Sequence[Any]:
         return [date + 2400000.5 for date in dates]
 
     def get_stock_id(self, dps: List[DataPoint]) -> set[int]:
-        return set(sum([el["stock"] if isinstance(el["stock"], list) else [el["stock"]] for el in dps if "LSST" in el["tag"]],[]))
+        return set(
+            sum(
+                [
+                    el["stock"]
+                    if isinstance(el["stock"], list)
+                    else [el["stock"]]
+                    for el in dps
+                    if "LSST" in el["tag"]
+                ],
+                [],
+            )
+        )
+
     def get_stock_name(self, dps: List[DataPoint]) -> list[str]:
         return [str(stock) for stock in self.get_stock_id(dps)]
 

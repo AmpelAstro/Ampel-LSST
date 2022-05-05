@@ -4,7 +4,7 @@
 # License           : BSD-3-Clause
 # Author            : Marcus Fenner <mf@physik.hu-berlin.de>
 # Date              : 26.05.2021
-# Last Modified Date: 21.03.2022
+# Last Modified Date: 05.05.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
 from typing import Any, List, Sequence, Tuple
@@ -56,17 +56,32 @@ class ZTFT2Tabulator(AbsT2Tabulator):
             dtype=("float64", "float64", "float64", "str", "int64", "str"),
         )
 
-    def get_pos(self, dps: List[DataPoint]) -> Sequence[Tuple[float, float]]:
-        return tuple(zip(*self.get_values(dps, ["ra", "dec"])))
+    def get_positions(
+        self, dps: List[DataPoint]
+    ) -> Sequence[Tuple[float, float, float]]:
+        return tuple(
+            zip(self.get_jd(dps), *self.get_values(dps, ["ra", "dec"]))
+        )
 
     def get_jd(
         self,
         dps: List[DataPoint],
     ) -> Sequence[Any]:
-        return self.get_values(dps, "jd")[0]
+        return self.get_values(dps, ["jd"])[0]
 
     def get_stock_id(self, dps: List[DataPoint]) -> set[int]:
-        return set(sum([el["stock"] if isinstance(el["stock"], list) else [el["stock"]] for el in dps if "ZTF" in el["tag"] ],[]))
+        return set(
+            sum(
+                [
+                    el["stock"]
+                    if isinstance(el["stock"], list)
+                    else [el["stock"]]
+                    for el in dps
+                    if "ZTF" in el["tag"]
+                ],
+                [],
+            )
+        )
 
     def get_stock_name(self, dps: List[DataPoint]) -> list[str]:
         return [ZTFIdMapper.to_ext_id(el) for el in self.get_stock_id(dps)]
