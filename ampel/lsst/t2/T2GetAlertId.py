@@ -38,7 +38,7 @@ class T2GetAlertId(AbsTiedPointT2Unit):
             payload = t2_view.get_payload()
             assert type(payload) is list
             for journal in payload:
-                if sourceid in journal["upsert"]:
+                if "upsert" in journal and sourceid in journal["upsert"]:
                     t0journals += [journal]
         if not t0journals:
             return {}
