@@ -38,9 +38,6 @@ class ReallySimpleLSSTFilter(AbsAlertFilter):
         # by the filter. Now deciding not to include drb in this list, eg.
         self.keys_to_check = (
             "midPointTai",
-            "ra",
-            "decl",
-            "nobs",
         )
 
     def _alert_has_keys(self, photop) -> bool:
