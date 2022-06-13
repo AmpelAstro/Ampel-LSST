@@ -12,6 +12,7 @@ import sncosmo
 from typing import IO, Optional, Sequence, Dict
 from ampel.log.AmpelLogger import AmpelLogger
 from ampel.abstract.AbsAlertLoader import AbsAlertLoader
+from ampel.types import Traceless
 
 
 # These can vary for different models, and more might be needed.
@@ -256,7 +257,7 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[IO[bytes]]):
 
     skip_transients: int = 0
     file_path: str
-    logger: Optional[AmpelLogger]
+    logger: Traceless[Optional[AmpelLogger]]
 
     #
     cut_col: Sequence[str] = ['CCDNUM','FIELD', 'PHOTFLAG', 'PHOTPROB', 'PSF_SIG2','PSF_RATIO', 'SKY_SIG_T', 'XPIX', 'YPIX', 'SIM_FLUXCAL_HOSTERR']
