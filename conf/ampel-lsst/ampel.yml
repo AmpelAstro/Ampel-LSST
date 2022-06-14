@@ -8,6 +8,7 @@ unit:
     - ampel.lsst.alert.ElasticcAlertSupplier
     - ampel.lsst.alert.load.MultiAvroAlertLoader
     - ampel.lsst.alert.load.ElasticcTrainingsetLoader
+    - ampel.lsst.alert.load.KafkaAlertLoader
     - ampel.lsst.ingest.LSSTCompilerOptions
     - ampel.lsst.view.LSSTT2Tabulator
     - ampel.lsst.view.ZTFT2Tabulator
