@@ -17,6 +17,7 @@ unit:
     - ampel.lsst.aux.LSSTObjFilter
     - ampel.lsst.t0.ReallySimpleLSSTFilter
     - ampel.lsst.t0.SimpleLSSTFilter
+    - ampel.lsst.t1.LSSTT1Combiner
     - ampel.lsst.t2.T2GetDiaObject
     - ampel.lsst.t2.T2GetAlertJournal
     - ampel.lsst.t2.T2GetAlertId
@@ -35,3 +36,6 @@ alias:
       filter: LSSTObjFilter
       sort: diaObjectId
       select: last
+
+template:
+  elasticc_alerts: ampel.lsst.template.ElasticcAlertConsumerTemplate
