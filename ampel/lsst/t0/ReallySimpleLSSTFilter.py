@@ -72,17 +72,13 @@ class ReallySimpleLSSTFilter(AbsAlertFilter):
 
         # cut on length of detection history
         detections_jds = [el["midPointTai"] for el in pps]
-        det_tspan = max(detections_jds) - min(detections_jds)
+        last_det = max(detections_jds)
+        det_tspan = last_det - min(detections_jds)
         if not (self.min_tspan <= det_tspan <= self.max_tspan):
             self.logger.info(None, extra={"tSpan": det_tspan})
             return None
 
-
-        latest = alert.datapoints[0]
-        if not self._alert_has_keys(latest):
-            return None
-
         self.logger.debug(
-            "Alert accepted", extra={"latestPpId": latest["diaSourceId"]}
+            "Alert accepted", extra={"midPointTai": last_det}
         )
         return True
