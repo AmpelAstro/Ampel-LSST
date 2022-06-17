@@ -39,8 +39,8 @@ class ElasticcAlertSupplier(BaseAlertSupplier):
         lc = self._deserialize(next(self.alert_loader))
 
         # Are these actually unique?
-        stock = int( lc.meta['SNID'] )
-        sntype = lc.meta['SIM_TYPE_INDEX']   # Again do not know how consistent these are
+        stock = int( lc.meta['snid'] )
+        sntype = lc.meta['sim_type_index']   # Again do not know how consistent these are
 
         # Generate datapoints.
         # Would be much more efficient if dps generation was done in Loader?
@@ -53,7 +53,7 @@ class ElasticcAlertSupplier(BaseAlertSupplier):
             d_hash = blake2b(encode(d), digest_size=7).digest()
             # We will call this a diaSourceId if it is associated with a detection
             # Only these are asigned and obsvered magn
-            if d['SIM_MAGOBS']<99.0:
+            if d['cause_alert']:
                 d['diaSourceId'] = int.from_bytes(d_hash, byteorder=sys.byteorder)
             else:
                 # Take this to be forced photometry
@@ -69,10 +69,6 @@ class ElasticcAlertSupplier(BaseAlertSupplier):
         )
 
         # Add meta as content of diaObject + alert info
-        l = [
- 'SNTYPE',
-]
-#        d = {k:v for k,v in lc.meta.items() if k in l}
         d = dict(lc.meta)
         d['alertId'] = alert_id
         # Is it an issue that diaObjectId is the same as stock?

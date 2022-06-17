@@ -195,15 +195,41 @@ meta_dcast = {
  'SIM_SUBSAMPLE_INDEX': int
 }
 
+# Some meta key names were also changed between the training set and
+# the test stream. We here try to track and change these
+meta_namechange = {
+    'dec': 'decl',
+    'redshift_final': 'z_final',
+    'redshift_final_err': 'z_final_err',
+    'hostgal_specz': 'hostgal_zspec',
+    'hostgal_specz_err': 'hostgal_zspec_err',
+    'hostgal_photoz': 'hostgal_zphot',
+    'hostgal_photoz_err': 'hostgal_zphot_err',
+    'hostgal_mag_y': 'hostgal_mag_Y',
+    'hostgal_magerr_y': 'hostgal_magerr_Y',
+    'hostgal2_specz': 'hostgal_zspec',
+    'hostgal2_specz_err': 'hostgal_zspec_err',
+    'hostgal2_photoz': 'hostgal_zphot',
+    'hostgal2_photoz_err': 'hostgal_zphot_err',
+    'hostgal2_magerr_y': 'hostgal2_magerr_Y',
+}
 
 class ElasticcLcIterator:
     """
     Iterator returns the next alert which would be generated from a lightcurve.
 
-    lightcurve is assumed to be an ELAsTICC AstropyTable where 'SIM_MAGOBS'
+    First idea:
+    - lightcurve is assumed to be an ELAsTICC AstropyTable where 'SIM_MAGOBS'
     determines whether an alert was generated (otherwise 99)
+    Does not work, looks like all datapoints after the first detection have
+    SIM_MAGOBS.
+
+    Second idea:
+    - Straightforward significance. Need a [significance] detection to trigger
+    an alert.
 
     """
+    detection_sigma: float = 5.
 
     def __init__(self, lightcurve, startindex=0, cut_col = [], decode_col=[], change_col={}):
         self.lightcurve = lightcurve
@@ -216,31 +242,34 @@ class ElasticcLcIterator:
         for oldname, newname in change_col.items():
             self.lightcurve.rename_column(oldname, newname)
 
+        # Typecast meta and change to lower case
         self.lightcurve.meta = {
-                k: meta_dcast[k](v)
+                k.lower(): meta_dcast[k](v)
                    if (k in meta_dcast and v is not None)
                    else v for k, v in self.lightcurve.meta.items()
             }
+        # Rename fields
+        for oldkey, newkey in meta_namechange.items():
+            if oldkey in self.lightcurve.meta:
+                self.lightcurve.meta[newkey] = self.lightcurve.meta.pop(oldkey)
 
-        # Determine index of first "detection"
-        for i, mag in enumerate(self.lightcurve['SIM_MAGOBS']):
-            if mag<99 and i>=startindex:
-                break
-        self.index = i
+        # Guess whether this is an alert
+        self.lightcurve['cause_alert'] = ( self.lightcurve['PHOTFLAG'] >= 4096)
+
+
+        # Determine the corresponding indices for which alerts will be generated
+        self.alert_index = [i for i, x in enumerate(self.lightcurve['cause_alert']) if x]
+
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        if self.index==len(self.lightcurve):
+        if len(self.alert_index)==0:
             raise StopIteration
 
-        lc = self.lightcurve[0:self.index+1]
-        # Determine next viable index
-        self.index += 1
-        while( self.index<len(self.lightcurve) and self.lightcurve['SIM_MAGOBS'][self.index]==99.0):
-            self.index += 1
-        return lc
+        return self.lightcurve[0:self.alert_index.pop(0)+1]
+
 
 
 class ElasticcTrainingsetLoader(AbsAlertLoader[IO[bytes]]):
@@ -252,6 +281,8 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[IO[bytes]]):
     - A PHOT file contains *full* lightcurves of transients.
     - Each *lightcurve* will be broken into individual alerts.
 
+    Todo: Remove meta fields with NaN values (None, -9, -99, ...)
+    Not sure I know exactly how these are allocated, so skipping for now.
 
 	"""
 
@@ -260,7 +291,7 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[IO[bytes]]):
     logger: Traceless[Optional[AmpelLogger]]
 
     #
-    cut_col: Sequence[str] = ['CCDNUM','FIELD', 'PHOTFLAG', 'PHOTPROB', 'PSF_SIG2','PSF_RATIO', 'SKY_SIG_T', 'XPIX', 'YPIX', 'SIM_FLUXCAL_HOSTERR']
+    cut_col: Sequence[str] = ['CCDNUM','FIELD', 'PHOTPROB', 'PSF_SIG2','PSF_RATIO', 'SKY_SIG_T', 'XPIX', 'YPIX', 'SIM_FLUXCAL_HOSTERR']
     decode_col: Sequence[str] = ['BAND']
     change_col: Dict[str,str] = {'MJD':'midPointTai', 'BAND':'filterName', 'FLUXCAL':'psFlux', 'FLUXCALERR':'psFluxErr'}
 
@@ -284,6 +315,11 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[IO[bytes]]):
 
     def next_lightcurve(self) -> None:
         self.lciter = ElasticcLcIterator( next(self.lightcurves),
+                cut_col=self.cut_col, change_col=self.change_col,
+                decode_col=self.decode_col)
+        # Check for lcs without alerts
+        while( len(self.lciter.alert_index)==0 ):
+            self.lciter = ElasticcLcIterator( next(self.lightcurves),
                 cut_col=self.cut_col, change_col=self.change_col,
                 decode_col=self.decode_col)
 
