@@ -4,7 +4,7 @@
 # License           : BSD-3-Clause
 # Author            : J Nordin <jno@physik.hu-berlin.de>
 # Date              : 09.06.2022
-# Last Modified Date: 09.06.2022
+# Last Modified Date: 22.06.2022
 # Last Modified By  : J Nordin <jno@physik.hu-berlin.de>
 
 import codecs
@@ -192,7 +192,16 @@ meta_dcast = {
  'SIM_GALFRAC_i': float,
  'SIM_GALFRAC_z': float,
  'SIM_GALFRAC_Y': float,
- 'SIM_SUBSAMPLE_INDEX': int
+ 'SIM_SUBSAMPLE_INDEX': int,
+ 'SIM_TEMPLATEMAG_u': float,
+ 'SIM_TEMPLATEMAG_g': float,
+ 'SIM_TEMPLATEMAG_r': float,
+ 'SIM_TEMPLATEMAG_i': float,
+ 'SIM_TEMPLATEMAG_z': float,
+ 'SIM_TEMPLATEMAG_Y': float,
+ 'SIM_HOSTLIB(g_obs)': float,
+ 'SIM_HOSTLIB(r_obs)': float,
+ 'SIM_HOSTLIB(i_obs)': float,
 }
 
 # Some meta key names were also changed between the training set and
