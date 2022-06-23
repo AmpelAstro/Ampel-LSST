@@ -44,7 +44,8 @@ class LSSTT2Tabulator(AbsT2Tabulator):
                 "flux": flux,
                 "fluxerr": fluxerr,
                 "band": filters,
-                "zp": [25] * len(filters),
+                # ZP for ELAsTiCC, might need to be corrected for LSST!
+                "zp": [27.5] * len(filters),
                 "zpsys": ["ab"] * len(filters),
             },
             dtype=("float64", "float64", "float64", "str", "int64", "str"),
