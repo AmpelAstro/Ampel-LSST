@@ -38,6 +38,11 @@ class LSSTT2Tabulator(AbsT2Tabulator):
         if self.convert2jd:
             tai = self._to_jd(tai)
         filters = list(map(LSST_BANDPASSES.get, filtername))
+
+        # Fudge flux to check for impact, decrease with 2.5 mag
+        #flux = [f*0.01 for f in flux]
+        #fluxerr = [f*0.01 for f in fluxerr]
+
         return Table(
             {
                 "time": tai,
@@ -48,7 +53,7 @@ class LSSTT2Tabulator(AbsT2Tabulator):
                 "zp": [27.5] * len(filters),
                 "zpsys": ["ab"] * len(filters),
             },
-            dtype=("float64", "float64", "float64", "str", "int64", "str"),
+            dtype=("float64", "float64", "float64", "str", "float64", "str"),
         )
 
     def get_positions(
