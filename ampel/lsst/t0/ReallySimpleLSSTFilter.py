@@ -25,6 +25,7 @@ class ReallySimpleLSSTFilter(AbsAlertFilter):
 
     # History
     min_ndet: int  # number of previous detections
+    max_ndet: Optional[ int ] # number of previous detections
     min_tspan: float  # minimum duration of alert detection history [days]
     max_tspan: float  # maximum duration of alert detection history [days]
 
@@ -67,6 +68,9 @@ class ReallySimpleLSSTFilter(AbsAlertFilter):
             el for el in alert.datapoints if el.get("diaSourceId") is not None
         ]
         if len(pps) < self.min_ndet:
+            self.logger.info(None, extra={"nDet": len(pps)})
+            return None
+        if self.max_ndet and len(pps)>self.max_ndet:
             self.logger.info(None, extra={"nDet": len(pps)})
             return None
 
