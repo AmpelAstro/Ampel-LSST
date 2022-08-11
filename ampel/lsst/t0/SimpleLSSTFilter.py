@@ -165,9 +165,9 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
             # among the remaining sources there is anything with
             # significant proper motion or parallax measurement
             if (
-                any(gaia_tab["FLAG_PMRA"] is True)  # noqa
-                or any(gaia_tab["FLAG_PMDec"] is True)
-                or any(gaia_tab["FLAG_Plx"] is True)
+                any(gaia_tab["FLAG_PMRA"] == True)  # noqa
+                or any(gaia_tab["FLAG_PMDec"] == True)
+                or any(gaia_tab["FLAG_Plx"] == True)
             ):
                 return True
 

@@ -10,6 +10,7 @@
 from typing import Any, List, Sequence, Tuple
 
 from ampel.content.DataPoint import DataPoint
+from ampel.types import StockId
 from astropy.table import Table
 
 from ampel.abstract.AbsT2Tabulator import AbsT2Tabulator
@@ -67,13 +68,13 @@ class LSSTT2Tabulator(AbsT2Tabulator):
     def _to_jd(dates: Sequence[Any]) -> Sequence[Any]:
         return [date + 2400000.5 for date in dates]
 
-    def get_stock_id(self, dps: List[DataPoint]) -> set[int]:
+    def get_stock_id(self, dps: List[DataPoint]) -> set[StockId]:
         return set(
             sum(
                 [
-                    el["stock"]
-                    if isinstance(el["stock"], list)
-                    else [el["stock"]]
+                    stockid
+                    if isinstance(stockid := el["stock"], Sequence) and not isinstance(stockid, (str, bytes))
+                    else [stockid]
                     for el in dps
                     if "LSST" in el["tag"]
                 ],

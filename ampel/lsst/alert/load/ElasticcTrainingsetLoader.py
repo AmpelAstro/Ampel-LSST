@@ -7,6 +7,10 @@
 # Last Modified Date: 22.06.2022
 # Last Modified By  : J Nordin <jno@physik.hu-berlin.de>
 
+from typing import Any, Callable, cast
+
+from astropy.table import Table
+
 import codecs
 import sncosmo
 from typing import IO, Optional, Sequence, Dict
@@ -16,7 +20,7 @@ from ampel.types import Traceless
 
 
 # These can vary for different models, and more might be needed.
-meta_dcast = {
+meta_dcast: dict[str, Callable[[str], Any]] = {
  'SNID': codecs.decode,
  'IAUC': codecs.decode,
  'FAKE': int,
@@ -240,7 +244,7 @@ class ElasticcLcIterator:
     """
     detection_sigma: float = 5.
 
-    def __init__(self, lightcurve, startindex=0, cut_col = [], decode_col=[], change_col={}):
+    def __init__(self, lightcurve: Table, startindex=0, cut_col = [], decode_col=[], change_col={}):
         self.lightcurve = lightcurve
         self.lightcurve.sort('MJD')    # Prob already done, but critical for usage.
         self.lightcurve.remove_columns(cut_col)
@@ -273,7 +277,7 @@ class ElasticcLcIterator:
     def __iter__(self):
         return self
 
-    def __next__(self):
+    def __next__(self) -> Table:
         if len(self.alert_index)==0:
             raise StopIteration
 
@@ -281,7 +285,7 @@ class ElasticcLcIterator:
 
 
 
-class ElasticcTrainingsetLoader(AbsAlertLoader[IO[bytes]]):
+class ElasticcTrainingsetLoader(AbsAlertLoader[Table]):
     """
     Load alerts from the ELAsTICC training set lightcurves.
     These are assumed to be distributed in "SNANA" fits format:
@@ -297,7 +301,6 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[IO[bytes]]):
 
     skip_transients: int = 0
     file_path: str
-    logger: Traceless[Optional[AmpelLogger]]
 
     #
     cut_col: Sequence[str] = ['CCDNUM','FIELD', 'PHOTPROB', 'PSF_SIG2','PSF_RATIO', 'SKY_SIG_T', 'XPIX', 'YPIX', 'SIM_FLUXCAL_HOSTERR']
@@ -306,11 +309,9 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[IO[bytes]]):
 
     def __init__(self, **kwargs) -> None:
 
-        if kwargs.get('logger') is None:
-            kwargs['logger'] = AmpelLogger.get_logger()
         super().__init__(**kwargs)
-        self.lightcurves = iter( sncosmo.read_snana_fits(self.file_path+'_HEAD.FITS.gz',
-                                                   self.file_path+'_PHOT.FITS.gz') )
+        self.lightcurves = iter( cast(list[Table], sncosmo.read_snana_fits(self.file_path+'_HEAD.FITS.gz',
+                                                   self.file_path+'_PHOT.FITS.gz')) )
 
         if self.skip_transients != 0:
             count = 0
@@ -337,7 +338,7 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[IO[bytes]]):
         return self
 
 
-    def __next__(self) -> IO[bytes]:
+    def __next__(self) -> Table:
 
         try:
             return next(self.lciter)

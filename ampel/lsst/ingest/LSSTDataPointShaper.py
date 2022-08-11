@@ -66,6 +66,6 @@ class LSSTDataPointShaper(AbsT0Unit):
                 )
                 tags.append("LSST_ND")
             ret_list.append(
-                {"id": id, "stock": stock, "tag": tags, "body": photo_dict}
+                {"id": id, "stock": stock, "tag": tags, "body": photo_dict} # type: ignore[typeddict-item]
             )
         return ret_list
