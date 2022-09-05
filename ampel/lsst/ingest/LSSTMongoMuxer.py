@@ -82,29 +82,6 @@ class LSSTMongoMuxer(AbsT0Muxer):
         # Difference between candids from the alert and candids present in DB
         ids_dps_to_insert = ids_dps_alert.keys() - ids_dps_db.keys()
 
-        for dp in dps_al:
-
-            if dp["id"] in ids_dps_to_insert:
-
-                add_to_set = {"stock": stock_id}
-                add_to_set["tag"] = maybe_use_each(dp["tag"])
-
-                # Unconditionally update the doc
-                add_update(
-                    UpdateOne(
-                        {"id": dp["id"]},
-                        {
-                            "$setOnInsert": {
-                                k: v
-                                for k, v in dp.items()
-                                if k not in {"tag", "stock"}
-                            },
-                            "$addToSet": add_to_set,
-                        },
-                        upsert=True,
-                    )
-                )
-
         # Emit datapoints in the order given in the alert, but prefer content
         # from the database. This allows the ingestion handler to detect when an
         # additional channel accepts a datapoint that was already in the
