@@ -20,7 +20,7 @@ from ampel.types import Traceless
 
 
 # These can vary for different models, and more might be needed.
-meta_dcast: dict[str, Callable[[str], Any]] = {
+meta_dcast: dict[str, Callable[[bytes], Any]] = {
  'SNID': codecs.decode,
  'IAUC': codecs.decode,
  'FAKE': int,
