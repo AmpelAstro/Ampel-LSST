@@ -1,0 +1,2649 @@
+build:
+  date: 16/08/2022
+  time: '15:58:46'
+  by: jakob
+mongo:
+  ingest:
+    stock: MongoStockIngester
+    t0: MongoT0Ingester
+    t1: MongoT1Ingester
+    t2: MongoT2Ingester
+    t3: MongoT3Ingester
+  databases:
+  - name: ext
+    collections:
+    - name: conf
+    - name: trace
+    - name: job
+    - name: counter
+    role:
+      r: logger
+      w: logger
+  - name: var
+    collections:
+    - name: log
+      indexes:
+      - field: r
+      - field: s
+        args:
+          sparse: true
+      - field: c
+        args:
+          sparse: true
+      # args:
+      #   storageEngine:
+      #     wiredTiger:
+      #       configString: block_compressor=zlib
+    - name: event
+      indexes: null
+    - name: beacon
+      indexes: null
+    - name: trouble
+      indexes: null
+    role:
+      r: logger
+      w: logger
+  - name: data
+    collections:
+    - name: stock
+      indexes:
+      - index:
+        - field: stock
+        - field: channel
+        args:
+          unique: true
+    - name: t0
+      indexes:
+      - field: id
+        args:
+          unique: true
+      - field: stock
+        args:
+          sparse: true
+    - name: t1
+      indexes:
+      - field: stock
+      - field: channel
+      - field: code
+        args:
+          sparse: true
+    - name: t2
+      indexes:
+      - field: stock
+      - field: channel
+      - field: code
+      - field: meta.ts
+    - name: t3
+      indexes:
+      - field: process
+      - field: meta.ts
+    - name: plot
+      indexes:
+      - field: tag
+    role:
+      r: logger
+      w: writer
+  prefix: Ampel
+logging:
+  default:
+    console:
+      std_stream: stdout
+      datefmt: '%Y-%m-%d %H:%M:%S'
+      level: 1024
+      aggregate_interval: 1.0
+      density: default
+      terminator: '
+
+        '
+      log_sep: '
+
+        '
+      prefix: null
+      provenance: true
+    db:
+      level: 1024
+  compact:
+    console:
+      level: 1024
+      density: compact
+      log_sep: ''
+    db:
+      level: 1024
+  headerless:
+    console:
+      level: 1024
+      density: headerless
+    db:
+      level: 1024
+  prod:
+    console:
+      std_stream: stderr
+      level: 2048
+    db:
+      level: 1024
+  verbose:
+    console:
+      std_stream: stdout
+      level: 512
+    db:
+      level: 512
+  debug:
+    console:
+      std_stream: stdout
+      level: 256
+    db:
+      level: 256
+  silent: {}
+  console_quiet:
+    console:
+      level: 2048
+  console_info:
+    console:
+      level: 1024
+  console_verbose:
+    console:
+      level: 512
+  console_debug:
+    console:
+      level: 256
+channel: {}
+unit:
+  DefaultProcessController:
+    fqn: ampel.core.DefaultProcessController
+    base:
+    - DefaultProcessController
+    - AbsProcessController
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  ZTFAlertStreamController:
+    fqn: ampel.ztf.t0.ZTFAlertStreamController
+    base:
+    - ZTFAlertStreamController
+    - AbsProcessController
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  AlertConsumer:
+    fqn: ampel.alert.AlertConsumer
+    base:
+    - AlertConsumer
+    - AbsEventUnit
+    - ContextUnit
+    distrib: ampel-alerts
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-alerts/conf/ampel-alerts/ampel.yml
+    version: 0.8.3a8
+  DemoProcessor:
+    fqn: ampel.demo.DemoProcessor
+    base:
+    - DemoProcessor
+    - AbsEventUnit
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  OpsProcessor:
+    fqn: ampel.ops.OpsProcessor
+    base:
+    - OpsProcessor
+    - AbsEventUnit
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T0HealpixPathProcessor:
+    fqn: ampel.ztf.t0.T0HealpixPathProcessor
+    base:
+    - T0HealpixPathProcessor
+    - AlertConsumer
+    - AbsEventUnit
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  T0HealpixProcessor:
+    fqn: ampel.ztf.t0.T0HealpixProcessor
+    base:
+    - T0HealpixProcessor
+    - AlertConsumer
+    - AbsEventUnit
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  T2Worker:
+    fqn: ampel.t2.T2Worker
+    base:
+    - T2Worker
+    - AbsWorker
+    - AbsEventUnit
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3Processor:
+    fqn: ampel.t3.T3Processor
+    base:
+    - T3Processor
+    - AbsEventUnit
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  AmpelExceptionPublisher:
+    fqn: ampel.ops.AmpelExceptionPublisher
+    base:
+    - AmpelExceptionPublisher
+    - AbsOpsUnit
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  ChainedT0Muxer:
+    fqn: ampel.ingest.ChainedT0Muxer
+    base:
+    - ChainedT0Muxer
+    - AbsT0Muxer
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  FritzReport:
+    fqn: ampel.ztf.t3.complement.FritzReport
+    base:
+    - FritzReport
+    - SkyPortalClient
+    - AbsBufferComplement
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  GROWTHMarshalReport:
+    fqn: ampel.ztf.t3.complement.GROWTHMarshalReport
+    base:
+    - GROWTHMarshalReport
+    - CatalogMatchContextUnit
+    - CatalogMatchUnitBase
+    - AbsBufferComplement
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  LSSTMongoMuxer:
+    fqn: ampel.lsst.ingest.LSSTMongoMuxer
+    base:
+    - LSSTMongoMuxer
+    - AbsT0Muxer
+    - ContextUnit
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  SimpleT2BasedSupplier:
+    fqn: ampel.t3.supply.SimpleT2BasedSupplier
+    base:
+    - SimpleT2BasedSupplier
+    - AbsT3Supplier
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3AdHocStockSelector:
+    fqn: ampel.ztf.t3.select.T3AdHocStockSelector
+    base:
+    - T3AdHocStockSelector
+    - AbsT3Selector
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  T3AdaptativeStager:
+    fqn: ampel.t3.stage.T3AdaptativeStager
+    base:
+    - T3AdaptativeStager
+    - T3ThreadedStager
+    - T3BaseStager
+    - AbsT3Stager
+    - T3DocBuilder
+    - ContextUnit
+    - T3DocBuilderModel
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3AggregatingStager:
+    fqn: ampel.t3.stage.T3AggregatingStager
+    base:
+    - T3AggregatingStager
+    - AbsT3Stager
+    - T3DocBuilder
+    - ContextUnit
+    - T3DocBuilderModel
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3BufferBinaryExporter:
+    fqn: ampel.cli.T3BufferBinaryExporter
+    base:
+    - T3BufferBinaryExporter
+    - AbsT3Stager
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3BufferTextExporter:
+    fqn: ampel.cli.T3BufferTextExporter
+    base:
+    - T3BufferTextExporter
+    - AbsT3Stager
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3ChannelStager:
+    fqn: ampel.t3.stage.T3ChannelStager
+    base:
+    - T3ChannelStager
+    - AbsT3Stager
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3DefaultBufferSupplier:
+    fqn: ampel.t3.supply.T3DefaultBufferSupplier
+    base:
+    - T3DefaultBufferSupplier
+    - AbsT3Supplier
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3DistributiveStager:
+    fqn: ampel.t3.stage.T3DistributiveStager
+    base:
+    - T3DistributiveStager
+    - T3ThreadedStager
+    - T3BaseStager
+    - AbsT3Stager
+    - T3DocBuilder
+    - ContextUnit
+    - T3DocBuilderModel
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3ExtJournalAppender:
+    fqn: ampel.t3.supply.complement.T3ExtJournalAppender
+    base:
+    - T3ExtJournalAppender
+    - AbsBufferComplement
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3FilteringStockSelector:
+    fqn: ampel.t3.supply.select.T3FilteringStockSelector
+    base:
+    - T3FilteringStockSelector
+    - T3StockSelector
+    - AbsT3Selector
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3LatestStateDataLoader:
+    fqn: ampel.t3.supply.load.T3LatestStateDataLoader
+    base:
+    - T3LatestStateDataLoader
+    - AbsT3Loader
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3LegacyExtJournalAppender:
+    fqn: ampel.ztf.t3.T3LegacyExtJournalAppender
+    base:
+    - T3LegacyExtJournalAppender
+    - T3ExtJournalAppender
+    - AbsBufferComplement
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  T3LogsAppender:
+    fqn: ampel.t3.supply.complement.T3LogsAppender
+    base:
+    - T3LogsAppender
+    - AbsBufferComplement
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3PlainUnitExecutor:
+    fqn: ampel.t3.T3PlainUnitExecutor
+    base:
+    - T3PlainUnitExecutor
+    - AbsT3ControlUnit
+    - T3DocBuilder
+    - ContextUnit
+    - T3DocBuilderModel
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3ProjectingStager:
+    fqn: ampel.t3.stage.T3ProjectingStager
+    base:
+    - T3ProjectingStager
+    - T3ThreadedStager
+    - T3BaseStager
+    - AbsT3Stager
+    - T3DocBuilder
+    - ContextUnit
+    - T3DocBuilderModel
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3RandIntAppender:
+    fqn: ampel.t3.supply.complement.T3RandIntAppender
+    base:
+    - T3RandIntAppender
+    - AbsBufferComplement
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3ReviewUnitExecutor:
+    fqn: ampel.t3.T3ReviewUnitExecutor
+    base:
+    - T3ReviewUnitExecutor
+    - AbsT3ControlUnit
+    - T3DocBuilder
+    - ContextUnit
+    - T3DocBuilderModel
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3SequentialStager:
+    fqn: ampel.t3.stage.T3SequentialStager
+    base:
+    - T3SequentialStager
+    - T3BaseStager
+    - AbsT3Stager
+    - T3DocBuilder
+    - ContextUnit
+    - T3DocBuilderModel
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3SessionAlertsNumber:
+    fqn: ampel.t3.include.session.T3SessionAlertsNumber
+    base:
+    - T3SessionAlertsNumber
+    - AbsT3Supplier
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3SessionLastRunTime:
+    fqn: ampel.t3.include.session.T3SessionLastRunTime
+    base:
+    - T3SessionLastRunTime
+    - AbsT3Supplier
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3SimpleDataLoader:
+    fqn: ampel.t3.supply.load.T3SimpleDataLoader
+    base:
+    - T3SimpleDataLoader
+    - AbsT3Loader
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3SimpleStager:
+    fqn: ampel.t3.stage.T3SimpleStager
+    base:
+    - T3SimpleStager
+    - T3ThreadedStager
+    - T3BaseStager
+    - AbsT3Stager
+    - T3DocBuilder
+    - ContextUnit
+    - T3DocBuilderModel
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3StockSelector:
+    fqn: ampel.t3.supply.select.T3StockSelector
+    base:
+    - T3StockSelector
+    - AbsT3Selector
+    - ContextUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  TNSNames:
+    fqn: ampel.ztf.t3.complement.TNSNames
+    base:
+    - TNSNames
+    - CatalogMatchContextUnit
+    - CatalogMatchUnitBase
+    - AbsBufferComplement
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  TNSReports:
+    fqn: ampel.ztf.t3.complement.TNSReports
+    base:
+    - TNSReports
+    - TNSNames
+    - CatalogMatchContextUnit
+    - CatalogMatchUnitBase
+    - AbsBufferComplement
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZTFAlertArchiverV3:
+    fqn: ampel.ztf.t0.load.ZTFAlertArchiverV3
+    base:
+    - ZTFAlertArchiverV3
+    - AbsOpsUnit
+    - ArchiveUnit
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZTFCutoutImages:
+    fqn: ampel.ztf.t3.complement.ZTFCutoutImages
+    base:
+    - ZTFCutoutImages
+    - AbsBufferComplement
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZTFGeneralActiveAlertRegister:
+    fqn: ampel.ztf.alert.ZTFGeneralActiveAlertRegister
+    base:
+    - ZTFGeneralActiveAlertRegister
+    - ZTFGeneralAlertRegister
+    - BaseAlertRegister
+    - AbsAlertRegister
+    - AmpelRegister
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZTFGeneralAlertRegister:
+    fqn: ampel.ztf.alert.ZTFGeneralAlertRegister
+    base:
+    - ZTFGeneralAlertRegister
+    - BaseAlertRegister
+    - AbsAlertRegister
+    - AmpelRegister
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZiArchiveMuxer:
+    fqn: ampel.ztf.ingest.ZiArchiveMuxer
+    base:
+    - ZiArchiveMuxer
+    - AbsT0Muxer
+    - ArchiveUnit
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZiMongoMuxer:
+    fqn: ampel.ztf.ingest.ZiMongoMuxer
+    base:
+    - ZiMongoMuxer
+    - AbsT0Muxer
+    - ContextUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  BasicMultiFilter:
+    fqn: ampel.alert.filter.BasicMultiFilter
+    base:
+    - BasicMultiFilter
+    - AbsAlertFilter
+    - LogicalUnit
+    distrib: ampel-alerts
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-alerts/conf/ampel-alerts/ampel.yml
+    version: 0.8.3a8
+  CatalogMatchFilter:
+    fqn: ampel.ztf.base.CatalogMatchFilter
+    base:
+    - CatalogMatchFilter
+    - CatalogMatchUnit
+    - CatalogMatchUnitBase
+    - AbsAlertFilter
+    - LogicalUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  DecentFilter:
+    fqn: ampel.ztf.t0.DecentFilter
+    base:
+    - DecentFilter
+    - CatalogMatchUnit
+    - CatalogMatchUnitBase
+    - AbsAlertFilter
+    - LogicalUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  DemoEvery3PhotoPointT2Unit:
+    fqn: ampel.demo.DemoEvery3PhotoPointT2Unit
+    base:
+    - DemoEvery3PhotoPointT2Unit
+    - AbsPointT2Unit
+    - LogicalUnit
+    distrib: ampel-photometry
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-photometry/conf/ampel-photometry/ampel.yaml
+    version: 0.8.3a1
+  DemoEvery4PhotoPointT2Unit:
+    fqn: ampel.demo.DemoEvery4PhotoPointT2Unit
+    base:
+    - DemoEvery4PhotoPointT2Unit
+    - AbsPointT2Unit
+    - LogicalUnit
+    distrib: ampel-photometry
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-photometry/conf/ampel-photometry/ampel.yaml
+    version: 0.8.3a1
+  DemoFirstPhotoPointT2Unit:
+    fqn: ampel.demo.DemoFirstPhotoPointT2Unit
+    base:
+    - DemoFirstPhotoPointT2Unit
+    - AbsPointT2Unit
+    - LogicalUnit
+    distrib: ampel-photometry
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-photometry/conf/ampel-photometry/ampel.yaml
+    version: 0.8.3a1
+  DemoFirstPointT2Unit:
+    fqn: ampel.demo.DemoFirstPointT2Unit
+    base:
+    - DemoFirstPointT2Unit
+    - AbsPointT2Unit
+    - LogicalUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  DemoFirstUpperLimitT2Unit:
+    fqn: ampel.demo.DemoFirstUpperLimitT2Unit
+    base:
+    - DemoFirstUpperLimitT2Unit
+    - AbsPointT2Unit
+    - LogicalUnit
+    distrib: ampel-photometry
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-photometry/conf/ampel-photometry/ampel.yaml
+    version: 0.8.3a1
+  DemoLightCurveT2Unit:
+    fqn: ampel.demo.DemoLightCurveT2Unit
+    base:
+    - DemoLightCurveT2Unit
+    - AbsLightCurveT2Unit
+    - AbsCustomStateT2Unit
+    - LogicalUnit
+    distrib: ampel-photometry
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-photometry/conf/ampel-photometry/ampel.yaml
+    version: 0.8.3a1
+  DemoPhotoPointT2Unit:
+    fqn: ampel.demo.DemoPhotoPointT2Unit
+    base:
+    - DemoPhotoPointT2Unit
+    - AbsPointT2Unit
+    - LogicalUnit
+    distrib: ampel-photometry
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-photometry/conf/ampel-photometry/ampel.yaml
+    version: 0.8.3a1
+  DemoPlainT3Unit:
+    fqn: ampel.demo.DemoPlainT3Unit
+    base:
+    - DemoPlainT3Unit
+    - AbsT3PlainUnit
+    - LogicalUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  DemoPointT2Unit:
+    fqn: ampel.demo.DemoPointT2Unit
+    base:
+    - DemoPointT2Unit
+    - AbsPointT2Unit
+    - LogicalUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  DemoReviewT3Unit:
+    fqn: ampel.demo.DemoReviewT3Unit
+    base:
+    - DemoReviewT3Unit
+    - AbsT3ReviewUnit
+    - LogicalUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  DemoTiedLightCurveT2Unit:
+    fqn: ampel.demo.DemoTiedLightCurveT2Unit
+    base:
+    - DemoTiedLightCurveT2Unit
+    - AbsTiedLightCurveT2Unit
+    - AbsTiedCustomStateT2Unit
+    - AbsTiedT2Unit
+    - LogicalUnit
+    distrib: ampel-photometry
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-photometry/conf/ampel-photometry/ampel.yaml
+    version: 0.8.3a1
+  LSSTDataPointShaper:
+    fqn: ampel.lsst.ingest.LSSTDataPointShaper
+    base:
+    - LSSTDataPointShaper
+    - AbsT0Unit
+    - LogicalUnit
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  LSSTT1Combiner:
+    fqn: ampel.lsst.t1.LSSTT1Combiner
+    base:
+    - LSSTT1Combiner
+    - T1SimpleCombiner
+    - AbsT1CombineUnit
+    - LogicalUnit
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  NoShaper:
+    fqn: ampel.dev.NoShaper
+    base:
+    - NoShaper
+    - AbsT0Unit
+    - LogicalUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  ReallySimpleLSSTFilter:
+    fqn: ampel.lsst.t0.ReallySimpleLSSTFilter
+    base:
+    - ReallySimpleLSSTFilter
+    - AbsAlertFilter
+    - LogicalUnit
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  SimpleLSSTFilter:
+    fqn: ampel.lsst.t0.SimpleLSSTFilter
+    base:
+    - SimpleLSSTFilter
+    - CatalogMatchUnit
+    - CatalogMatchUnitBase
+    - AbsAlertFilter
+    - LogicalUnit
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  T1SimpleCombiner:
+    fqn: ampel.t1.T1SimpleCombiner
+    base:
+    - T1SimpleCombiner
+    - AbsT1CombineUnit
+    - LogicalUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T1SimpleRetroCombiner:
+    fqn: ampel.t1.T1SimpleRetroCombiner
+    base:
+    - T1SimpleRetroCombiner
+    - AbsT1CombineUnit
+    - LogicalUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T2CatalogMatch:
+    fqn: ampel.ztf.t2.T2CatalogMatch
+    base:
+    - T2CatalogMatch
+    - CatalogMatchUnit
+    - CatalogMatchUnitBase
+    - AbsPointT2Unit
+    - LogicalUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  T2GetAlertId:
+    fqn: ampel.lsst.t2.T2GetAlertId
+    base:
+    - T2GetAlertId
+    - AbsTiedPointT2Unit
+    - AbsTiedT2Unit
+    - LogicalUnit
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  T2GetAlertJournal:
+    fqn: ampel.lsst.t2.T2GetAlertJournal
+    base:
+    - T2GetAlertJournal
+    - AbsStockT2Unit
+    - LogicalUnit
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  T2GetDiaObject:
+    fqn: ampel.lsst.t2.T2GetDiaObject
+    base:
+    - T2GetDiaObject
+    - AbsPointT2Unit
+    - LogicalUnit
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  T2LightCurveFeatures:
+    fqn: ampel.ztf.t2.T2LightCurveFeatures
+    base:
+    - T2LightCurveFeatures
+    - AbsLightCurveT2Unit
+    - AbsCustomStateT2Unit
+    - LogicalUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  T2LightCurveSummary:
+    fqn: ampel.ztf.t2.T2LightCurveSummary
+    base:
+    - T2LightCurveSummary
+    - AbsLightCurveT2Unit
+    - AbsCustomStateT2Unit
+    - LogicalUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  T3DemoSavePlot:
+    fqn: ampel.demo.T3DemoSavePlot
+    base:
+    - T3DemoSavePlot
+    - AbsT3PlainUnit
+    - LogicalUnit
+    distrib: ampel-plot
+    file: conf/ampel-plot/ampel.yml
+    version: 0.8.3
+  T3LogAggregatedStocks:
+    fqn: ampel.t3.unit.T3LogAggregatedStocks
+    base:
+    - T3LogAggregatedStocks
+    - AbsT3PlainUnit
+    - LogicalUnit
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  ZiDataPointShaper:
+    fqn: ampel.ztf.ingest.ZiDataPointShaper
+    base:
+    - ZiDataPointShaper
+    - ZiDataPointShaperBase
+    - AbsT0Unit
+    - LogicalUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZiT1Combiner:
+    fqn: ampel.ztf.t1.ZiT1Combiner
+    base:
+    - ZiT1Combiner
+    - T1SimpleCombiner
+    - AbsT1CombineUnit
+    - LogicalUnit
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  SimpleTagFilter:
+    fqn: ampel.aux.SimpleTagFilter
+    base:
+    - SimpleTagFilter
+    - AbsApplicable
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  SimpleDictArrayFilter:
+    fqn: ampel.aux.filter.SimpleDictArrayFilter
+    base:
+    - SimpleDictArrayFilter
+    - AbsLogicOperatorFilter
+    - AbsApplicable
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  FlatDictArrayFilter:
+    fqn: ampel.aux.filter.FlatDictArrayFilter
+    base:
+    - FlatDictArrayFilter
+    - AbsLogicOperatorFilter
+    - AbsApplicable
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3ChannelProjector:
+    fqn: ampel.t3.stage.project.T3ChannelProjector
+    base:
+    - T3ChannelProjector
+    - T3BaseProjector
+    - AbsT3Projector
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  T3AmpelBufferFilter:
+    fqn: ampel.t3.stage.filter.T3AmpelBufferFilter
+    base:
+    - T3AmpelBufferFilter
+    - AbsT3Filter
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  MongoStockIngester:
+    fqn: ampel.mongo.update.MongoStockIngester
+    base:
+    - MongoStockIngester
+    - AbsDocIngester
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  MongoT0Ingester:
+    fqn: ampel.mongo.update.MongoT0Ingester
+    base:
+    - MongoT0Ingester
+    - AbsDocIngester
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  MongoT1Ingester:
+    fqn: ampel.mongo.update.MongoT1Ingester
+    base:
+    - MongoT1Ingester
+    - AbsDocIngester
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  MongoT2Ingester:
+    fqn: ampel.mongo.update.MongoT2Ingester
+    base:
+    - MongoT2Ingester
+    - AbsDocIngester
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  MongoT3Ingester:
+    fqn: ampel.mongo.update.MongoT3Ingester
+    base:
+    - MongoT3Ingester
+    - AbsDocIngester
+    - AmpelBaseModel
+    distrib: ampel-core
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+    version: 0.8.3a22
+  FilteringAlertSupplier:
+    fqn: ampel.alert.FilteringAlertSupplier
+    base:
+    - FilteringAlertSupplier
+    - AbsAlertSupplier
+    distrib: ampel-alerts
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-alerts/conf/ampel-alerts/ampel.yml
+    version: 0.8.3a8
+  UnitTestAlertSupplier:
+    fqn: ampel.dev.UnitTestAlertSupplier
+    base:
+    - UnitTestAlertSupplier
+    - AbsAlertSupplier
+    distrib: ampel-alerts
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-alerts/conf/ampel-alerts/ampel.yml
+    version: 0.8.3a8
+  TarAlertLoader:
+    fqn: ampel.alert.load.TarAlertLoader
+    base:
+    - TarAlertLoader
+    - AbsAlertLoader
+    - AmpelBaseModel
+    distrib: ampel-alerts
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-alerts/conf/ampel-alerts/ampel.yml
+    version: 0.8.3a8
+  FileAlertLoader:
+    fqn: ampel.alert.load.FileAlertLoader
+    base:
+    - FileAlertLoader
+    - AbsAlertLoader
+    - AmpelBaseModel
+    distrib: ampel-alerts
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-alerts/conf/ampel-alerts/ampel.yml
+    version: 0.8.3a8
+  DirAlertLoader:
+    fqn: ampel.alert.load.DirAlertLoader
+    base:
+    - DirAlertLoader
+    - AbsAlertLoader
+    - AmpelBaseModel
+    distrib: ampel-alerts
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-alerts/conf/ampel-alerts/ampel.yml
+    version: 0.8.3a8
+  DirFileNamesLoader:
+    fqn: ampel.alert.load.DirFileNamesLoader
+    base:
+    - DirFileNamesLoader
+    - AbsAlertLoader
+    - AmpelBaseModel
+    distrib: ampel-alerts
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-alerts/conf/ampel-alerts/ampel.yml
+    version: 0.8.3a8
+  DirTaggedAlertLoader:
+    fqn: ampel.alert.load.DirTaggedAlertLoader
+    base:
+    - DirTaggedAlertLoader
+    - DirAlertLoader
+    - AbsAlertLoader
+    - AmpelBaseModel
+    distrib: ampel-alerts
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-alerts/conf/ampel-alerts/ampel.yml
+    version: 0.8.3a8
+  HealpixPathSupplier:
+    fqn: ampel.ztf.alert.HealpixPathSupplier
+    base:
+    - HealpixPathSupplier
+    - ZiHealpixAlertSupplier
+    - BaseAlertSupplier
+    - AbsAlertSupplier
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZiAlertSupplier:
+    fqn: ampel.ztf.alert.ZiAlertSupplier
+    base:
+    - ZiAlertSupplier
+    - BaseAlertSupplier
+    - AbsAlertSupplier
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZiHealpixAlertSupplier:
+    fqn: ampel.ztf.alert.ZiHealpixAlertSupplier
+    base:
+    - ZiHealpixAlertSupplier
+    - BaseAlertSupplier
+    - AbsAlertSupplier
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZiTaggedAlertSupplier:
+    fqn: ampel.ztf.alert.ZiTaggedAlertSupplier
+    base:
+    - ZiTaggedAlertSupplier
+    - BaseAlertSupplier
+    - AbsAlertSupplier
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZTFForcedPhotometryAlertSupplier:
+    fqn: ampel.ztf.alert.ZTFForcedPhotometryAlertSupplier
+    base:
+    - ZTFForcedPhotometryAlertSupplier
+    - BaseAlertSupplier
+    - AbsAlertSupplier
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZTFFPbotForcedPhotometryAlertSupplier:
+    fqn: ampel.ztf.alert.ZTFFPbotForcedPhotometryAlertSupplier
+    base:
+    - ZTFFPbotForcedPhotometryAlertSupplier
+    - BaseAlertSupplier
+    - AbsAlertSupplier
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZTFHealpixAlertLoader:
+    fqn: ampel.ztf.alert.load.ZTFHealpixAlertLoader
+    base:
+    - ZTFHealpixAlertLoader
+    - AbsAlertLoader
+    - AmpelBaseModel
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  UWAlertLoader:
+    fqn: ampel.ztf.t0.load.UWAlertLoader
+    base:
+    - UWAlertLoader
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZTFArchiveAlertLoader:
+    fqn: ampel.ztf.t0.load.ZTFArchiveAlertLoader
+    base:
+    - ZTFArchiveAlertLoader
+    - AbsAlertLoader
+    - AmpelBaseModel
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZTFIdMapper:
+    fqn: ampel.ztf.util.ZTFIdMapper
+    base:
+    - ZTFIdMapper
+    - AbsIdMapper
+    - AmpelBaseModel
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  ZiCompilerOptions:
+    fqn: ampel.ztf.ingest.ZiCompilerOptions
+    base:
+    - ZiCompilerOptions
+    - CompilerOptions
+    - AuxAliasableModel
+    - AmpelBaseModel
+    distrib: ampel-ztf
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-ZTF/conf/ampel-ztf/ampel.yml
+    version: 0.8.3a1
+  PPSFilter:
+    fqn: ampel.aux.PPSFilter
+    base:
+    - PPSFilter
+    - AbsApplicable
+    - AmpelBaseModel
+    distrib: ampel-photometry
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-photometry/conf/ampel-photometry/ampel.yaml
+    version: 0.8.3a1
+  ULSFilter:
+    fqn: ampel.aux.ULSFilter
+    base:
+    - ULSFilter
+    - AbsApplicable
+    - AmpelBaseModel
+    distrib: ampel-photometry
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-photometry/conf/ampel-photometry/ampel.yaml
+    version: 0.8.3a1
+  LSSTAlertSupplier:
+    fqn: ampel.lsst.alert.LSSTAlertSupplier
+    base:
+    - LSSTAlertSupplier
+    - BaseAlertSupplier
+    - AbsAlertSupplier
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  ElasticcAlertSupplier:
+    fqn: ampel.lsst.alert.ElasticcAlertSupplier
+    base:
+    - ElasticcAlertSupplier
+    - BaseAlertSupplier
+    - AbsAlertSupplier
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  MultiAvroAlertLoader:
+    fqn: ampel.lsst.alert.load.MultiAvroAlertLoader
+    base:
+    - MultiAvroAlertLoader
+    - AbsAlertLoader
+    - AmpelBaseModel
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  ElasticcTrainingsetLoader:
+    fqn: ampel.lsst.alert.load.ElasticcTrainingsetLoader
+    base:
+    - ElasticcTrainingsetLoader
+    - AbsAlertLoader
+    - AmpelBaseModel
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  KafkaAlertLoader:
+    fqn: ampel.lsst.alert.load.KafkaAlertLoader
+    base:
+    - KafkaAlertLoader
+    - AbsAlertLoader
+    - AmpelBaseModel
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  LSSTCompilerOptions:
+    fqn: ampel.lsst.ingest.LSSTCompilerOptions
+    base:
+    - LSSTCompilerOptions
+    - CompilerOptions
+    - AuxAliasableModel
+    - AmpelBaseModel
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  LSSTT2Tabulator:
+    fqn: ampel.lsst.view.LSSTT2Tabulator
+    base:
+    - LSSTT2Tabulator
+    - AbsT2Tabulator
+    - AmpelBaseModel
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  ZTFT2Tabulator:
+    fqn: ampel.lsst.view.ZTFT2Tabulator
+    base:
+    - ZTFT2Tabulator
+    - AbsT2Tabulator
+    - AmpelBaseModel
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  LSSTDPFilter:
+    fqn: ampel.lsst.aux.LSSTDPFilter
+    base:
+    - LSSTDPFilter
+    - AbsApplicable
+    - AmpelBaseModel
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  LSSTFPFilter:
+    fqn: ampel.lsst.aux.LSSTFPFilter
+    base:
+    - LSSTFPFilter
+    - AbsApplicable
+    - AmpelBaseModel
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+  LSSTObjFilter:
+    fqn: ampel.lsst.aux.LSSTObjFilter
+    base:
+    - LSSTObjFilter
+    - AbsApplicable
+    - AmpelBaseModel
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.2a2
+process:
+  t0:
+    HU_RANDOM|T0|ztf_uw_private:
+      name: HU_RANDOM|T0|ztf_uw_private
+      version: -4837571280742208266
+      active: true
+      tier: 0
+      schedule:
+      - super
+      channel: HU_RANDOM
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/channel/HU_RANDOM.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: ZTFAlertStreamController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: AlertConsumer
+        config:
+          supplier:
+            unit: ZiAlertSupplier
+            config:
+              loader:
+                unit: UWAlertLoader
+                config:
+                  bootstrap: partnership.alerts.ztf.uw.edu:9092
+                  group_name: ampel-v0.7.1
+                  timeout: 3600
+                  stream: ztf_uw_private
+          shaper:
+            unit: ZiDataPointShaper
+          compiler_opts: null
+          directives:
+          - channel: HU_RANDOM
+            filter:
+              unit: RandFilter
+              config:
+                passing_rate: 0.0001
+            ingest:
+              mux:
+                unit: ZiMongoMuxer
+                combine:
+                - unit: ZiT1Combiner
+                  config:
+                    access: []
+                    policy: []
+                  state_t2:
+                  - unit: T2LightCurveSummary
+                    config: 7820636831213609010
+        secrets: null
+        override: null
+    HU_RAPID_SINGLE|T0|ztf_uw_private:
+      name: HU_RAPID_SINGLE|T0|ztf_uw_private
+      version: 4835413346115264214
+      active: true
+      tier: 0
+      schedule:
+      - super
+      channel: HU_RAPID_SINGLE
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/channel/HU_RAPID_SINGLE.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: ZTFAlertStreamController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: AlertConsumer
+        config:
+          supplier:
+            unit: ZiAlertSupplier
+            config:
+              loader:
+                unit: UWAlertLoader
+                config:
+                  bootstrap: partnership.alerts.ztf.uw.edu:9092
+                  group_name: ampel-v0.7.1
+                  timeout: 3600
+                  stream: ztf_uw_private
+          shaper:
+            unit: ZiDataPointShaper
+          compiler_opts: null
+          directives:
+          - channel: HU_RAPID_SINGLE
+            filter:
+              unit: XShooterFilter
+              config: ampel-hu-astro/HU_RAPID
+              override:
+                ul_within: 3
+                min_ndet: 1
+                max_tspan: 2
+                min_rb: 0.4
+                min_drb: 0.99
+                max_fwhm: 4.5
+                ps1_sgveto_rad: 2
+            ingest:
+              mux:
+                unit: ZiMongoMuxer
+                combine:
+                - unit: ZiT1Combiner
+                  config:
+                    access: []
+                    policy: []
+                  state_t2:
+                  - unit: T2InfantCatalogEval
+                    config: -7570421466636044752
+                  - unit: T2LightCurveSummary
+                    config: 7820636831213609010
+                insert:
+                  point_t2:
+                  - unit: T2CatalogMatch
+                    config: -9013279456798248093
+        secrets: null
+        override: null
+    HU_RAPID_INFANT|T0|ztf_uw_private:
+      name: HU_RAPID_INFANT|T0|ztf_uw_private
+      version: -7507135146136990137
+      active: true
+      tier: 0
+      schedule:
+      - super
+      channel: HU_RAPID_INFANT
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/channel/HU_RAPID_INFANT.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: ZTFAlertStreamController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: AlertConsumer
+        config:
+          supplier:
+            unit: ZiAlertSupplier
+            config:
+              loader:
+                unit: UWAlertLoader
+                config:
+                  bootstrap: partnership.alerts.ztf.uw.edu:9092
+                  group_name: ampel-v0.7.1
+                  timeout: 3600
+                  stream: ztf_uw_private
+          shaper:
+            unit: ZiDataPointShaper
+          compiler_opts: null
+          directives:
+          - channel: HU_RAPID_INFANT
+            filter:
+              unit: XShooterFilter
+              config: ampel-hu-astro/HU_RAPID
+              override:
+                ul_within: 3
+                min_ndet: 1
+                max_tspan: 2
+                min_rb: 0.4
+                min_drb: 0.995
+                max_fwhm: 4.5
+                ps1_sgveto_rad: 2
+                max_chipsf: 2
+                max_seeratio: 1.3
+                min_sumrat: 0.8
+            ingest:
+              mux:
+                unit: ZiMongoMuxer
+                combine:
+                - unit: ZiT1Combiner
+                  config:
+                    access: []
+                    policy: []
+                  state_t2:
+                  - unit: T2InfantCatalogEval
+                    config: -6014459479367663727
+                  - unit: T2LightCurveSummary
+                    config: 7820636831213609010
+                insert:
+                  point_t2:
+                  - unit: T2CatalogMatch
+                    config: -9013279456798248093
+        secrets: null
+        override: null
+  t1: {}
+  t2: {}
+  t3:
+    CosmologySummary:
+      name: CosmologySummary
+      version: -2560818839822459737
+      active: true
+      tier: 3
+      schedule:
+      - every().day.at('13:00')
+      channel: null
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/process/CosmologySummary.yaml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: T3Processor
+        config:
+          include:
+            session:
+            - unit: T3SessionAlertsNumber
+          execute:
+          - unit: T3ReviewUnitExecutor
+            config:
+              supply:
+                unit: T3DefaultBufferSupplier
+                config:
+                  select:
+                    unit: T3FilteringStockSelector
+                    config:
+                      updated:
+                        after:
+                          match_type: time_last_run
+                          process_name: CosmologySummary
+                        before:
+                          match_type: time_delta
+                      channel:
+                        any_of:
+                        - HU_PARTNER_10
+                        - HU_PARTNER_59
+                        - HU_TNS_PARTNER
+                      tag:
+                        with: ZTF
+                        without: HAS_ERROR
+                      t2_filter:
+                        any_of:
+                        - unit: T2SNCosmo
+                          match:
+                            fit_acceptable: true
+                        - unit: T2BrightSNProb
+                          match:
+                            SNGuess:
+                              $gt: 0.5
+                  load:
+                    unit: T3SimpleDataLoader
+                    config:
+                      directives:
+                      - TRANSIENT
+                      - COMPOUND
+                      - DATAPOINT
+                      - T2RECORD
+                      channel:
+                        any_of:
+                        - HU_PARTNER_10
+                        - HU_PARTNER_59
+                        - HU_TNS_PARTNER
+                  complement:
+                  - unit: ZTFCutoutImages
+                    config: null
+                    secrets: null
+                    override: null
+              stage:
+                unit: T3ProjectingStager
+                config:
+                  directives:
+                  - project:
+                      unit: T3ChannelProjector
+                      config:
+                        channel:
+                          any_of:
+                          - HU_PARTNER_10
+                          - HU_PARTNER_59
+                          - HU_TNS_PARTNER
+                    execute:
+                    - unit: SlackSummaryPublisher
+                      config: ampel-hu-astro/slack-ztf_general
+                      secrets: null
+                      override:
+                        slack_channel: '#ztf_cosmosne'
+                        excitement:
+                          Low: 10
+                          Mid: 100
+                          High: 300
+                        quiet: false
+                    - unit: SkyPortalPublisher
+                      config:
+                        token:
+                          label: desi/skyportal/jno
+                        base_url: http://desi2.lbl.gov:5000
+                      secrets: null
+                      override: null
+        secrets: null
+        override: null
+    ClusterSummary:
+      name: ClusterSummary
+      version: 4215696890426410268
+      active: true
+      tier: 3
+      schedule:
+      - every().day.at('16:00')
+      channel: null
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/process/ClusterSummary.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: T3Processor
+        config:
+          include:
+            session:
+            - unit: T3SessionAlertsNumber
+          execute:
+          - unit: T3ReviewUnitExecutor
+            config:
+              supply:
+                unit: T3DefaultBufferSupplier
+                config:
+                  select:
+                    unit: T3StockSelector
+                    config:
+                      updated:
+                        after:
+                          match_type: time_last_run
+                          process_name: ClusterSummary
+                        before:
+                          match_type: time_delta
+                      channel:
+                        any_of:
+                        - HU_NEARBY_CLUSTERS
+                      tag:
+                        with: ZTF
+                        without: HAS_ERROR
+                  load:
+                    unit: T3SimpleDataLoader
+                    config:
+                      directives:
+                      - TRANSIENT
+                      - COMPOUND
+                      - DATAPOINT
+                      - T2RECORD
+                      channel:
+                        any_of:
+                        - HU_NEARBY_CLUSTERS
+              stage:
+                unit: T3ProjectingStager
+                config:
+                  directives:
+                  - project:
+                      unit: T3ChannelProjector
+                      config:
+                        channel:
+                          any_of:
+                          - HU_NEARBY_CLUSTERS
+                    execute:
+                    - unit: SlackSummaryPublisher
+                      config: ampel-hu-astro/slack-ztf_general
+                      secrets: null
+                      override:
+                        slack_channel: '#ztf_lensing'
+                    - unit: SkyPortalPublisher
+                      config:
+                        token:
+                          label: fritz/jvs/ampelbot
+                        base_url: https://fritz.science
+                        filters:
+                        - AMPEL.OKC_LENSED
+                      secrets: null
+                      override: null
+        secrets: null
+        override: null
+    ChannelSummary:
+      name: ChannelSummary
+      version: -1504315639079393286
+      active: false
+      tier: 3
+      schedule:
+      - every().day.at('15:00')
+      channel: null
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/process/ChannelSummary.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: T3Processor
+        config:
+          execute:
+          - unit: T3ReviewUnitExecutor
+            config:
+              supply:
+                unit: T3DefaultBufferSupplier
+                config:
+                  select:
+                    unit: T3StockSelector
+                    config:
+                      updated:
+                        after:
+                          match_type: time_last_run
+                          process_name: ChannelSummary
+                        before:
+                          match_type: time_delta
+                      tag:
+                        with: ZTF
+                        without: HAS_ERROR
+                  load:
+                    unit: T3LatestStateDataLoader
+                    config:
+                      directives:
+                      - STOCK
+                      - COMPOUND
+              stage:
+                unit: T3AdaptativeStager
+                config:
+                  execute:
+                  - unit: ChannelSummaryPublisher
+        secrets: null
+        override: null
+    TNSSubmitNew:
+      name: TNSSubmitNew
+      version: -7867577353719966429
+      active: true
+      tier: 3
+      schedule:
+      - every(60).minutes
+      channel: null
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/process/TNSSubmitNew.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: T3Processor
+        config:
+          include:
+            session:
+            - unit: T3SessionAlertsNumber
+          execute:
+          - unit: T3ReviewUnitExecutor
+            config:
+              supply:
+                unit: T3DefaultBufferSupplier
+                config:
+                  select:
+                    unit: T3FilteringStockSelector
+                    config:
+                      updated:
+                        after:
+                          match_type: time_last_run
+                          process_name: TNSSubmitNew
+                        before:
+                          match_type: time_delta
+                      channel:
+                        any_of:
+                        - HU_TNS_MSIP
+                      tag:
+                        with: ZTF
+                        without: HAS_ERROR
+                      t2_filter:
+                        all_of:
+                        - unit: T2TNSEval
+                          match:
+                            tns_candidate: true
+                        - unit: T2BrightSNProb
+                          match:
+                            SNGuess:
+                              $gt: 0.5
+                            ndet:
+                              $lt: 7
+                  load:
+                    unit: T3SimpleDataLoader
+                    config:
+                      directives:
+                      - TRANSIENT
+                      - col: t2
+                        query_complement:
+                          unit:
+                            $in:
+                            - T2TNSEval
+                            - T2LightCurveSummary
+                        resolve_config: false
+                        excluding_query: false
+                      channel:
+                        any_of:
+                        - HU_TNS_MSIP
+                  complement:
+                  - unit: TNSNames
+                    config: null
+                    secrets: null
+                    override: null
+              stage:
+                unit: T3ProjectingStager
+                config:
+                  directives:
+                  - project:
+                      unit: T3ChannelProjector
+                      config:
+                        channel:
+                          any_of:
+                          - HU_TNS_MSIP
+                    execute:
+                    - unit: TNSTalker
+                      config:
+                        tns_api_key:
+                          label: tns/new
+                        submit_tns: true
+                        sandbox: false
+                      secrets: null
+                      override: null
+        secrets: null
+        override: null
+    DesiSkyPortalSaltSN:
+      name: DesiSkyPortalSaltSN
+      version: -6899482422358502075
+      active: true
+      tier: 3
+      schedule:
+      - every(60).minutes
+      channel: null
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/process/DesiSkyportalSaltSN.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: T3Processor
+        config:
+          include:
+            session:
+            - unit: T3SessionAlertsNumber
+          execute:
+          - unit: T3ReviewUnitExecutor
+            config:
+              supply:
+                unit: T3DefaultBufferSupplier
+                config:
+                  select:
+                    unit: T3FilteringStockSelector
+                    config:
+                      updated:
+                        after:
+                          match_type: time_last_run
+                          process_name: DesiSkyPortalSaltSN
+                        before:
+                          match_type: time_delta
+                      channel:
+                        any_of:
+                        - HU_GP_10
+                        - HU_GP_59
+                        - HU_TNS_MSIP
+                      tag:
+                        with: ZTF
+                        without: HAS_ERROR
+                      t2_filter:
+                        all_of:
+                        - unit: T2TNSEval
+                          match:
+                            tns_candidate: true
+                        - unit: T2SNCosmo
+                          match:
+                            fit_acceptable: true
+                  load:
+                    unit: T3SimpleDataLoader
+                    config:
+                      directives:
+                      - TRANSIENT
+                      - DATAPOINT
+                      - T2RECORD
+                      channel:
+                        any_of:
+                        - HU_GP_10
+                        - HU_GP_59
+                        - HU_TNS_MSIP
+                  complement:
+                  - unit: ZTFCutoutImages
+                    config: null
+                    secrets: null
+                    override: null
+              stage:
+                unit: T3ProjectingStager
+                config:
+                  directives:
+                  - project:
+                      unit: T3ChannelProjector
+                      config:
+                        channel:
+                          any_of:
+                          - HU_GP_10
+                          - HU_GP_59
+                          - HU_TNS_MSIP
+                    execute:
+                    - unit: SkyPortalPublisher
+                      config:
+                        token:
+                          label: desi/skyportal/jno
+                        base_url: http://desi2.lbl.gov:5000
+                        filters:
+                        - AMPEL SaltSN
+                      secrets: null
+                      override: null
+        secrets: null
+        override: null
+    LensingSummary:
+      name: LensingSummary
+      version: 6301903372695048115
+      active: true
+      tier: 3
+      schedule:
+      - every().day.at('15:00')
+      channel: null
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/process/LensingSummary.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: T3Processor
+        config:
+          include:
+            session:
+            - unit: T3SessionAlertsNumber
+          execute:
+          - unit: T3ReviewUnitExecutor
+            config:
+              supply:
+                unit: T3DefaultBufferSupplier
+                config:
+                  select:
+                    unit: T3StockSelector
+                    config:
+                      updated:
+                        after:
+                          match_type: time_last_run
+                          process_name: LensingSummary
+                        before:
+                          match_type: time_delta
+                      channel:
+                        any_of:
+                        - OKC_LENSED
+                      tag:
+                        with: ZTF
+                        without: HAS_ERROR
+                  load:
+                    unit: T3SimpleDataLoader
+                    config:
+                      directives:
+                      - TRANSIENT
+                      - COMPOUND
+                      - DATAPOINT
+                      - T2RECORD
+                      channel:
+                        any_of:
+                        - OKC_LENSED
+              stage:
+                unit: T3ProjectingStager
+                config:
+                  directives:
+                  - project:
+                      unit: T3ChannelProjector
+                      config:
+                        channel:
+                          any_of:
+                          - OKC_LENSED
+                    execute:
+                    - unit: SlackSummaryPublisher
+                      config: ampel-hu-astro/slack-ztf_general
+                      secrets: null
+                      override:
+                        slack_channel: '#ztf_lensing'
+                    - unit: SkyPortalPublisher
+                      config:
+                        token:
+                          label: fritz/jvs/ampelbot
+                        base_url: https://fritz.science
+                      secrets: null
+                      override: null
+        secrets: null
+        override: null
+    TNSSubmitComplete:
+      name: TNSSubmitComplete
+      version: 445092804362168127
+      active: true
+      tier: 3
+      schedule:
+      - every(60).minutes
+      channel: null
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/process/TNSSubmitComplete.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: T3Processor
+        config:
+          include:
+            session:
+            - unit: T3SessionAlertsNumber
+          execute:
+          - unit: T3ReviewUnitExecutor
+            config:
+              supply:
+                unit: T3DefaultBufferSupplier
+                config:
+                  select:
+                    unit: T3FilteringStockSelector
+                    config:
+                      updated:
+                        after:
+                          match_type: time_last_run
+                          process_name: TNSSubmitComplete
+                        before:
+                          match_type: time_delta
+                      channel:
+                        any_of:
+                        - HU_GP_10
+                        - HU_GP_59
+                      tag:
+                        with: ZTF
+                        without: HAS_ERROR
+                      t2_filter:
+                        unit: T2TNSEval
+                        match:
+                          tns_candidate: true
+                  load:
+                    unit: T3SimpleDataLoader
+                    config:
+                      directives:
+                      - TRANSIENT
+                      - col: t2
+                        query_complement:
+                          unit:
+                            $in:
+                            - T2TNSEval
+                            - T2LightCurveSummary
+                        resolve_config: false
+                        excluding_query: false
+                      channel:
+                        any_of:
+                        - HU_GP_10
+                        - HU_GP_59
+                  complement:
+                  - unit: TNSNames
+                    config: null
+                    secrets: null
+                    override: null
+              stage:
+                unit: T3ProjectingStager
+                config:
+                  directives:
+                  - project:
+                      unit: T3ChannelProjector
+                      config:
+                        channel:
+                          any_of:
+                          - HU_GP_10
+                          - HU_GP_59
+                    execute:
+                    - unit: TNSTalker
+                      config:
+                        tns_api_key:
+                          label: tns/complete
+                        submit_tns: true
+                        sandbox: false
+                      secrets: null
+                      override: null
+        secrets: null
+        override: null
+    DesiSkyPortal:
+      name: DesiSkyPortal
+      version: -3105368435958071871
+      active: true
+      tier: 3
+      schedule:
+      - every(60).minutes
+      channel: null
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/process/DesiSkyportal.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: T3Processor
+        config:
+          include:
+            session:
+            - unit: T3SessionAlertsNumber
+          execute:
+          - unit: T3ReviewUnitExecutor
+            config:
+              supply:
+                unit: T3DefaultBufferSupplier
+                config:
+                  select:
+                    unit: T3FilteringStockSelector
+                    config:
+                      updated:
+                        after:
+                          match_type: time_last_run
+                          process_name: DesiSkyPortal
+                        before:
+                          match_type: time_delta
+                      channel:
+                        any_of:
+                        - HU_GP_10
+                        - HU_GP_59
+                      tag:
+                        with: ZTF
+                        without: HAS_ERROR
+                      t2_filter:
+                        unit: T2TNSEval
+                        match:
+                          tns_candidate: true
+                  load:
+                    unit: T3SimpleDataLoader
+                    config:
+                      directives:
+                      - TRANSIENT
+                      - DATAPOINT
+                      - T2RECORD
+                      channel:
+                        any_of:
+                        - HU_GP_10
+                        - HU_GP_59
+                  complement:
+                  - unit: ZTFCutoutImages
+                    config: null
+                    secrets: null
+                    override: null
+              stage:
+                unit: T3ProjectingStager
+                config:
+                  directives:
+                  - project:
+                      unit: T3ChannelProjector
+                      config:
+                        channel:
+                          any_of:
+                          - HU_GP_10
+                          - HU_GP_59
+                    execute:
+                    - unit: SkyPortalPublisher
+                      config:
+                        token:
+                          label: desi/skyportal/jno
+                        base_url: http://desi2.lbl.gov:5000
+                        filters:
+                        - AMPEL General
+                      secrets: null
+                      override: null
+        secrets: null
+        override: null
+    RapidAllz:
+      name: RapidAllz
+      version: 2092827251325738758
+      active: false
+      tier: 3
+      schedule:
+      - every().day.at('13:00')
+      channel: null
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/process/RapidAllz.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: T3Processor
+        config:
+          include:
+            session:
+            - unit: T3SessionAlertsNumber
+          execute:
+          - unit: T3ReviewUnitExecutor
+            config:
+              supply:
+                unit: T3DefaultBufferSupplier
+                config:
+                  select:
+                    unit: T3StockSelector
+                    config:
+                      updated:
+                        after:
+                          match_type: time_last_run
+                          process_name: RapidAllz
+                        before:
+                          match_type: time_delta
+                      channel:
+                        any_of:
+                        - HU_RAPID_SOUTH
+                        - HU_RAPID_UL
+                      tag:
+                        with: ZTF
+                        without: HAS_ERROR
+                  load:
+                    unit: T3SimpleDataLoader
+                    config:
+                      directives:
+                      - TRANSIENT
+                      - DATAPOINT
+                      - col: t2
+                        query_complement:
+                          unit: T2CatalogMatch
+                        resolve_config: false
+                        excluding_query: false
+                      channel:
+                        any_of:
+                        - HU_RAPID_SOUTH
+                        - HU_RAPID_UL
+              stage:
+                unit: T3ProjectingStager
+                config:
+                  directives:
+                  - project:
+                      unit: T3ChannelProjector
+                      config:
+                        channel:
+                          any_of:
+                          - HU_RAPID_SOUTH
+                          - HU_RAPID_UL
+                    execute:
+                    - unit: SlackSummaryPublisher
+                      config: ampel-hu-astro/slack-ztf_general
+                      secrets: null
+                      override:
+                        slack_channel: '#ztf_rapid'
+        secrets: null
+        override: null
+    AmpelAutoLco:
+      name: AmpelAutoLco
+      version: -2069748689384244030
+      active: true
+      tier: 3
+      schedule:
+      - every(10).minutes
+      channel: null
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/process/AmpelAutoLco.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: T3Processor
+        config:
+          include:
+            session:
+            - unit: T3SessionAlertsNumber
+          execute:
+          - unit: T3ReviewUnitExecutor
+            config:
+              supply:
+                unit: T3DefaultBufferSupplier
+                config:
+                  select:
+                    unit: T3FilteringStockSelector
+                    config:
+                      updated:
+                        after:
+                          match_type: time_last_run
+                          process_name: AmpelAutoLco
+                        before:
+                          match_type: time_delta
+                      channel:
+                        any_of:
+                        - HU_RAPID_INFANT
+                      tag:
+                        with: ZTF
+                        without: HAS_ERROR
+                      t2_filter:
+                        unit: T2InfantCatalogEval
+                        match:
+                          action: true
+                  load:
+                    unit: T3SimpleDataLoader
+                    config:
+                      directives:
+                      - TRANSIENT
+                      - DATAPOINT
+                      - T2RECORD
+                      channel:
+                        any_of:
+                        - HU_RAPID_INFANT
+              stage:
+                unit: T3ProjectingStager
+                config:
+                  directives:
+                  - project:
+                      unit: T3ChannelProjector
+                      config:
+                        channel:
+                          any_of:
+                          - HU_RAPID_INFANT
+                    execute:
+                    - unit: SlackSummaryPublisher
+                      config: ampel-hu-astro/slack-ztf_general
+                      secrets: null
+                      override:
+                        slack_channel: '#ztf_auto'
+                    - unit: RapidLco
+                      config:
+                        do_react: true
+                        do_testreact: true
+                        slack_token:
+                          label: slack/ztf_general/jno
+                        slack_channel: '#ztf_auto'
+                        slack_username: AMPEL
+                        t2info_from:
+                        - T2InfantCatalogEval
+                        lco_api:
+                          label: lco/jnordin
+                      secrets: null
+                      override: null
+                    - unit: SkyPortalPublisher
+                      config:
+                        token:
+                          label: fritz/jvs/ampelbot
+                        base_url: https://fritz.science
+                      secrets: null
+                      override: null
+        secrets: null
+        override: null
+    DesiSkyPortalSNGuess:
+      name: DesiSkyPortalSNGuess
+      version: 396142857499661623
+      active: true
+      tier: 3
+      schedule:
+      - every(60).minutes
+      channel: null
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/process/DesiSkyportalSNGuess.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: T3Processor
+        config:
+          include:
+            session:
+            - unit: T3SessionAlertsNumber
+          execute:
+          - unit: T3ReviewUnitExecutor
+            config:
+              supply:
+                unit: T3DefaultBufferSupplier
+                config:
+                  select:
+                    unit: T3FilteringStockSelector
+                    config:
+                      updated:
+                        after:
+                          match_type: time_last_run
+                          process_name: DesiSkyPortalSNGuess
+                        before:
+                          match_type: time_delta
+                      channel:
+                        any_of:
+                        - HU_GP_10
+                        - HU_GP_59
+                        - HU_TNS_MSIP
+                      tag:
+                        with: ZTF
+                        without: HAS_ERROR
+                      t2_filter:
+                        all_of:
+                        - unit: T2TNSEval
+                          match:
+                            tns_candidate: true
+                        - unit: T2BrightSNProb
+                          match:
+                            SNGuess:
+                              $gt: 0.5
+                  load:
+                    unit: T3SimpleDataLoader
+                    config:
+                      directives:
+                      - TRANSIENT
+                      - DATAPOINT
+                      - T2RECORD
+                      channel:
+                        any_of:
+                        - HU_GP_10
+                        - HU_GP_59
+                        - HU_TNS_MSIP
+                  complement:
+                  - unit: ZTFCutoutImages
+                    config: null
+                    secrets: null
+                    override: null
+              stage:
+                unit: T3ProjectingStager
+                config:
+                  directives:
+                  - project:
+                      unit: T3ChannelProjector
+                      config:
+                        channel:
+                          any_of:
+                          - HU_GP_10
+                          - HU_GP_59
+                          - HU_TNS_MSIP
+                    execute:
+                    - unit: SkyPortalPublisher
+                      config:
+                        token:
+                          label: desi/skyportal/jno
+                        base_url: http://desi2.lbl.gov:5000
+                        filters:
+                        - AMPEL SNguess
+                      secrets: null
+                      override: null
+        secrets: null
+        override: null
+    RapidReact:
+      name: RapidReact
+      version: 2878460666218492600
+      active: true
+      tier: 3
+      schedule:
+      - every(10).minutes
+      channel: null
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/process/RapidReact.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: T3Processor
+        config:
+          include:
+            session:
+            - unit: T3SessionAlertsNumber
+          execute:
+          - unit: T3ReviewUnitExecutor
+            config:
+              supply:
+                unit: T3DefaultBufferSupplier
+                config:
+                  select:
+                    unit: T3FilteringStockSelector
+                    config:
+                      updated:
+                        after:
+                          match_type: time_last_run
+                          process_name: RapidReact
+                        before:
+                          match_type: time_delta
+                      channel:
+                        any_of:
+                        - HU_RAPID_SINGLE
+                      tag:
+                        with: ZTF
+                        without: HAS_ERROR
+                      t2_filter:
+                        unit: T2InfantCatalogEval
+                        match:
+                          action: true
+                  load:
+                    unit: T3SimpleDataLoader
+                    config:
+                      directives:
+                      - TRANSIENT
+                      - DATAPOINT
+                      - T2RECORD
+                      channel:
+                        any_of:
+                        - HU_RAPID_SINGLE
+              stage:
+                unit: T3ProjectingStager
+                config:
+                  directives:
+                  - project:
+                      unit: T3ChannelProjector
+                      config:
+                        channel:
+                          any_of:
+                          - HU_RAPID_SINGLE
+                    execute:
+                    - unit: RapidBase
+                      config:
+                        do_react: false
+                        do_testreact: true
+                        slack_token:
+                          label: slack/ztf_general/jno
+                        slack_channel: '#ztf_rapid'
+                        slack_username: AMPEL
+                        t2info_from:
+                        - T2InfantCatalogEval
+                      secrets: null
+                      override: null
+                    - unit: SkyPortalPublisher
+                      config:
+                        token:
+                          label: fritz/jvs/ampelbot
+                        base_url: https://fritz.science
+                      secrets: null
+                      override: null
+        secrets: null
+        override: null
+  ops:
+    ExceptionPublisher:
+      name: ExceptionPublisher
+      version: -3767430623145573038
+      active: true
+      tier: null
+      schedule:
+      - every(10).minutes
+      channel: null
+      distrib: ampel-core
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-core/conf/ampel-core/ampel.yaml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: OpsProcessor
+        config:
+          execute:
+            unit: AmpelExceptionPublisher
+        secrets: null
+        override: null
+    UpdateTNSMirror:
+      name: UpdateTNSMirror
+      version: -2762634999892370190
+      active: true
+      tier: null
+      schedule:
+      - every(5).minutes
+      channel: null
+      distrib: ampel-hu-astro
+      source: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-HU-astro/conf/ampel-hu-astro/process/UpdateTNSMirror.yml
+      isolate: true
+      multiplier: 1
+      log: null
+      controller:
+        unit: DefaultProcessController
+        config: null
+        secrets: null
+        override: null
+      processor:
+        unit: OpsProcessor
+        config:
+          execute:
+            unit: TNSMirrorUpdater
+            config:
+              api_key:
+                label: tns/complete
+        secrets: null
+        override: null
+alias:
+  t0: {}
+  t1: {}
+  t2: {}
+  t3:
+    '%TRANSIENT':
+      col: stock
+    '%STOCK':
+      col: stock
+    '%DATAPOINT':
+      col: t0
+    '%T0':
+      col: t0
+    '%COMPOUND':
+      col: t1
+    '%T1':
+      col: t1
+    '%T2DOC':
+      col: t2
+    '%T2DOC_WITH_CONF':
+      col: t2
+      resolve_config: true
+    '%T2':
+      col: t2
+    '%T2RECORD':
+      col: t2
+    '%PHOTOPOINT':
+      col: t0
+      query_complement:
+        _id:
+          $gt: 0
+    '%UPPERLIMIT':
+      col: t0
+      query_complement:
+        _id:
+          $lt: 0
+    '%PHOTOMETRY':
+      col: t0
+resource:
+  mongo: mongodb://localhost:27017
+  extcats: mongodb://localhost:27017
+  ampel-ztf/archive: https://ampel.zeuthen.desy.de/api/ztf/archive/v3/
+  ampel-ztf/catalogmatch: https://ampel.zeuthen.desy.de/api/catalogmatch/
+  ampel-ztf/kafka:
+    bootstrap: partnership.alerts.ztf.uw.edu:9092
+    group_name: ampel-v0.7.1
+    timeout: 3600
+confid: {}
+template:
+  compact_t3: ampel.template.TPLCompactT3
+  ztf_uw_private: ampel.template.ZTFLegacyChannelTemplate
+  ztf_uw_public: ampel.template.ZTFLegacyChannelTemplate
+  ztf_uw_caltech: ampel.template.ZTFLegacyChannelTemplate
+  ztf_periodic_summary: ampel.template.ZTFPeriodicSummaryT3
+  ztf_local_alerts: ampel.template.ZTFProcessLocalAlerts
+  elasticc_alerts: ampel.lsst.template.ElasticcAlertConsumerTemplate

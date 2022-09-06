@@ -39,6 +39,7 @@ class LSSTMongoMuxer(AbsT0Muxer):
         "body.midPointTai": 1,
         "body.filterName": 1,
         "body.psFlux": 1,
+        "body.diaObjectId": 1,
     }
 
     def __init__(self, **kwargs) -> None:
@@ -70,41 +71,27 @@ class LSSTMongoMuxer(AbsT0Muxer):
         add_update = self.updates_buffer.add_t0_update
 
         # Create set with datapoint ids from alert
-        ids_dps_alert = {el["id"] for el in dps_al}
+        ids_dps_alert = {el["id"]: el for el in dps_al}
 
         # python set of ids of datapoints from DB
-        ids_dps_db = {el["id"] for el in dps_db}
+        ids_dps_db = {el["id"]: el for el in dps_db}
 
         # Part 2: Insert new data points
         ################################
 
         # Difference between candids from the alert and candids present in DB
-        ids_dps_to_insert = ids_dps_alert - ids_dps_db
+        ids_dps_to_insert = ids_dps_alert.keys() - ids_dps_db.keys()
 
-        for dp in dps_al:
-
-            if dp["id"] in ids_dps_to_insert:
-
-                add_to_set = {"stock": stock_id}
-                add_to_set["tag"] = maybe_use_each(dp["tag"])
-
-                # Unconditionally update the doc
-                add_update(
-                    UpdateOne(
-                        {"id": dp["id"]},
-                        {
-                            "$setOnInsert": {
-                                k: v
-                                for k, v in dp.items()
-                                if k not in {"tag", "stock"}
-                            },
-                            "$addToSet": add_to_set,
-                        },
-                        upsert=True,
-                    )
-                )
-
-        dps_combine = dps_al
+        # Emit datapoints in the order given in the alert, but prefer content
+        # from the database. This allows the ingestion handler to detect when an
+        # additional channel accepts a datapoint that was already in the
+        # database.
+        dps_combine = [
+            ids_dps_db[dp["id"]]
+            if dp["id"] in ids_dps_db
+            else self._project(ids_dps_alert[dp["id"]], self.projection)
+            for dp in dps_al
+        ]
 
         return [
             dp for dp in dps_al if dp["id"] in ids_dps_to_insert

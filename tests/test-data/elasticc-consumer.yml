@@ -1,0 +1,42 @@
+unit: AlertConsumer
+config:
+  process_name: consume
+  iter_max: 50000
+  compiler_opts: LSSTCompilerOptions
+  supplier:
+    unit: LSSTAlertSupplier
+    config:
+      deserialize: null
+      loader:
+        unit: KafkaAlertLoader
+        config:
+          bootstrap: public.alerts.ztf.uw.edu
+          group_name: ampel-v0.8.3-elasticc
+          topics:
+            - "^elasticc-.*$"
+          timeout: 60
+  shaper:
+    unit: LSSTDataPointShaper
+  include_alert_extra_with_keys:
+    alert_ts: kafka.timestamp.create
+  directives:
+  - channel: ElasticcLong
+    ingest:
+      mux:
+        unit: LSSTMongoMuxer
+        insert: &insert
+          point_t2:
+            - unit: T2GetDiaObject
+              ingest:
+                filter: LSSTObjFilter
+                select: last
+                sort: diaObjectId
+        combine:
+          - unit: LSSTT1Combiner
+  - channel: ElasticcShort
+    ingest:
+      mux:
+        unit: LSSTMongoMuxer
+        insert: *insert
+        combine:
+          - unit: LSSTT1Combiner

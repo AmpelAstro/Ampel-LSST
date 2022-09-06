@@ -7,9 +7,10 @@
 # Last Modified Date: 05.05.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
-from typing import Any, List, Sequence, Tuple
+from typing import Any, Sequence, Iterable
 
 from ampel.content.DataPoint import DataPoint
+from ampel.types import StockId
 from astropy.table import Table
 
 from ampel.abstract.AbsT2Tabulator import AbsT2Tabulator
@@ -31,7 +32,7 @@ class LSSTT2Tabulator(AbsT2Tabulator):
 
     def get_flux_table(
         self,
-        dps: List[DataPoint],
+        dps: Iterable[DataPoint],
     ) -> Table:
         flux, fluxerr, filtername, tai = self.get_values(
             dps, ["psFlux", "psFluxErr", "filterName", "midPointTai"]
@@ -54,26 +55,26 @@ class LSSTT2Tabulator(AbsT2Tabulator):
         )
 
     def get_positions(
-        self, dps: List[DataPoint]
-    ) -> Sequence[Tuple[float, float, float]]:
+        self, dps: Iterable[DataPoint]
+    ) -> Sequence[tuple[float, float, float]]:
         return tuple(
             zip(self.get_jd(dps), *self.get_values(dps, ["ra", "decl"]))
         )
 
-    def get_jd(self, dps: List[DataPoint]) -> Sequence[float]:
+    def get_jd(self, dps: Iterable[DataPoint]) -> Sequence[float]:
         return self._to_jd(self.get_values(dps, ["midPointTai"])[0])
 
     @staticmethod
     def _to_jd(dates: Sequence[Any]) -> Sequence[Any]:
         return [date + 2400000.5 for date in dates]
 
-    def get_stock_id(self, dps: List[DataPoint]) -> set[int]:
+    def get_stock_id(self, dps: Iterable[DataPoint]) -> set[StockId]:
         return set(
             sum(
                 [
-                    el["stock"]
-                    if isinstance(el["stock"], list)
-                    else [el["stock"]]
+                    list(stockid)
+                    if isinstance(stockid := el["stock"], Sequence) and not isinstance(stockid, (str, bytes))
+                    else [stockid]
                     for el in dps
                     if "LSST" in el["tag"]
                 ],
@@ -81,13 +82,13 @@ class LSSTT2Tabulator(AbsT2Tabulator):
             )
         )
 
-    def get_stock_name(self, dps: List[DataPoint]) -> list[str]:
+    def get_stock_name(self, dps: Iterable[DataPoint]) -> list[str]:
         return [str(stock) for stock in self.get_stock_id(dps)]
 
     @staticmethod
     def get_values(
-        dps: List[DataPoint], params: Sequence[str]
-    ) -> Tuple[Sequence[Any], ...]:
+        dps: Iterable[DataPoint], params: Sequence[str]
+    ) -> tuple[Sequence[Any], ...]:
         if tup := tuple(
             map(
                 list,

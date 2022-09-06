@@ -8,7 +8,7 @@
 # Last Modified By  : j nordin <jnordin@physik.hu-berlin.de>
 
 import sys
-from typing import Literal, Optional
+from typing import Literal, Optional, cast, TYPE_CHECKING
 from hashlib import blake2b
 from bson import encode
 
@@ -17,6 +17,8 @@ from ampel.alert.BaseAlertSupplier import BaseAlertSupplier
 from ampel.protocol.AmpelAlertProtocol import AmpelAlertProtocol
 from ampel.view.ReadOnlyDict import ReadOnlyDict
 
+if TYPE_CHECKING:
+    from astropy.table import Table
 
 
 
@@ -36,7 +38,7 @@ class ElasticcAlertSupplier(BaseAlertSupplier):
         :raises AttributeError: if alert_loader was not set properly before this method is called
         """
 
-        lc = self._deserialize(next(self.alert_loader))
+        lc = cast(Table, self._deserialize(next(self.alert_loader)))
 
         # Are these actually unique?
         sntype = lc.meta['sim_type_index']   # Again do not know how consistent these are
