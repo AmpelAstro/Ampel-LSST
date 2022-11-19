@@ -22,11 +22,32 @@ class LSSTMongoMuxer(AbsT0Muxer):
     """
     This class compares info between alert and DB so that only the needed info is ingested later.
 
+    # Not used - removed
     :param alert_history_length: alerts must not contain all available info for a given transient.
     Alerts for LSST should provide a photometric history of 365 days.
+
+    JN: For *elasticc* diffimage and forced photometry will have identical flux 
+    values. Since there is both a previous source phot and previous forced phot
+    history, a single alert can contain multiple copes of the same measurement.
+    Again, for *elasticc* it also seems like they keep the same id
+    ForcedSourceID and SourceID
+    for both kinds. As JN understand, this means that as new measurements come
+    in, the typical SourceId flux values will be retained and forced phot
+    "updates" not added to the DB. As the flux is the same this _should_ not
+    matter.
+    What we should do is probably:
+    - Generate ID datapoints in LSSTDataPointShaper, prob of a hash from
+    [time, flux, ccdVisitId(?)].
+    - Make a proper superseeded search a la ZiMongoMuxer here where we would
+    look for identical time (only?)
+    But since this should not make a difference, provided we drop duplicates in
+    the LSSTDataPointShaper it seems that this change is not strictly necessary
+    now (assuming I got everything right.)
+
+
     """
 
-    alert_history_length: int = 365
+    #alert_history_length: int = 365
 
     # Standard projection used when checking DB for existing PPS/ULS
     projection = {
