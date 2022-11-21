@@ -35,7 +35,7 @@ class LSSTDataPointShaper(AbsT0Unit):
 
         ret_list: list[DataPoint] = []
         # Record forced photometry for comp.
-        sourceid_list: list[int | str] = []
+        sourceid_list: set[int | str] = set()
         setitem = dict.__setitem__
 
         for photo_dict in arg:
@@ -52,7 +52,7 @@ class LSSTDataPointShaper(AbsT0Unit):
             if "diaSourceId" in photo_dict:
                 id = photo_dict["diaSourceId"]
                 tags.append("LSST_DP")
-                sourceid_list.append(id)
+                sourceid_list.add(id)
             elif "diaForcedSourceId" in photo_dict:
                 id = photo_dict["diaForcedSourceId"]
                 tags.append("LSST_FP")
@@ -76,10 +76,8 @@ class LSSTDataPointShaper(AbsT0Unit):
         # Current alert format allows for the same dp to be provided as
         # both source and forcedsource. If so, we here choose FP.
         # (flux values should consistently be the same)
-        ret_list = [
+        return [
             dp
             for dp in ret_list
             if not (dp["id"] in sourceid_list and "LSST_FP" in dp["tag"])
         ]
-
-        return ret_list

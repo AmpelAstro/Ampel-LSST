@@ -1043,6 +1043,16 @@ unit:
     distrib: ampel-alerts
     file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-alerts/conf/ampel-alerts/ampel.yml
     version: 0.8.3a8
+  ElasticcDirAlertLoader:
+    fqn: ampel.lsst.alert.load.ElasticcDirAlertLoader
+    base:
+    - ElasticcDirAlertLoader
+    - DirAlertLoader
+    - AbsAlertLoader
+    - AmpelBaseModel
+    distrib: ampel-lsst
+    file: /Users/jakob/Documents/ZTF/Ampel-v0.8.3/Ampel-LSST/conf/ampel-lsst/ampel.yml
+    version: 0.8.3a8
   DirFileNamesLoader:
     fqn: ampel.alert.load.DirFileNamesLoader
     base:

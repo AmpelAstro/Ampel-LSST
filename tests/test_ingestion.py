@@ -1,4 +1,6 @@
 from pathlib import Path
+from ampel.base.AuxUnitRegister import AuxUnitRegister
+from ampel.lsst.alert.LSSTAlertSupplier import LSSTAlertSupplier
 
 import yaml
 import pytest
@@ -77,9 +79,9 @@ def test_muxer(mock_context: DevAmpelContext):
     ).open() as f:
         model = UnitModel(**yaml.safe_load(f))
     # alerts from a single diaObject
-    with (
-        Path(__file__).parent / "test-data" / "11290844.avro"
-    ).open("rb") as f:
+    with (Path(__file__).parent / "test-data" / "11290844.avro").open(
+        "rb"
+    ) as f:
         alerts = list(fastavro.reader(f))[:2]
     model.config["supplier"]["config"]["loader"] = UnitModel(
         unit="MockAlertLoader", config={"alerts": alerts}
@@ -118,3 +120,48 @@ def test_muxer(mock_context: DevAmpelContext):
         == 1
     ), "single point T2 doc found"
     assert len(set(docs[0]["channel"])) == 2, "t2 doc in both channels"
+
+
+def test_duplicate_datapoints(mock_context: DevAmpelContext):
+    """
+    Alerts that contain differential and forced photometry with the same id
+    result in states with unique datapoints.
+    """
+
+    with (
+        Path(__file__).parent / "test-data" / "elasticc-consumer.yml"
+    ).open() as f:
+        model = UnitModel(**yaml.safe_load(f))
+    # alert with duplicated datapoints
+    model.config["supplier"]["config"]["loader"] = UnitModel(
+        unit="ElasticcDirAlertLoader",
+        config={
+            "folder": str(Path(__file__).parent / "test-data"),
+            "extension": "alert_mjd60563.1120_obj104044681_src208089362038.avro.gz",
+        },
+    )
+
+    supplier = AuxUnitRegister.new_unit(
+        model=UnitModel(**model.config["supplier"]), sub_type=LSSTAlertSupplier
+    )
+    alert = next(supplier)
+    assert len(alert.datapoints) == 20
+
+    processor = mock_context.loader.new_context_unit(
+        model=model,
+        context=mock_context,
+        sub_type=AlertConsumer,
+        raise_exc=True,
+    )
+    processor.iter_max = 1
+
+    # insert datapoints from first alert into the database
+    assert processor.run() == 1
+
+    assert (t1 := mock_context.db.get_collection("t1").find_one())
+    assert len(t1["dps"]) == len(
+        set(t1["dps"])
+    ), "datapoints in state are unique"
+    assert (
+        len(t1["dps"]) < len(alert.datapoints) - 1
+    ), "some alert datapoints eliminated"
