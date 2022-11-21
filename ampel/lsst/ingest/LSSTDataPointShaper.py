@@ -7,7 +7,7 @@
 # Last Modified Date: 21.03.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
-from typing import Any, Dict, Iterable, List
+from typing import Any, Iterable
 from bson import encode
 
 from ampel.content.DataPoint import DataPoint
@@ -27,14 +27,15 @@ class LSSTDataPointShaper(AbsT0Unit):
     # Mandatory implementation
 
     def process(  # type: ignore[override]
-        self, arg: Iterable[Dict[str, Any]], stock: StockId
-    ) -> List[DataPoint]:
+        self, arg: Iterable[dict[str, Any]], stock: StockId
+    ) -> list[DataPoint]:
         """
         :param arg: sequence of unshaped dps
         """
 
-        ret_list: List[DataPoint] = []
-        sourceid_list: List[int|str] = [] # Record forced photometry for comp.
+        ret_list: list[DataPoint] = []
+        # Record forced photometry for comp.
+        sourceid_list: list[int | str] = []
         setitem = dict.__setitem__
 
         for photo_dict in arg:
@@ -67,16 +68,18 @@ class LSSTDataPointShaper(AbsT0Unit):
                     size=-self.digest_size * 8,
                 )
                 tags.append("LSST_ND")
-                print('OOOOOO do we have upper limits?')
+                print("OOOOOO do we have upper limits?")
             ret_list.append(
-                {"id": id, "stock": stock, "tag": tags, "body": photo_dict}
+                {"id": id, "stock": stock, "tag": tags, "body": photo_dict}  # type: ignore[typeddict-item]
             )
 
         # Current alert format allows for the same dp to be provided as
         # both source and forcedsource. If so, we here choose FP.
         # (flux values should consistently be the same)
-        ret_list = [dp for dp in ret_list if
-                not (dp['id'] in source_id_list and "LSST_FP" in dp['tags'])
-                ]
+        ret_list = [
+            dp
+            for dp in ret_list
+            if not (dp["id"] in sourceid_list and "LSST_FP" in dp["tag"])
+        ]
 
         return ret_list
