@@ -129,7 +129,7 @@ requests-toolbelt = ">=0.9.1,<0.10.0"
 kafka = ["confluent-kafka (>=1.5.0,<2.0.0)"]
 healpix = ["healpy (>=1.15,<2.0)"]
 light-curve = ["light-curve (>=0.6,<0.7)"]
-archive = ["ampel-ztf-archive (<empty>)"]
+archive = ["ampel-ztf-archive"]
 
 [[package]]
 name = "appdirs"
