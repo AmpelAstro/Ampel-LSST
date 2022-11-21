@@ -2,14 +2,11 @@
 
 
 import logging
-from typing import List, Optional, Union
 from io import BytesIO, StringIO
 
 import gzip
 import fastavro
-#from pydantic import Field
 
-from ampel.abstract.AbsAlertLoader import AbsAlertLoader
 from ampel.alert.load.DirAlertLoader import DirAlertLoader
 
 log = logging.getLogger(__name__)
@@ -497,14 +494,12 @@ class ElasticcDirAlertLoader(DirAlertLoader):
 
     #: Message schema
     avro_schema: dict = DEFAULT_SCHEMA
-    schema = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.schema = fastavro.schema.parse_schema(self.avro_schema)
+        self.schema: dict = fastavro.schema.parse_schema(self.avro_schema)
 
-
-    def __next__(self) -> Union[StringIO, BytesIO]:
+    def __next__(self) -> StringIO | BytesIO:
 
         if not self.files:
             self.build_file_list()
@@ -518,10 +513,6 @@ class ElasticcDirAlertLoader(DirAlertLoader):
 
         with gzip.open(fpath, self.open_mode) as alert_file:
 
-            alert = fastavro.schemaless_reader(
-                    BytesIO(alert_file.read()) if self.binary_mode
-                    else StringIO(alert_file.read()),
-                    self.schema
-            )
+            alert = fastavro.schemaless_reader(alert_file, self.schema)
             # Assuming one alert per file
             return alert
