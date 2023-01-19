@@ -137,7 +137,8 @@ def test_duplicate_datapoints(mock_context: DevAmpelContext):
         unit="ElasticcDirAlertLoader",
         config={
             "folder": str(Path(__file__).parent / "test-data"),
-            "extension": "alert_mjd60563.1120_obj104044681_src208089362038.avro.gz",
+            # extension gets translated into .*{extension}
+            "extension": "1120_obj104044681_src208089362038.avro.gz",
         },
     )
 
