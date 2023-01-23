@@ -69,6 +69,7 @@ plugins = [
   "numpy.typing.mypy_plugin"
 ]
 show_error_codes = true
+check_untyped_defs = true
 
 [[tool.mypy.overrides]]
 module = [

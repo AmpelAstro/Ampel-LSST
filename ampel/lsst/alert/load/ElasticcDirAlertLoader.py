@@ -497,7 +497,7 @@ class ElasticcDirAlertLoader(DirAlertLoader):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.schema: dict = fastavro.schema.parse_schema(self.avro_schema)
+        self.alert_schema: dict = fastavro.schema.parse_schema(self.avro_schema)
 
     def __next__(self) -> StringIO | BytesIO:
 
@@ -513,6 +513,6 @@ class ElasticcDirAlertLoader(DirAlertLoader):
 
         with gzip.open(fpath, self.open_mode) as alert_file:
 
-            alert = fastavro.schemaless_reader(alert_file, self.schema)
+            alert = fastavro.schemaless_reader(alert_file, self.alert_schema)
             # Assuming one alert per file
             return alert
