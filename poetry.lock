@@ -2271,5 +2271,5 @@ tests = ["coverage", "flake8", "wheel"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.10,<3.11"
-content-hash = "201eac50a4fccc3016c89313ec7b7c0acc3ff51db5536aee3ecd23dcfecb8907"
+python-versions = ">=3.10,<3.12"
+content-hash = "6a0c1c542f11d53612a4d914da3b9c9d1eb7a90d1b5ab63f10aeff9eb44f25e3"
