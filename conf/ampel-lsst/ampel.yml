@@ -38,4 +38,5 @@ alias:
       select: last
 
 template:
-  elasticc_alerts: ampel.lsst.template.ElasticcAlertConsumerTemplate
+  ingest_elasticc_alerts: ampel.lsst.template.ElasticcAlertConsumerTemplate
+  ingest_lsst_alerts: ampel.lsst.template.LSSTAlertConsumerTemplate
