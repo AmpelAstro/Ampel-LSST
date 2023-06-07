@@ -11,14 +11,13 @@ import sys
 from typing import Literal, Optional, cast, TYPE_CHECKING
 from hashlib import blake2b
 from bson import encode
+from astropy.table import Table
 
 from ampel.alert.AmpelAlert import AmpelAlert
 from ampel.alert.BaseAlertSupplier import BaseAlertSupplier
 from ampel.protocol.AmpelAlertProtocol import AmpelAlertProtocol
 from ampel.view.ReadOnlyDict import ReadOnlyDict
 
-if TYPE_CHECKING:
-    from astropy.table import Table
 
 
 
