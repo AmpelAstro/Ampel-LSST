@@ -43,7 +43,10 @@ class ElasticcAlertSupplier(BaseAlertSupplier):
         sntype = lc.meta['sim_type_index']   # Again do not know how consistent these are
         # Try to generate a unique stock. Not sure how well this will work.
         # Lets see whether we still get dubplicates...
-        stock = int( lc.meta['snid']+str(abs(lc.meta['ra'])*10000)[0:2] )
+        if lc.meta['ra']==0.0:          # Unclear why this happens
+            stock = int( lc.meta['snid']+'99' )            
+        else:
+            stock = int( lc.meta['snid']+str(abs(lc.meta['ra'])*10000)[0:2] )
 
         # Generate datapoints.
         # Would be much more efficient if dps generation was done in Loader?
