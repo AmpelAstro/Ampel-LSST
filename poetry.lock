@@ -2374,4 +2374,4 @@ tests = ["build", "coverage", "mypy", "ruff", "wheel"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "28b6f78c7cc2cfbb4cf0ad789e92616d77ad76566407e5775ce85e11d995e7b4"
+content-hash = "b0a1786e075949836037332d74c25a207f6cefff292a665449cee217cfb31ca0"
