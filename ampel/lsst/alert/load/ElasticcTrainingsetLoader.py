@@ -207,6 +207,12 @@ meta_dcast: dict[str, Callable[[bytes], Any]] = {
  'SIM_HOSTLIB(r_obs)': float,
  'SIM_HOSTLIB(i_obs)': float,
  'SIM_MJD_EXPLODE': float,
+ 'AGN_PARAM(M_BH)': float,
+ 'AGN_PARAM(Mi)': float,
+ 'AGN_PARAM(edd_ratio)': float,
+ 'AGN_PARAM(edd_ratio2)': float,
+ 'AGN_PARAM(t_transition)': float,
+ 'AGN_PARAM(cl_flag)': float,
 }
 
 # Some meta key names were also changed between the training set and
@@ -262,7 +268,7 @@ class ElasticcLcIterator:
                    if (k in meta_dcast and v is not None)
                    else v for k, v in self.lightcurve.meta.items()
             }
-                
+
         # Rename fields
         for oldkey, newkey in meta_namechange.items():
             if oldkey in self.lightcurve.meta:
