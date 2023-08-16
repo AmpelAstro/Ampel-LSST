@@ -49,10 +49,13 @@ class LSSTDataPointShaper(AbsT0Unit):
             Non detection limit don't have an identifier.
             """
 
+            id = hash_payload(
+                encode(dict(sorted(photo_dict.items()))),
+                size=-self.digest_size * 8,
+            )
             if "diaSourceId" in photo_dict:
-                id = photo_dict["diaSourceId"]
                 tags.append("LSST_DP")
-                sourceid_list.add(id)
+                sourceid_list.add(photo_dict["diaSourceId"])
             elif "diaForcedSourceId" in photo_dict:
                 id = photo_dict["diaForcedSourceId"]
                 tags.append("LSST_FP")
@@ -63,10 +66,6 @@ class LSSTDataPointShaper(AbsT0Unit):
                 tags.append("LSST_OBJ")
             else:
                 # Nondetection Limit
-                id = hash_payload(
-                    encode(dict(sorted(photo_dict.items()))),
-                    size=-self.digest_size * 8,
-                )
                 tags.append("LSST_ND")
                 print("OOOOOO do we have upper limits?")
             ret_list.append(
@@ -79,5 +78,5 @@ class LSSTDataPointShaper(AbsT0Unit):
         return [
             dp
             for dp in ret_list
-            if not (dp["id"] in sourceid_list and "LSST_FP" in dp["tag"])
+            if not (dp["body"].get("diaSourceId") in sourceid_list and "LSST_FP" in dp["tag"])
         ]
