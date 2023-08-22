@@ -57,12 +57,10 @@ class LSSTDataPointShaper(AbsT0Unit):
                 tags.append("LSST_DP")
                 sourceid_list.add(photo_dict["diaSourceId"])
             elif "diaForcedSourceId" in photo_dict:
-                id = photo_dict["diaForcedSourceId"]
                 tags.append("LSST_FP")
             elif "diaObjectId" in photo_dict:  # DiaObject
                 # diaObjectId is also used in (prv)diaSource and diaForcedPhotometry
                 # if other fields are added, check if they contain diaObjectId
-                id = photo_dict["diaObjectId"]
                 tags.append("LSST_OBJ")
             else:
                 # Nondetection Limit
@@ -78,5 +76,5 @@ class LSSTDataPointShaper(AbsT0Unit):
         return [
             dp
             for dp in ret_list
-            if not (dp["body"].get("diaSourceId") in sourceid_list and "LSST_FP" in dp["tag"])
+            if not (dp["body"].get("diaForcedSourceId") in sourceid_list and "LSST_FP" in dp["tag"])
         ]
