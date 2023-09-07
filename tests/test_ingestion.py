@@ -85,7 +85,8 @@ def test_message_ack(alert_consumer: AlertConsumer, mocker):
     assert alert_consumer.run() == 2
 
     assert ack.call_count == 1, "exactly one batch of acks"
-    alerts = list(ack.call_args[0][0])
+    # NB: alerts may be acked in arbitrary order
+    alerts = sorted(ack.call_args[0][0], key=lambda d: d["__kafka"]["alertId"])
     assert len(alerts) == 2
     assert alerts == [
         {"__kafka": {"alertId": alert["alertId"]}}
