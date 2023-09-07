@@ -7,7 +7,7 @@
 # Last Modified Date: 21.03.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
-from typing import Literal, Optional
+from typing import Literal, Optional, Iterator
 
 from ampel.alert.AmpelAlert import AmpelAlert
 from ampel.alert.BaseAlertSupplier import BaseAlertSupplier
@@ -52,10 +52,20 @@ class LSSTAlertSupplier(BaseAlertSupplier):
                 id=d["alertId"],  # alert id
                 stock=diaObjectId,  # internal ampel id
                 datapoints=tuple(dps),
-                extra={"kafka": kafka} if (kafka := d.get("__kafka")) else None,
+                extra={"kafka": kafka}
+                if (kafka := d.get("__kafka"))
+                else None,
             )
         else:
             raise DIAObjectMissingError
+
+    def acknowledge(self, alerts: Iterator[AmpelAlertProtocol]) -> None:
+        # invert transformation applied in _shape()
+        self.alert_loader.acknowledge(
+            {"__kafka": alert.extra["kafka"]}  # type: ignore[misc]
+            for alert in alerts
+            if alert.extra and "kafka" in alert.extra
+        )
 
     def __next__(self) -> AmpelAlertProtocol:
         """
@@ -66,5 +76,3 @@ class LSSTAlertSupplier(BaseAlertSupplier):
         d = self._deserialize(next(self.alert_loader))
 
         return self._shape(d)
-
-        
