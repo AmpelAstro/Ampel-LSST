@@ -2,7 +2,7 @@ from pathlib import PurePosixPath
 from urllib.parse import urlsplit, urlunsplit
 
 import requests
-from fastavro.schema import load_schema
+import fastavro.schema
 from fastavro.types import Schema
 from fastavro.repository.base import (
     AbstractSchemaRepository,
@@ -33,7 +33,7 @@ class HttpSchemaRepostory(AbstractSchemaRepository):
     @classmethod
     def load_schema(cls, url: str) -> Schema:
         base, schema, ext = cls.get_parts(url)
-        return load_schema(schema, repo=cls(base, ext))
+        return fastavro.schema.load_schema(schema, repo=cls(base, ext))
 
     def __init__(self, base_url: str, file_ext: str = ".avsc"):
         self.base_url = base_url
@@ -56,4 +56,4 @@ def parse_schema(schema_or_url: str | dict) -> Schema:
     if isinstance(schema_or_url, str):
         return HttpSchemaRepostory.load_schema(schema_or_url)
     else:
-        return load_schema(schema_or_url)
+        return fastavro.schema.parse_schema(schema_or_url)
