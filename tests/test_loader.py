@@ -96,7 +96,7 @@ def test_loader_ack(
     assert not mock_consumer.commit.called
 
     def verify_offset(offset):
-        offsets = mock_consumer.commit.call_args[1]["offsets"]
+        offsets = mock_consumer.store_offsets.call_args[1]["offsets"]
         assert len(offsets) == 1
         toppar = offsets[0]
         assert toppar.topic == "topic"
@@ -104,11 +104,11 @@ def test_loader_ack(
         assert toppar.offset == offset
 
     supplier.acknowledge(iter(alerts[:2]))
-    assert not mock_consumer.store_offsets.called
-    assert mock_consumer.commit.called
+    assert mock_consumer.store_offsets.called
     # offset is at the second alert, even though all have been consumed
-    verify_offset(1)
+    verify_offset(2)
 
     supplier.acknowledge(reversed(alerts))
+    assert mock_consumer.store_offsets.call_count == 2
     # offset is at the last alert, even though acks came out of order
-    verify_offset(2)
+    verify_offset(3)
