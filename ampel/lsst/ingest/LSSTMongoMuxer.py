@@ -50,7 +50,7 @@ class LSSTMongoMuxer(AbsT0Muxer):
     #alert_history_length: int = 365
 
     # Standard projection used when checking DB for existing PPS/ULS
-    projection = {
+    projection: dict[str,int] = {
         "_id": 0,
         "id": 1,
         "tag": 1,
