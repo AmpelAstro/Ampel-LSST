@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 
-import logging
+import os, logging
 from io import BytesIO, StringIO
+from typing import Callable, IO
 
 import gzip
 import fastavro
@@ -38,8 +39,14 @@ class ElasticcDirAlertLoader(DirAlertLoader):
         if self.logger.verbose > 1:
             self.logger.debug("Loading " + fpath)
 
-        with gzip.open(fpath, self.open_mode) as alert_file:
+        # Assuming one alert per file and either compressed (gz) or binary uncompressed
+        if os.path.splitext(fpath)[1] == '.gz' :
+            alertopener = gzip.open
+        else:
+            alertopener = open # type: ignore[assignment]
 
+        with alertopener(fpath, self.open_mode) as alert_file:
             alert = fastavro.schemaless_reader(alert_file, self.alert_schema)
-            # Assuming one alert per file
             return alert
+
+
