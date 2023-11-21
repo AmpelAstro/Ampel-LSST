@@ -9,7 +9,10 @@ from fastavro.repository.base import (
     SchemaRepositoryError,
 )
 
-DEFAULT_SCHEMA = "https://raw.githubusercontent.com/LSSTDESC/elasticc/c47fbd301b87f915c77ac0046d7845c68c306444/alert_schema/elasticc.v0_9.alert.avsc"
+# Schema used until ~summer 2023
+# DEFAULT_SCHEMA = "https://raw.githubusercontent.com/LSSTDESC/elasticc/c47fbd301b87f915c77ac0046d7845c68c306444/alert_schema/elasticc.v0_9.alert.avsc"
+# Current default
+DEFAULT_SCHEMA = "https://raw.githubusercontent.com/LSSTDESC/elasticc/main/alert_schema/elasticc.v0_9_1.alert.avsc"
 
 class HttpSchemaRepostory(AbstractSchemaRepository):
     @classmethod
