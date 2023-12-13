@@ -7,6 +7,7 @@
 # Last Modified Date: 18.03.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
+import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 from ampel.content.DataPoint import DataPoint
@@ -46,7 +47,7 @@ class LSSTMongoMuxer(AbsT0Muxer):
     """
 
     # Standard projection used when checking DB for existing PPS/ULS
-    projection: dict[str,int] = {
+    projection: dict[str, int] = {
         "_id": 0,
         "id": 1,
         "tag": 1,
@@ -58,6 +59,9 @@ class LSSTMongoMuxer(AbsT0Muxer):
         "body.psFlux": 1,
         "body.diaObjectId": 1,
     }
+
+    #: Require minimum time-to-live for datapoints
+    min_ttl: None | float = None
 
     def __init__(self, **kwargs) -> None:
 
@@ -81,8 +85,16 @@ class LSSTMongoMuxer(AbsT0Muxer):
         #######################################
 
         # New pps/uls lists for db loaded datapoints
+        filter: dict[str, Any] = {"stock": stock_id}
+        if self.min_ttl is not None:
+            filter["expiry"] = {
+                "$not": {
+                    "$lt": datetime.datetime.now(tz=datetime.timezone.utc)
+                    + datetime.timedelta(seconds=self.min_ttl)
+                }
+            }
         dps_db: List[DataPoint] = list(
-            self._photo_col.find({"stock": stock_id}, self.projection)
+            self._photo_col.find(filter, self.projection)
         )
 
         # Create set with datapoint ids from alert
