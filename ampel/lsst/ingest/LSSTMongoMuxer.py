@@ -10,10 +10,8 @@
 from typing import Any, Dict, List, Optional, Tuple
 
 from ampel.content.DataPoint import DataPoint
-from ampel.mongo.utils import maybe_use_each
 from ampel.types import StockId
 from ampel.util.mappings import unflatten_dict
-from pymongo import UpdateOne
 
 from ampel.abstract.AbsT0Muxer import AbsT0Muxer
 
@@ -26,7 +24,7 @@ class LSSTMongoMuxer(AbsT0Muxer):
     :param alert_history_length: alerts must not contain all available info for a given transient.
     Alerts for LSST should provide a photometric history of 365 days.
 
-    JN: For *elasticc* diffimage and forced photometry will have identical flux 
+    JN: For *elasticc* diffimage and forced photometry will have identical flux
     values. Since there is both a previous source phot and previous forced phot
     history, a single alert can contain multiple copes of the same measurement.
     Again, for *elasticc* it also seems like they keep the same id
@@ -46,8 +44,6 @@ class LSSTMongoMuxer(AbsT0Muxer):
 
 
     """
-
-    #alert_history_length: int = 365
 
     # Standard projection used when checking DB for existing PPS/ULS
     projection: dict[str,int] = {
@@ -88,8 +84,6 @@ class LSSTMongoMuxer(AbsT0Muxer):
         dps_db: List[DataPoint] = list(
             self._photo_col.find({"stock": stock_id}, self.projection)
         )
-
-        add_update = self.updates_buffer.add_t0_update
 
         # Create set with datapoint ids from alert
         ids_dps_alert = {el["id"]: el for el in dps_al}
