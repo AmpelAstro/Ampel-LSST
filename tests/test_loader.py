@@ -10,6 +10,8 @@ from pytest_mock import MockerFixture
 from ampel.lsst.alert.LSSTAlertSupplier import LSSTAlertSupplier
 from ampel.model.UnitModel import UnitModel
 
+# ruff: noqa: SLF001
+
 
 class MockMessage:
     """
