@@ -111,6 +111,7 @@ def test_duplicate_datapoints(mock_context: DevAmpelContext):
             "folder": str(Path(__file__).parent / "test-data"),
             # extension gets translated into .*{extension}
             "extension": "1120_obj104044681_src208089362038.avro.gz",
+            "avro_schema": "https://raw.githubusercontent.com/LSSTDESC/elasticc/c47fbd301b87f915c77ac0046d7845c68c306444/alert_schema/elasticc.v0_9.alert.avsc",
         },
     )
 
