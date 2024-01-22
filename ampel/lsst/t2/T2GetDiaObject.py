@@ -7,13 +7,14 @@
 # Last Modified Date:  22.06.2022
 # Last Modified By:    jno <jnordin@physik.hu-berlinn.de>
 
-from typing import ClassVar, List, Union, TYPE_CHECKING
-from ampel.types import UBson
+from typing import TYPE_CHECKING, ClassVar, List, Union
+
 from ampel.abstract.AbsPointT2Unit import AbsPointT2Unit
 from ampel.content.DataPoint import DataPoint
-from ampel.struct.UnitResult import UnitResult
 from ampel.model.DPSelection import DPSelection
 from ampel.protocol.LoggerProtocol import LoggerProtocol
+from ampel.struct.UnitResult import UnitResult
+from ampel.types import UBson
 
 
 class T2GetDiaObject(AbsPointT2Unit):

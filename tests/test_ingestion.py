@@ -1,13 +1,13 @@
+from pathlib import Path
+
+import fastavro
 import pytest
 import yaml
-import fastavro
 
-from pathlib import Path
-from ampel.base.AuxUnitRegister import AuxUnitRegister
-from ampel.lsst.alert.LSSTAlertSupplier import LSSTAlertSupplier
-
-from ampel.dev.DevAmpelContext import DevAmpelContext
 from ampel.alert.AlertConsumer import AlertConsumer
+from ampel.base.AuxUnitRegister import AuxUnitRegister
+from ampel.dev.DevAmpelContext import DevAmpelContext
+from ampel.lsst.alert.LSSTAlertSupplier import LSSTAlertSupplier
 from ampel.model.UnitModel import UnitModel
 
 

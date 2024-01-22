@@ -9,9 +9,8 @@
 
 from typing import List
 
-from ampel.content.DataPoint import DataPoint
-
 from ampel.abstract.AbsApplicable import AbsApplicable
+from ampel.content.DataPoint import DataPoint
 
 
 class LSSTFPFilter(AbsApplicable):

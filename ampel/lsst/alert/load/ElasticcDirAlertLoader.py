@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 
 
-import os, logging
-from io import BytesIO, StringIO
-from typing import Callable, IO
-
 import gzip
+import logging
+import os
+from io import BytesIO, StringIO
+
 import fastavro
 
 from ampel.alert.load.DirAlertLoader import DirAlertLoader
-from .HttpSchemaRepository import parse_schema, DEFAULT_SCHEMA, Schema
+
+from .HttpSchemaRepository import DEFAULT_SCHEMA, Schema, parse_schema
 
 log = logging.getLogger(__name__)
 

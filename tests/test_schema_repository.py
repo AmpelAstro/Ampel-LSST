@@ -1,7 +1,6 @@
-from ampel.lsst.alert.load.HttpSchemaRepository import HttpSchemaRepostory
 import fastavro
 
-from fastavro._schema_py import load_schema
+from ampel.lsst.alert.load.HttpSchemaRepository import HttpSchemaRepostory
 
 DEFAULT_SCHEMA = {
     "type": "record",

@@ -1,15 +1,12 @@
-import pytest
-
+from itertools import cycle
 from pathlib import Path
 
-import pytest
 import mongomock
+import pytest
 
-from itertools import cycle
-
-from ampel.dev.DevAmpelContext import DevAmpelContext
-from ampel.abstract.AbsAlertLoader import AbsAlertLoader
 from ampel.abstract.AbsAlertFilter import AbsAlertFilter, AmpelAlertProtocol
+from ampel.abstract.AbsAlertLoader import AbsAlertLoader
+from ampel.dev.DevAmpelContext import DevAmpelContext
 
 
 class MockAlertLoader(AbsAlertLoader):

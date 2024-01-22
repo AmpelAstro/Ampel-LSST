@@ -7,14 +7,15 @@
 # Last Modified Date:  24.03.2022
 # Last Modified By:    Marcus Fenner <mf@physik.hu-berlin.de>
 
+from typing import Any, Dict, Optional, Union
+
 import numpy as np
-from typing import Optional, Union, Dict, Any
-from astropy.table import Table
 from astropy.coordinates import SkyCoord
+from astropy.table import Table
 
 from ampel.abstract.AbsAlertFilter import AbsAlertFilter
-from ampel.ztf.base.CatalogMatchUnit import CatalogMatchUnit
 from ampel.protocol.AmpelAlertProtocol import AmpelAlertProtocol
+from ampel.ztf.base.CatalogMatchUnit import CatalogMatchUnit
 
 
 class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):

@@ -10,11 +10,10 @@
 import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
+from ampel.abstract.AbsT0Muxer import AbsT0Muxer
 from ampel.content.DataPoint import DataPoint
 from ampel.types import StockId
 from ampel.util.mappings import unflatten_dict
-
-from ampel.abstract.AbsT0Muxer import AbsT0Muxer
 
 
 class LSSTMongoMuxer(AbsT0Muxer):

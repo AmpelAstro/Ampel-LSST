@@ -1,13 +1,13 @@
 from pathlib import PurePosixPath
 from urllib.parse import urlsplit, urlunsplit
 
-import requests
 import fastavro.schema
-from fastavro.types import Schema
+import requests
 from fastavro.repository.base import (
     AbstractSchemaRepository,
     SchemaRepositoryError,
 )
+from fastavro.types import Schema
 
 # Schema used until ~summer 2023
 # DEFAULT_SCHEMA = "https://raw.githubusercontent.com/LSSTDESC/elasticc/c47fbd301b87f915c77ac0046d7845c68c306444/alert_schema/elasticc.v0_9.alert.avsc"

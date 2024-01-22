@@ -7,17 +7,13 @@
 # Last Modified Date: 22.06.2022
 # Last Modified By  : J Nordin <jno@physik.hu-berlin.de>
 
-from typing import Any, Callable, cast
+import codecs
+from typing import Any, Callable, Dict, Sequence, cast
 
+import sncosmo
 from astropy.table import Table
 
-import codecs
-import sncosmo
-from typing import IO, Optional, Sequence, Dict
-from ampel.log.AmpelLogger import AmpelLogger
 from ampel.abstract.AbsAlertLoader import AbsAlertLoader
-from ampel.types import Traceless
-
 
 # These can vary for different models, and more might be needed.
 meta_dcast: dict[str, Callable[[bytes], Any]] = {

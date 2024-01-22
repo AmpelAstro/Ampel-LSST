@@ -7,14 +7,15 @@
 # Last Modified Date:  31.03.2022
 # Last Modified By:    Marcus Fennner <mf@physik.hu-berlinn.de>
 
-from typing import ClassVar, List, Union, Sequence, Dict, Literal
-from ampel.types import UBson
+from typing import ClassVar, Dict, List, Literal, Sequence, Union
+
 from ampel.abstract.AbsTiedPointT2Unit import AbsTiedPointT2Unit
-from ampel.view.T2DocView import T2DocView
 from ampel.content.DataPoint import DataPoint
-from ampel.struct.UnitResult import UnitResult
 from ampel.model.DPSelection import DPSelection
 from ampel.model.UnitModel import UnitModel
+from ampel.struct.UnitResult import UnitResult
+from ampel.types import UBson
+from ampel.view.T2DocView import T2DocView
 
 
 class T2GetAlertId(AbsTiedPointT2Unit):

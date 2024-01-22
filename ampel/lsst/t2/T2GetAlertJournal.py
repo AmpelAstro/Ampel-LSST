@@ -7,12 +7,12 @@
 # Last Modified Date:  31.03.2022
 # Last Modified By:    Marcus Fennner <mf@physik.hu-berlinn.de>
 
-from typing import ClassVar, List, Union
-from ampel.types import UBson
+from typing import Union
+
 from ampel.abstract.AbsStockT2Unit import AbsStockT2Unit
 from ampel.content.StockDocument import StockDocument
 from ampel.struct.UnitResult import UnitResult
-from ampel.model.DPSelection import DPSelection
+from ampel.types import UBson
 
 
 class T2GetAlertJournal(AbsStockT2Unit):

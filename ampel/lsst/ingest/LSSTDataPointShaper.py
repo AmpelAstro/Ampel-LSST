@@ -8,13 +8,13 @@
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
 from typing import Any, Iterable
+
 from bson import encode
 
+from ampel.abstract.AbsT0Unit import AbsT0Unit
 from ampel.content.DataPoint import DataPoint
 from ampel.types import StockId
 from ampel.util.hash import hash_payload
-
-from ampel.abstract.AbsT0Unit import AbsT0Unit
 
 
 class LSSTDataPointShaper(AbsT0Unit):

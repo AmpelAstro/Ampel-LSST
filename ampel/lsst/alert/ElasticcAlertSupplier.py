@@ -8,10 +8,11 @@
 # Last Modified By  : j nordin <jnordin@physik.hu-berlin.de>
 
 import sys
-from typing import Literal, Optional, cast, TYPE_CHECKING
 from hashlib import blake2b
-from bson import encode
+from typing import Literal, Optional, cast
+
 from astropy.table import Table
+from bson import encode
 
 from ampel.alert.AmpelAlert import AmpelAlert
 from ampel.alert.BaseAlertSupplier import BaseAlertSupplier

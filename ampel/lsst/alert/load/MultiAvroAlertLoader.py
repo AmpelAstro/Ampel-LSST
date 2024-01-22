@@ -10,11 +10,11 @@
 from io import BytesIO, IOBase
 from typing import Iterable, no_type_check
 
-from ampel.base.AuxUnitRegister import AuxUnitRegister
-from ampel.model.UnitModel import UnitModel
 from fastavro import reader
 
 from ampel.abstract.AbsAlertLoader import AbsAlertLoader
+from ampel.base.AuxUnitRegister import AuxUnitRegister
+from ampel.model.UnitModel import UnitModel
 
 
 class MultiAvroAlertLoader(AbsAlertLoader[BytesIO]):

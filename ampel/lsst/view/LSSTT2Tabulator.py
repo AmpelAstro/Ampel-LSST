@@ -7,13 +7,13 @@
 # Last Modified Date: 05.05.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
-from typing import Any, Sequence, Iterable
+from typing import Any, Iterable, Sequence
 
-from ampel.content.DataPoint import DataPoint
-from ampel.types import StockId
 from astropy.table import Table
 
 from ampel.abstract.AbsT2Tabulator import AbsT2Tabulator
+from ampel.content.DataPoint import DataPoint
+from ampel.types import StockId
 
 LSST_BANDPASSES = {
     "u": "lsstu",
