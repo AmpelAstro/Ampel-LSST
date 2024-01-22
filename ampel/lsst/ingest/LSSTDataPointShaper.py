@@ -65,7 +65,6 @@ class LSSTDataPointShaper(AbsT0Unit):
             else:
                 # Nondetection Limit
                 tags.append("LSST_ND")
-                print("OOOOOO do we have upper limits?")
             ret_list.append(
                 {"id": id, "stock": stock, "tag": tags, "body": photo_dict}  # type: ignore[typeddict-item]
             )
