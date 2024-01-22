@@ -56,8 +56,7 @@ class LSSTAlertSupplier(BaseAlertSupplier):
                 if (kafka := d.get("__kafka"))
                 else None,
             )
-        else:
-            raise DIAObjectMissingError
+        raise DIAObjectMissingError
 
     def acknowledge(self, alerts: Iterator[AmpelAlertProtocol]) -> None:
         # invert transformation applied in _shape()

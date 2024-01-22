@@ -60,5 +60,4 @@ class HttpSchemaRepostory(AbstractSchemaRepository):
 def parse_schema(schema_or_url: str | dict) -> Schema:
     if isinstance(schema_or_url, str):
         return HttpSchemaRepostory.load_schema(schema_or_url)
-    else:
-        return fastavro.schema.parse_schema(schema_or_url)
+    return fastavro.schema.parse_schema(schema_or_url)

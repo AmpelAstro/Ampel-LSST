@@ -29,5 +29,4 @@ class T2GetDiaObject(AbsPointT2Unit):
         logger: LoggerProtocol
 
     def process(self, datapoint: DataPoint) -> UBson:
-        r = {param: datapoint["body"].get(param) for param in self.params}
-        return r
+        return {param: datapoint["body"].get(param) for param in self.params}

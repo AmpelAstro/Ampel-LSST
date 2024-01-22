@@ -33,13 +33,11 @@ def alert_consumer(mock_context: DevAmpelContext) -> AlertConsumer:
         unit="MockFilter", config={"pattern": [False, True]}
     )
 
-    processor = mock_context.loader.new_context_unit(
+    return mock_context.loader.new_context_unit(
         model=model,
         context=mock_context,
         sub_type=AlertConsumer,
     )
-
-    return processor
 
 
 def test_muxer(
