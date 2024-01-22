@@ -2,6 +2,7 @@ unit: AlertConsumer
 config:
   process_name: consume
   iter_max: 50000
+  raise_exc: true
   compiler_opts: LSSTCompilerOptions
   supplier:
     unit: LSSTAlertSupplier

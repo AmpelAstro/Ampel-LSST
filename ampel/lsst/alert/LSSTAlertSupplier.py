@@ -7,6 +7,7 @@
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
 from collections.abc import Iterator
+from itertools import chain
 from typing import Literal
 
 from ampel.alert.AmpelAlert import AmpelAlert
@@ -36,18 +37,16 @@ class LSSTAlertSupplier(BaseAlertSupplier):
     def _shape(d: dict) -> AmpelAlertProtocol:
         if d["diaObject"]:
             diaObjectId = d["diaObject"]["diaObjectId"]
-            dps = [ReadOnlyDict(d["diaSource"])]
-            if d.get("prvDiaSources"):
-                for prv_source in d["prvDiaSources"]:
-                    dps.append(ReadOnlyDict(prv_source))
-            if d.get("prvDiaForcedSources"):
-                for forced_source in d["prvDiaForcedSources"]:
-                    dps.append(ReadOnlyDict(forced_source))
-            if d.get("diaNondetectionLimit"):
-                for non_det in d["diaNondetectionLimit"]:
-                    dps.append(ReadOnlyDict(non_det))
-            if d.get("diaObject"):
-                dps.append(ReadOnlyDict(d["diaObject"]))
+            dps = tuple(
+                ReadOnlyDict(dp)
+                for dp in chain(
+                    (d["diaSource"],),
+                    d.get("prvDiaSources") or (),
+                    d.get("prvDiaForcedSources") or (),
+                    d.get("diaNondetectionLimit") or (),
+                    ((d.get("diaObject"),) if d.get("diaObject") else ()),
+                )
+            )
             return AmpelAlert(
                 id=d["alertId"],  # alert id
                 stock=diaObjectId,  # internal ampel id
