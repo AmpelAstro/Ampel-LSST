@@ -8,7 +8,7 @@
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
 from io import BytesIO, IOBase
-from typing import Iterable
+from typing import Iterable, no_type_check
 
 from ampel.base.AuxUnitRegister import AuxUnitRegister
 from ampel.model.UnitModel import UnitModel
@@ -38,12 +38,14 @@ class MultiAvroAlertLoader(AbsAlertLoader[BytesIO]):
         )
         self.next_file()
 
+    @no_type_check
     def next_file(self) -> None:
         self.reader = reader(next(self.alert_loader))
 
     def __iter__(self):
         return self
 
+    @no_type_check
     def __next__(self) -> BytesIO:
         try:
             return next(self.reader)

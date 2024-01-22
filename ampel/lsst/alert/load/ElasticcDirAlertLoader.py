@@ -46,7 +46,7 @@ class ElasticcDirAlertLoader(DirAlertLoader):
             alertopener = open # type: ignore[assignment]
 
         with alertopener(fpath, self.open_mode) as alert_file:
-            alert = fastavro.schemaless_reader(alert_file, self.alert_schema)
-            return alert
+            alert = fastavro.schemaless_reader(alert_file, self.alert_schema, reader_schema=None) # type: ignore[arg-type]
+            return alert # type: ignore[return-value]
 
 
