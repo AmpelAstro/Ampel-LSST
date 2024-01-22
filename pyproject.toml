@@ -111,4 +111,5 @@ select = [
     "I",
     "UP", # pyupgrade
     "B", # bugbear
+    "DTZ", # datetimez
 ]
