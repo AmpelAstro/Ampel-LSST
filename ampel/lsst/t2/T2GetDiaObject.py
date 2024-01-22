@@ -15,17 +15,20 @@ from ampel.struct.UnitResult import UnitResult
 from ampel.model.DPSelection import DPSelection
 from ampel.protocol.LoggerProtocol import LoggerProtocol
 
+
 class T2GetDiaObject(AbsPointT2Unit):
     """
     Get information from a LSST transient's diaObject to use in other T2
     """
-    eligible: ClassVar[DPSelection] = DPSelection(filter='LSSTObjFilter', sort='diaObjectId', select='last')
+
+    eligible: ClassVar[DPSelection] = DPSelection(
+        filter="LSSTObjFilter", sort="diaObjectId", select="last"
+    )
     params: List[str]
 
     if TYPE_CHECKING:
         logger: LoggerProtocol
 
-
     def process(self, datapoint: DataPoint) -> Union[UBson, UnitResult]:
-        r= {param: datapoint["body"].get(param) for param in self.params}
+        r = {param: datapoint["body"].get(param) for param in self.params}
         return r

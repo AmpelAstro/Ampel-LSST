@@ -50,7 +50,6 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
     gaia_excessnoise_sig_max: float  # maximum allowed noise (expressed as significance) for Gaia match to be trusted.
 
     def post_init(self):
-
         # feedback
         for k in self.__annotations__:
             self.logger.info(f"Using {k}={getattr(self, k)}")
@@ -114,7 +113,6 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
         )[0]
 
         if srcs:
-
             gaia_tab = Table(
                 [
                     {

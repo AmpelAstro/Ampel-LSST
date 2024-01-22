@@ -14,6 +14,7 @@ from fastavro.repository.base import (
 # Current default
 DEFAULT_SCHEMA = "https://raw.githubusercontent.com/LSSTDESC/elasticc/main/alert_schema/elasticc.v0_9_1.alert.avsc"
 
+
 class HttpSchemaRepostory(AbstractSchemaRepository):
     @classmethod
     def get_parts(cls, url: str) -> tuple[str, str, str]:
@@ -54,6 +55,7 @@ class HttpSchemaRepostory(AbstractSchemaRepository):
             raise SchemaRepositoryError(
                 f"Failed to load '{name}' schema",
             ) from error
+
 
 def parse_schema(schema_or_url: str | dict) -> Schema:
     if isinstance(schema_or_url, str):

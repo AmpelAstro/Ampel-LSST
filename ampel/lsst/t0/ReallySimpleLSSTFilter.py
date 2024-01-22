@@ -25,21 +25,18 @@ class ReallySimpleLSSTFilter(AbsAlertFilter):
 
     # History
     min_ndet: int  # number of previous detections
-    max_ndet: Optional[ int ] # number of previous detections
+    max_ndet: Optional[int]  # number of previous detections
     min_tspan: float  # minimum duration of alert detection history [days]
     max_tspan: float  # maximum duration of alert detection history [days]
 
     def post_init(self):
-
         # feedback
         for k in self.__annotations__:
             self.logger.info(f"Using {k}={getattr(self, k)}")
 
         # To make this tenable we should create this list dynamically depending on what entries are required
         # by the filter. Now deciding not to include drb in this list, eg.
-        self.keys_to_check = (
-            "midPointTai",
-        )
+        self.keys_to_check = ("midPointTai",)
 
     def _alert_has_keys(self, photop) -> bool:
         """
@@ -70,7 +67,7 @@ class ReallySimpleLSSTFilter(AbsAlertFilter):
         if len(pps) < self.min_ndet:
             self.logger.info(None, extra={"nDet": len(pps)})
             return None
-        if self.max_ndet and len(pps)>self.max_ndet:
+        if self.max_ndet and len(pps) > self.max_ndet:
             self.logger.info(None, extra={"nDet": len(pps)})
             return None
 
@@ -82,7 +79,5 @@ class ReallySimpleLSSTFilter(AbsAlertFilter):
             self.logger.info(None, extra={"tSpan": det_tspan})
             return None
 
-        self.logger.debug(
-            "Alert accepted", extra={"midPointTai": last_det}
-        )
+        self.logger.debug("Alert accepted", extra={"midPointTai": last_det})
         return True

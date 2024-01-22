@@ -1,4 +1,3 @@
-
 from ampel.lsst.alert.load.HttpSchemaRepository import HttpSchemaRepostory
 import fastavro
 
@@ -476,11 +475,18 @@ DEFAULT_SCHEMA = {
     ],
 }
 
-def test_load_schema():
 
-    schema = HttpSchemaRepostory.load_schema("https://raw.githubusercontent.com/LSSTDESC/elasticc/c47fbd301b87f915c77ac0046d7845c68c306444/alert_schema/elasticc.v0_9.alert.avsc")
+def test_load_schema():
+    schema = HttpSchemaRepostory.load_schema(
+        "https://raw.githubusercontent.com/LSSTDESC/elasticc/c47fbd301b87f915c77ac0046d7845c68c306444/alert_schema/elasticc.v0_9.alert.avsc"
+    )
     assert schema == fastavro.parse_schema(DEFAULT_SCHEMA)
+
 
 def test_split():
     url = "https://raw.githubusercontent.com/LSSTDESC/elasticc/c47fbd301b87f915c77ac0046d7845c68c306444/alert_schema/elasticc.v0_9.alert.avsc"
-    assert HttpSchemaRepostory.get_parts(url) == ("https://raw.githubusercontent.com/LSSTDESC/elasticc/c47fbd301b87f915c77ac0046d7845c68c306444/alert_schema/", "elasticc.v0_9.alert", ".avsc")
+    assert HttpSchemaRepostory.get_parts(url) == (
+        "https://raw.githubusercontent.com/LSSTDESC/elasticc/c47fbd301b87f915c77ac0046d7845c68c306444/alert_schema/",
+        "elasticc.v0_9.alert",
+        ".avsc",
+    )

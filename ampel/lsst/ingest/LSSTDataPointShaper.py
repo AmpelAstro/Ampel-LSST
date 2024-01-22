@@ -76,5 +76,8 @@ class LSSTDataPointShaper(AbsT0Unit):
         return [
             dp
             for dp in ret_list
-            if not (dp["body"].get("diaForcedSourceId") in sourceid_list and "LSST_FP" in dp["tag"])
+            if not (
+                dp["body"].get("diaForcedSourceId") in sourceid_list
+                and "LSST_FP" in dp["tag"]
+            )
         ]

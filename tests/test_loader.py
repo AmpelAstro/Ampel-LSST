@@ -15,13 +15,15 @@ class MockMessage:
     """
     Mockup of confluent_kafka.Message, which can't be instantiated from Python
     """
+
     def __init__(self, record: dict, schema: dict, offset: int):
         buf = io.BytesIO()
         fastavro.schemaless_writer(buf, schema, record)
         self._value = buf.getvalue()
         self._offset = offset
-        self._timestamp = confluent_kafka.TIMESTAMP_CREATE_TIME, int(
-            datetime.datetime.now().timestamp() * 1000
+        self._timestamp = (
+            confluent_kafka.TIMESTAMP_CREATE_TIME,
+            int(datetime.datetime.now().timestamp() * 1000),
         )
 
     def value(self):

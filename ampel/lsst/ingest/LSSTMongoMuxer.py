@@ -64,7 +64,6 @@ class LSSTMongoMuxer(AbsT0Muxer):
     min_ttl: None | float = None
 
     def __init__(self, **kwargs) -> None:
-
         super().__init__(**kwargs)
 
         # used to check potentially already inserted pps
@@ -125,10 +124,8 @@ class LSSTMongoMuxer(AbsT0Muxer):
         ], dps_combine
 
     def _project(self, doc, projection):
-
         out: Dict[str, Any] = {}
         for key, spec in projection.items():
-
             if key not in doc:
                 continue
 

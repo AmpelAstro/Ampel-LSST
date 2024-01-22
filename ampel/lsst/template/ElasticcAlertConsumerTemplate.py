@@ -2,8 +2,8 @@ from ampel.model.UnitModel import UnitModel
 
 from .LSSTAlertConsumerTemplate import LSSTAlertConsumerTemplate
 
-class ElasticcAlertConsumerTemplate(LSSTAlertConsumerTemplate):
 
+class ElasticcAlertConsumerTemplate(LSSTAlertConsumerTemplate):
     loader = UnitModel(
         unit="KafkaAlertLoader",
         config={

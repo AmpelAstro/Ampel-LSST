@@ -73,7 +73,8 @@ class LSSTT2Tabulator(AbsT2Tabulator):
             sum(
                 [
                     list(stockid)
-                    if isinstance(stockid := el["stock"], Sequence) and not isinstance(stockid, (str, bytes))
+                    if isinstance(stockid := el["stock"], Sequence)
+                    and not isinstance(stockid, (str, bytes))
                     else [stockid]
                     for el in dps
                     if "LSST" in el["tag"]

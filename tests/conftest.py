@@ -28,7 +28,6 @@ class MockAlertLoader(AbsAlertLoader):
 
 
 class MockFilter(AbsAlertFilter):
-
     pattern: list[bool]
 
     def __init__(self, **kwargs) -> None:
