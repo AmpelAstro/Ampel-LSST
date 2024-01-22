@@ -22,4 +22,4 @@ jobs:
     with:
       mongo: false
       python-version: "3.10"
-      ruff: false
+      ruff: true
