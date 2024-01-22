@@ -53,7 +53,7 @@ class ElasticcAlertSupplier(BaseAlertSupplier):
         dps = []
         all_ids = b""
         df = lc.to_pandas()
-        for k, row in df.iterrows():
+        for _, row in df.iterrows():
             d = dict(row)
             # Generate point id through hash
             d_hash = blake2b(encode(d), digest_size=7).digest()

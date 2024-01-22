@@ -58,7 +58,11 @@ class LSSTT2Tabulator(AbsT2Tabulator):
         self, dps: Iterable[DataPoint]
     ) -> Sequence[tuple[float, float, float]]:
         return tuple(
-            zip(self.get_jd(dps), *self.get_values(dps, ["ra", "decl"]))
+            zip(
+                self.get_jd(dps),
+                *self.get_values(dps, ["ra", "decl"]),
+                strict=False,
+            )
         )
 
     def get_jd(self, dps: Iterable[DataPoint]) -> Sequence[float]:
@@ -98,7 +102,8 @@ class LSSTT2Tabulator(AbsT2Tabulator):
                         [el["body"][param] for param in params]
                         for el in dps
                         if ("LSST_DP" in el["tag"] or "LSST_FP" in el["tag"])
-                    )
+                    ),
+                    strict=False,
                 ),
             )
         ):

@@ -7,7 +7,7 @@
 # Last Modified By  : J Nordin <jno@physik.hu-berlin.de>
 
 import codecs
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from typing import Any, cast
 
 import sncosmo
@@ -253,23 +253,24 @@ class ElasticcLcIterator:
         self,
         lightcurve: Table,
         startindex=0,
-        cut_col=[],
-        decode_col=[],
-        change_col={},
+        cut_col: None | Sequence[str] = None,
+        decode_col: None | Sequence[str] = None,
+        change_col: None | Mapping[str, str] = None,
     ):
         self.lightcurve = lightcurve
         self.lightcurve.sort(
             "MJD"
         )  # Prob already done, but critical for usage.
-        self.lightcurve.remove_columns(cut_col)
-        for dcol in decode_col:
+        self.lightcurve.remove_columns(cut_col or [])
+        for dcol in decode_col or []:
             # self.lightcurve[dcol] = self.lightcurve[dcol].astype(str)
             # Reading fits like this also cause trailing whitespaces, so instead
             self.lightcurve[dcol] = [
                 str(s).rstrip() for s in self.lightcurve[dcol]
             ]
-        for oldname, newname in change_col.items():
-            self.lightcurve.rename_column(oldname, newname)
+        if change_col:
+            for oldname, newname in change_col.items():
+                self.lightcurve.rename_column(oldname, newname)
 
         # Typecast meta and change to lower case
         self.lightcurve.meta = {
@@ -353,7 +354,7 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[Table]):
 
         if self.skip_transients != 0:
             count = 0
-            for lc in self.lightcurves:
+            for _ in self.lightcurves:
                 count += 1
                 if count >= self.skip_transients:
                     break
