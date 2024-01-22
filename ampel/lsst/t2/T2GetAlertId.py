@@ -33,7 +33,7 @@ class T2GetAlertId(AbsTiedPointT2Unit):
         sourceid = datapoint["body"]["diaSourceId"]
         t0journals: list[dict] = []
         for t2_view in t2_views:
-            if not t2_view.unit == "T2GetAlertJournal":
+            if t2_view.unit != "T2GetAlertJournal":
                 continue
             payload = t2_view.get_payload()
             assert isinstance(payload, list)
