@@ -35,8 +35,8 @@ class MockFilter(AbsAlertFilter):
         return next(self._cycle)
 
 
-@pytest.fixture
-def patch_mongo(monkeypatch):
+@pytest.fixture()
+def _patch_mongo(monkeypatch):
     monkeypatch.setattr(
         "ampel.core.AmpelDB.MongoClient", mongomock.MongoClient
     )
@@ -51,8 +51,8 @@ def testing_config():
     return Path(__file__).parent / "test-data" / "testing-config.yaml"
 
 
-@pytest.fixture
-def mock_context(patch_mongo, testing_config: Path):
+@pytest.fixture()
+def mock_context(_patch_mongo, testing_config: Path):
     ctx: DevAmpelContext = DevAmpelContext.load(
         config=str(testing_config), purge_db=True
     )

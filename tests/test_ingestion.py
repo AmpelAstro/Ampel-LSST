@@ -11,7 +11,7 @@ from ampel.lsst.alert.LSSTAlertSupplier import LSSTAlertSupplier
 from ampel.model.UnitModel import UnitModel
 
 
-@pytest.fixture
+@pytest.fixture()
 def alert_consumer(mock_context: DevAmpelContext) -> AlertConsumer:
     with (
         Path(__file__).parent / "test-data" / "elasticc-consumer.yml"
