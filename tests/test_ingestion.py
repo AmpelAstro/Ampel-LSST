@@ -40,9 +40,7 @@ def alert_consumer(mock_context: DevAmpelContext) -> AlertConsumer:
     )
 
 
-def test_muxer(
-    mock_context: DevAmpelContext, alert_consumer: AlertConsumer, mocker
-):
+def test_muxer(mock_context: DevAmpelContext, alert_consumer: AlertConsumer):
     """
     A point T2 bound to a specific datapoint appears for both channels, even
     when the alert where the target datapoint first appeared was accepted by

@@ -31,7 +31,7 @@ class MockFilter(AbsAlertFilter):
         super().__init__(**kwargs)
         self._cycle = cycle(self.pattern)
 
-    def process(self, alert: AmpelAlertProtocol) -> None | bool | int:
+    def process(self, alert: AmpelAlertProtocol) -> None | bool | int:  # noqa: ARG002
         return next(self._cycle)
 
 

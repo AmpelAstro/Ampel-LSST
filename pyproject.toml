@@ -57,6 +57,9 @@ types-requests = "^2.25.9"
 before_after = "^1.0.1"
 isort = "^5.12.0"
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.14"
+
 [build-system]
 requires = ["poetry-core>=1.0.0", "setuptools >= 40.6.0", "wheel"]
 build-backend = "poetry.core.masonry.api"
@@ -104,12 +107,29 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = [
-    "E4",
-    "E7",
-    "E9",
-    "F",
-    "I",
-    "UP", # pyupgrade
-    "B", # bugbear
-    "DTZ", # datetimez
+    "E",    # pycodestyle
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # bugbear
+    "DTZ",  # datetimez
+    "T20",  # print
+    "PT",   # pytest-style
+    "RET",  # return
+    "SLF",  # self
+    "SIM",  # simplify
+    "ARG",  # unused-arguments
+    "PL",   # pylint
+    "PERF", # perflint
+    "RUF",  # ruff
 ]
+ignore = [
+    "E501",    # line too long
+    "PLR09",   # too many (arguments|branches)
+    "PLR2004", # Magic value used in comparison
+    "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
+               # fine for AmpelUnit, actually (ruff has a special case for pydantic)
+]
+
+[tool.ruff.lint.flake8-unused-arguments]
+ignore-variadic-names = true

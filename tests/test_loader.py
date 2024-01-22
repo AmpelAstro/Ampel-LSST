@@ -68,7 +68,7 @@ def test_alerts():
 
 def test_loader_ack(
     mocker: MockerFixture,
-    mock_context,
+    # mock_context,
     test_alerts: tuple[dict, list[MockMessage]],
 ):
     """

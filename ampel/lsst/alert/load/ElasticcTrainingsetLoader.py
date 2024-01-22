@@ -252,7 +252,6 @@ class ElasticcLcIterator:
     def __init__(
         self,
         lightcurve: Table,
-        startindex=0,
         cut_col: None | Sequence[str] = None,
         decode_col: None | Sequence[str] = None,
         change_col: None | Mapping[str, str] = None,
