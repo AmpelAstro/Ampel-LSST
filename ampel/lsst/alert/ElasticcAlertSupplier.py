@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # File              : Ampel-LSST/ampel/lsst/alert/ElasticcAlertSupplier.py
 # License           : BSD-3-Clause
 # Author            : j nordin <jnordin@physik.hu-berlin.de>
@@ -9,7 +8,7 @@
 
 import sys
 from hashlib import blake2b
-from typing import Literal, Optional, cast
+from typing import Literal, cast
 
 from astropy.table import Table
 from bson import encode
@@ -27,7 +26,7 @@ class ElasticcAlertSupplier(BaseAlertSupplier):
     """
 
     # Override default
-    deserialize: Optional[Literal["avro", "json"]]
+    deserialize: None | Literal["avro", "json"]
 
     def __next__(self) -> AmpelAlertProtocol:
         """

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # File              : Ampel-LSST/ampel/lsst/ingest/LSSTDataPointShaper.py
 # License           : BSD-3-Clause
 # Author            : vb <vbrinnel@physik.hu-berlin.de>
@@ -7,7 +6,8 @@
 # Last Modified Date: 21.03.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from bson import encode
 

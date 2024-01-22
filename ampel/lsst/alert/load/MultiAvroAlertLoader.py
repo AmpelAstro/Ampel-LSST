@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # File              : Ampel-LSST/ampel/lsst/alert/load/MultiAvroAlertLoader.py
 # License           : BSD-3-Clause
 # Author            : Marcus Fenner <mf@physik.hu-berlin.de>
@@ -7,8 +6,9 @@
 # Last Modified Date: 14.09.2021
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
+from collections.abc import Iterable
 from io import BytesIO, IOBase
-from typing import Iterable, no_type_check
+from typing import no_type_check
 
 from fastavro import reader
 

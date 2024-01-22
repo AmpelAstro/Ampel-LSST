@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # File              : Ampel-LSST/ampel/lsst/alert/load/ElasticcTrainingsetLoader.py
 # License           : BSD-3-Clause
 # Author            : J Nordin <jno@physik.hu-berlin.de>
@@ -8,7 +7,8 @@
 # Last Modified By  : J Nordin <jno@physik.hu-berlin.de>
 
 import codecs
-from typing import Any, Callable, Dict, Sequence, cast
+from collections.abc import Callable, Sequence
+from typing import Any, cast
 
 import sncosmo
 from astropy.table import Table
@@ -332,7 +332,7 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[Table]):
         "SIM_FLUXCAL_HOSTERR",
     ]
     decode_col: Sequence[str] = ["BAND"]
-    change_col: Dict[str, str] = {
+    change_col: dict[str, str] = {
         "MJD": "midPointTai",
         "BAND": "filterName",
         "FLUXCAL": "psFlux",

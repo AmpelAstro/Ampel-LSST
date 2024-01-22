@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # File              : Ampel-LSST/ampel/lsst/view/LSSTT2Tabulator.py
 # License           : BSD-3-Clause
 # Author            : Marcus Fenner <mf@physik.hu-berlin.de>
@@ -7,7 +6,8 @@
 # Last Modified Date: 05.05.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
-from typing import Any, Iterable, Sequence
+from collections.abc import Iterable, Sequence
+from typing import Any
 
 from astropy.table import Table
 
@@ -74,7 +74,7 @@ class LSSTT2Tabulator(AbsT2Tabulator):
                 [
                     list(stockid)
                     if isinstance(stockid := el["stock"], Sequence)
-                    and not isinstance(stockid, (str, bytes))
+                    and not isinstance(stockid, str | bytes)
                     else [stockid]
                     for el in dps
                     if "LSST" in el["tag"]

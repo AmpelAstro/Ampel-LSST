@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # File              : Ampel-LSST/ampel/lsst/alert/LSSTAlertSupplier.py
 # License           : BSD-3-Clause
 # Author            : vb <vbrinnel@physik.hu-berlin.de>
@@ -7,7 +6,8 @@
 # Last Modified Date: 21.03.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
-from typing import Iterator, Literal, Optional
+from collections.abc import Iterator
+from typing import Literal
 
 from ampel.alert.AmpelAlert import AmpelAlert
 from ampel.alert.BaseAlertSupplier import BaseAlertSupplier
@@ -30,7 +30,7 @@ class LSSTAlertSupplier(BaseAlertSupplier):
     """
 
     # Override default
-    deserialize: Optional[Literal["avro", "json"]] = "avro"
+    deserialize: None | Literal["avro", "json"] = "avro"
 
     @staticmethod
     def _shape(d: dict) -> AmpelAlertProtocol:

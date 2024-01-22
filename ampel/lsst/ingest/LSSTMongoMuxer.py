@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # File              : Ampel-LSST/ampel/lsst/ingest/LSSTMongoMuxer.py
 # License           : BSD-3-Clause
 # Author            : vb <vbrinnel@physik.hu-berlin.de>
@@ -8,7 +7,7 @@
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
 import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from ampel.abstract.AbsT0Muxer import AbsT0Muxer
 from ampel.content.DataPoint import DataPoint
@@ -70,8 +69,8 @@ class LSSTMongoMuxer(AbsT0Muxer):
         self._projection_spec = unflatten_dict(self.projection)
 
     def process(
-        self, dps_al: List[DataPoint], stock_id: Optional[StockId] = None
-    ) -> Tuple[Optional[List[DataPoint]], Optional[List[DataPoint]]]:
+        self, dps_al: list[DataPoint], stock_id: None | StockId = None
+    ) -> tuple[None | list[DataPoint], None | list[DataPoint]]:
         """
         :param dps_al: datapoints from alert
         :param stock_id: stock id from alert
@@ -91,7 +90,7 @@ class LSSTMongoMuxer(AbsT0Muxer):
                     + datetime.timedelta(seconds=self.min_ttl)
                 }
             }
-        dps_db: List[DataPoint] = list(
+        dps_db: list[DataPoint] = list(
             self._photo_col.find(filter, self.projection)
         )
 
@@ -123,7 +122,7 @@ class LSSTMongoMuxer(AbsT0Muxer):
         ], dps_combine
 
     def _project(self, doc, projection):
-        out: Dict[str, Any] = {}
+        out: dict[str, Any] = {}
         for key, spec in projection.items():
             if key not in doc:
                 continue

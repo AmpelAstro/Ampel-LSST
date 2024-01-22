@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # File:                Ampel-LSST/ampel/lsst/t0/SimpleLSSTFilter.py
 # License:             BSD-3-Clause
 # Author:              m. giomi <matteo.giomi@desy.de>
@@ -7,7 +6,7 @@
 # Last Modified Date:  24.03.2022
 # Last Modified By:    Marcus Fenner <mf@physik.hu-berlin.de>
 
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 import numpy as np
 from astropy.coordinates import SkyCoord
@@ -84,7 +83,7 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
         coordinates = SkyCoord(transient["ra"], transient["decl"], unit="deg")
         return coordinates.galactic.b.deg
 
-    def is_star_in_gaia(self, transient: Dict[str, Any]) -> bool:
+    def is_star_in_gaia(self, transient: dict[str, Any]) -> bool:
         """
         match tranient position with GAIA DR2 and uses parallax
         and proper motion to evaluate star-likeliness
@@ -173,7 +172,7 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
         return False
 
     # Override
-    def process(self, alert: AmpelAlertProtocol) -> Optional[Union[bool, int]]:
+    def process(self, alert: AmpelAlertProtocol) -> None | bool:
         """
         Mandatory implementation.
         To exclude the alert, return *None*

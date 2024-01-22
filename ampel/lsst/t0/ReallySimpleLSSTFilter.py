@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # File:                Ampel-ZTF/ampel/lsst/t0/ReallySimpleLSSTFilter.py
 # License:             BSD-3-Clause
 # Author:              Marcus Fenner <mf@physik.hu-berlin.de>
@@ -7,7 +6,6 @@
 # Last Modified Date:  24.03.2022
 # Last Modified By:    Marcus Fenner <mf@physik.hu-berlin.de>
 
-from typing import Optional, Union
 
 from ampel.abstract.AbsAlertFilter import AbsAlertFilter
 from ampel.protocol.AmpelAlertProtocol import AmpelAlertProtocol
@@ -21,7 +19,7 @@ class ReallySimpleLSSTFilter(AbsAlertFilter):
 
     # History
     min_ndet: int  # number of previous detections
-    max_ndet: Optional[int]  # number of previous detections
+    max_ndet: None | int  # number of previous detections
     min_tspan: float  # minimum duration of alert detection history [days]
     max_tspan: float  # maximum duration of alert detection history [days]
 
@@ -48,7 +46,7 @@ class ReallySimpleLSSTFilter(AbsAlertFilter):
         return True
 
     # Override
-    def process(self, alert: AmpelAlertProtocol) -> Optional[Union[bool, int]]:
+    def process(self, alert: AmpelAlertProtocol) -> None | bool:
         """
         Mandatory implementation.
         To exclude the alert, return *None*
