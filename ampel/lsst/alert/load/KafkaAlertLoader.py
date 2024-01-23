@@ -28,7 +28,7 @@ class KafkaAlertLoader(AbsAlertLoader[dict]):
     #: Address of Kafka broker
     bootstrap: str = "public.alerts.ztf.uw.edu:9092"
     #: Topics to subscribe to
-    topics: list[str] = Field(..., min_items=1)
+    topics: list[str] = Field(..., min_length=1)
     #: Message schema (or url pointing to one)
     avro_schema: dict | str = DEFAULT_SCHEMA
     #: Consumer group name
