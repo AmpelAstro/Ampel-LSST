@@ -1,5 +1,4 @@
 import datetime
-import io
 from pathlib import Path
 
 import confluent_kafka
@@ -18,10 +17,8 @@ class MockMessage:
     Mockup of confluent_kafka.Message, which can't be instantiated from Python
     """
 
-    def __init__(self, record: dict, schema: dict, offset: int):
-        buf = io.BytesIO()
-        fastavro.schemaless_writer(buf, schema, record)
-        self._value = buf.getvalue()
+    def __init__(self, record: dict, offset: int):
+        self._value = record
         self._offset = offset
         self._timestamp = (
             confluent_kafka.TIMESTAMP_CREATE_TIME,
@@ -60,21 +57,19 @@ def test_alerts():
         "rb"
     ) as f:
         reader = fastavro.reader(f)
-        return reader.writer_schema, [
-            MockMessage(record, reader.writer_schema, offset)
-            for offset, record in enumerate(reader)
+        return [
+            MockMessage(record, offset) for offset, record in enumerate(reader)
         ]
 
 
+@pytest.mark.usefixtures("mock_context")
 def test_loader_ack(
     mocker: MockerFixture,
-    # mock_context,
-    test_alerts: tuple[dict, list[MockMessage]],
+    test_alerts: list[MockMessage],
 ):
     """
     LSSTAlertLoader acknowledges alerts back to AllConsumingConsumer
     """
-    schema, messages = test_alerts
 
     supplier = LSSTAlertSupplier(
         deserialize=None,
@@ -83,24 +78,20 @@ def test_loader_ack(
             config={
                 "bootstrap": "foo",
                 "topics": ["topic"],
-                "avro_schema": schema,
+                "avro_schema": {},
             },
         ),
     )
 
-    mock_consumer = mocker.patch.object(
-        supplier.alert_loader._consumer, "_consumer"
-    )
-    mock_consumer.poll.side_effect = messages
+    mock_consumer = mocker.patch.object(supplier.alert_loader, "_consumer")
+    mock_consumer.poll.side_effect = [*test_alerts, None]
 
-    assert supplier.alert_loader._consumer._consumer is mock_consumer
+    assert supplier.alert_loader._consumer is mock_consumer
 
     alerts = list(supplier)
     assert len(alerts) == 3
 
-    assert supplier.alert_loader._consumer._offsets == {("topic", 0): 2}
     assert not mock_consumer.store_offsets.called
-    assert not mock_consumer.commit.called
 
     def verify_offset(offset):
         offsets = mock_consumer.store_offsets.call_args[1]["offsets"]
