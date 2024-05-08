@@ -43,7 +43,7 @@ class KafkaAlertLoader(AbsAlertLoader[dict]):
     """
 
     #: Address of Kafka broker
-    bootstrap: str = "public.alerts.ztf.uw.edu:9092"
+    bootstrap: str
     #: Optional authentication
     auth: None | SASLAuthentication = None
     #: Topics to subscribe to
