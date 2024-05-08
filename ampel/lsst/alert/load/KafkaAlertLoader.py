@@ -1,22 +1,40 @@
 #!/usr/bin/env python
 
 import itertools
-import logging
 import uuid
 from collections.abc import Iterable, Iterator
-from typing import Any
+from typing import Any, Literal
 
 import confluent_kafka
 from confluent_kafka.deserializing_consumer import DeserializingConsumer
+from confluent_kafka.schema_registry import SchemaRegistryClient
+from confluent_kafka.schema_registry.avro import AvroDeserializer
 from pydantic import Field
 
 from ampel.abstract.AbsAlertLoader import AbsAlertLoader
+from ampel.base.AmpelBaseModel import AmpelBaseModel
 from ampel.log.AmpelLogger import AmpelLogger
+from ampel.secret.NamedSecret import NamedSecret
 
 from .HttpSchemaRepository import DEFAULT_SCHEMA
-from .PlainAvroDeserializer import PlainAvroDeserializer
+from .PlainAvroDeserializer import Deserializer, PlainAvroDeserializer
 
-log = logging.getLogger(__name__)
+
+class SchemaRegistryURL(AmpelBaseModel):
+    registry: str
+
+
+class StaticSchemaURL(AmpelBaseModel):
+    root_url: str = DEFAULT_SCHEMA
+
+
+class SASLAuthentication(AmpelBaseModel):
+    protocol: Literal["SASL_PLAINTEXT", "SASL_SSL"] = "SASL_PLAINTEXT"
+    mechanism: Literal[
+        "PLAIN", "SCRAM-SHA-256", "SCRAM-SHA-512"
+    ] = "SCRAM-SHA-512"
+    username: NamedSecret[str]
+    password: NamedSecret[str]
 
 
 class KafkaAlertLoader(AbsAlertLoader[dict]):
@@ -26,31 +44,63 @@ class KafkaAlertLoader(AbsAlertLoader[dict]):
 
     #: Address of Kafka broker
     bootstrap: str = "public.alerts.ztf.uw.edu:9092"
+    #: Optional authentication
+    auth: None | SASLAuthentication = None
     #: Topics to subscribe to
     topics: list[str] = Field(..., min_length=1)
     #: Message schema (or url pointing to one)
-    avro_schema: dict | str = DEFAULT_SCHEMA
+    avro_schema: SchemaRegistryURL | StaticSchemaURL
     #: Consumer group name
-    group_name: str = str(uuid.uuid1())
+    group_name: None | str = None
     #: time to wait for messages before giving up, in seconds
-    timeout: int = 1
+    timeout: int = Field(1, gt=0)
     #: extra configuration to pass to confluent_kafka.Consumer
     kafka_consumer_properties: dict[str, Any] = {}
 
     def __init__(self, **kwargs):
+        if isinstance(kwargs.get("avro_schema"), str):
+            kwargs["avro_schema"] = {"root_url": kwargs["avro_schema"]}
         super().__init__(**kwargs)
 
-        config = {
-            "bootstrap.servers": self.bootstrap,
-            "group.id": self.group_name,
-            "auto.offset.reset": "smallest",
-            "enable.auto.commit": True,
-            "enable.auto.offset.store": False,
-            "auto.commit.interval.ms": 10000,
-            "receive.message.max.bytes": 2**29,
-            "enable.partition.eof": False,  # don't emit messages on EOF
-            "value.deserializer": PlainAvroDeserializer(self.avro_schema),
-        } | self.kafka_consumer_properties
+        if isinstance(self.avro_schema, StaticSchemaURL):
+            deserializer: Deserializer = PlainAvroDeserializer(
+                self.avro_schema.root_url
+            )
+        else:
+            deserializer = AvroDeserializer(
+                SchemaRegistryClient({"url": self.avro_schema.registry})
+            )
+
+        config = (
+            {
+                "bootstrap.servers": self.bootstrap,
+                "auto.offset.reset": "smallest",
+                "enable.auto.commit": True,
+                "enable.auto.offset.store": False,
+                "auto.commit.interval.ms": 10000,
+                "receive.message.max.bytes": 2**29,
+                "enable.partition.eof": False,  # don't emit messages on EOF
+                "value.deserializer": deserializer,
+            }
+            | (
+                {
+                    "group.id": self.group_name
+                    if self.group_name
+                    else str(uuid.uuid1())
+                }
+                if self.auth is None
+                else {
+                    "security.protocol": self.auth.protocol,
+                    "sasl.mechanism": self.auth.mechanism,
+                    "sasl.username": self.auth.username.get(),
+                    "sasl.password": self.auth.password.get(),
+                    "group.id": self.group_name
+                    if self.group_name
+                    else f"{self.auth.username.get()}-{uuid.uuid1()}",
+                }
+            )
+            | self.kafka_consumer_properties
+        )
 
         self._consumer = DeserializingConsumer(config)
         self._consumer.subscribe(self.topics)
