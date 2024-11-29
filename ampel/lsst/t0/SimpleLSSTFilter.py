@@ -44,7 +44,9 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
     # Gaia
     gaia_rs: float  # search radius for GAIA DR2 matching [arcsec]
     gaia_pm_signif: float  # significance of proper motion detection of GAIA counterpart [sigma]
-    gaia_plx_signif: float  # significance of parallax detection of GAIA counterpart [sigma]
+    gaia_plx_signif: (
+        float  # significance of parallax detection of GAIA counterpart [sigma]
+    )
     gaia_veto_gmag_min: float  # min gmag for normalized distance cut of GAIA counterparts [mag]
     gaia_veto_gmag_max: float  # max gmag for normalized distance cut of GAIA counterparts [mag]
     gaia_excessnoise_sig_max: float  # maximum allowed noise (expressed as significance) for Gaia match to be trusted.

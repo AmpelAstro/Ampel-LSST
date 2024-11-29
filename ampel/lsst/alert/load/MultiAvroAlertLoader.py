@@ -33,10 +33,10 @@ class MultiAvroAlertLoader(AbsAlertLoader[BytesIO]):
         self.set_alert_source(self.loader)
 
     def set_alert_source(self, loader) -> None:
-        self.alert_loader: AbsAlertLoader[
-            Iterable[IOBase]
-        ] = AuxUnitRegister.new_unit(  # type: ignore
-            model=loader
+        self.alert_loader: AbsAlertLoader[Iterable[IOBase]] = (
+            AuxUnitRegister.new_unit(  # type: ignore
+                model=loader
+            )
         )
         self.next_file()
 

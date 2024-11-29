@@ -352,7 +352,14 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[Table]):
         )
 
         if self.skip_transients != 0:
-            next(islice(self.lightcurves, self.skip_transients, self.skip_transients), None)
+            next(
+                islice(
+                    self.lightcurves,
+                    self.skip_transients,
+                    self.skip_transients,
+                ),
+                None,
+            )
 
         self.next_lightcurve()
 
