@@ -125,5 +125,8 @@ ignore = [
                # fine for AmpelUnit, actually (ruff has a special case for pydantic)
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["RUF018"]
+
 [tool.ruff.lint.flake8-unused-arguments]
 ignore-variadic-names = true

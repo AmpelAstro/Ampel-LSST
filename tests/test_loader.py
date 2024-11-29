@@ -50,7 +50,7 @@ class MockMessage:
         return self._timestamp
 
 
-@pytest.fixture()
+@pytest.fixture
 def test_alerts():
     """Turn alerts back into Kafka messages"""
     with (Path(__file__).parent / "test-data" / "11290844.avro").open(
