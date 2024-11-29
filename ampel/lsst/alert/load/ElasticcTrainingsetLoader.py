@@ -8,6 +8,7 @@
 
 import codecs
 from collections.abc import Callable, Mapping, Sequence
+from itertools import islice
 from typing import Any, cast
 
 import sncosmo
@@ -319,7 +320,6 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[Table]):
     skip_transients: int = 0
     file_path: str
 
-    #
     cut_col: Sequence[str] = [
         "CCDNUM",
         "FIELD",
@@ -352,11 +352,14 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[Table]):
         )
 
         if self.skip_transients != 0:
-            count = 0
-            for _ in self.lightcurves:
-                count += 1
-                if count >= self.skip_transients:
-                    break
+            next(
+                islice(
+                    self.lightcurves,
+                    self.skip_transients,
+                    self.skip_transients,
+                ),
+                None,
+            )
 
         self.next_lightcurve()
 

@@ -11,7 +11,7 @@ from ampel.lsst.alert.LSSTAlertSupplier import LSSTAlertSupplier
 from ampel.model.UnitModel import UnitModel
 
 
-@pytest.fixture()
+@pytest.fixture
 def alert_consumer(mock_context: DevAmpelContext) -> AlertConsumer:
     with (
         Path(__file__).parent / "test-data" / "elasticc-consumer.yml"
@@ -24,14 +24,14 @@ def alert_consumer(mock_context: DevAmpelContext) -> AlertConsumer:
         alerts = list(fastavro.reader(f))[:2]
     model.config["supplier"]["config"]["loader"] = UnitModel(
         unit="MockAlertLoader", config={"alerts": alerts}
-    )
+    ).dict()
     # accept first alert in one channel only
     model.config["directives"][0]["filter"] = UnitModel(
         unit="MockFilter", config={"pattern": [True, True]}
-    )
+    ).dict()
     model.config["directives"][1]["filter"] = UnitModel(
         unit="MockFilter", config={"pattern": [False, True]}
-    )
+    ).dict()
 
     return mock_context.loader.new_context_unit(
         model=model,
@@ -47,7 +47,7 @@ def test_muxer(mock_context: DevAmpelContext, alert_consumer: AlertConsumer):
     only one channel.
     """
 
-    alert_consumer.iter_max = 1
+    object.__setattr__(alert_consumer, "iter_max", 1)
 
     # insert datapoints from first alert into the database
     assert alert_consumer.run() == 1
@@ -75,7 +75,7 @@ def test_message_ack(alert_consumer: AlertConsumer, mocker):
     Alerts are explicitly acknowledged back to the loader
     """
     ack = mocker.patch.object(
-        alert_consumer.alert_supplier.alert_loader, "acknowledge"
+        type(alert_consumer.alert_supplier.alert_loader), "acknowledge"
     )
 
     assert alert_consumer.run() == 2
@@ -110,6 +110,7 @@ def test_duplicate_datapoints(mock_context: DevAmpelContext):
             "avro_schema": "https://raw.githubusercontent.com/LSSTDESC/elasticc/c47fbd301b87f915c77ac0046d7845c68c306444/alert_schema/elasticc.v0_9.alert.avsc",
         },
     )
+    model.config["iter_max"] = 1
 
     supplier = AuxUnitRegister.new_unit(
         model=UnitModel(**model.config["supplier"]), sub_type=LSSTAlertSupplier
@@ -123,7 +124,6 @@ def test_duplicate_datapoints(mock_context: DevAmpelContext):
         sub_type=AlertConsumer,
         raise_exc=True,
     )
-    processor.iter_max = 1
 
     # insert datapoints from first alert into the database
     assert processor.run() == 1

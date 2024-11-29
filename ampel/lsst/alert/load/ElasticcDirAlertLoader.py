@@ -27,14 +27,14 @@ class ElasticcDirAlertLoader(DirAlertLoader):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.alert_schema: Schema = parse_schema(self.avro_schema)
+        self._alert_schema: Schema = parse_schema(self.avro_schema)
 
     def __next__(self) -> StringIO | BytesIO:
-        if not self.files:
+        if not self._files:
             self.build_file_list()
-            self.iter_files = iter(self.files)
+            self._iter_files = iter(self._files)
 
-        if (fpath := next(self.iter_files, None)) is None:
+        if (fpath := next(self._iter_files, None)) is None:
             raise StopIteration
 
         if self.logger.verbose > 1:
@@ -46,9 +46,9 @@ class ElasticcDirAlertLoader(DirAlertLoader):
         else:
             alertopener = open  # type: ignore[assignment]
 
-        with alertopener(fpath, self.open_mode) as alert_file:
+        with alertopener(fpath, self._open_mode) as alert_file:
             return fastavro.schemaless_reader(  # type: ignore[return-value]
                 alert_file,  # type: ignore[arg-type]
-                self.alert_schema,
+                self._alert_schema,
                 reader_schema=None,
             )
