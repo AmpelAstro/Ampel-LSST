@@ -219,8 +219,7 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
         # check with gaia
         if self.gaia_rs > 0 and self.is_star_in_gaia(latest):
             self.logger.debug(
-                "rejected: within %.2f arcsec from a GAIA start (PM of PLX)"
-                % (self.gaia_rs)
+                f"rejected: within {self.gaia_rs:.2f} arcsec from a GAIA start (PM of PLX)"
             )
             self.logger.info(None, extra={"gaiaIsStar": True})
             return None
