@@ -3,13 +3,13 @@
 import itertools
 import uuid
 from collections.abc import Iterable, Iterator
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 import confluent_kafka
+from annotated_types import Gt, MinLen
 from confluent_kafka.deserializing_consumer import DeserializingConsumer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer
-from pydantic import Field
 
 from ampel.abstract.AbsAlertLoader import AbsAlertLoader
 from ampel.base.AmpelBaseModel import AmpelBaseModel
@@ -47,13 +47,13 @@ class KafkaAlertLoader(AbsAlertLoader[dict]):
     #: Optional authentication
     auth: None | SASLAuthentication = None
     #: Topics to subscribe to
-    topics: list[str] = Field(..., min_length=1)
+    topics: Annotated[list[str], MinLen(1)]
     #: Message schema (or url pointing to one)
     avro_schema: SchemaRegistryURL | StaticSchemaURL
     #: Consumer group name
     group_name: None | str = None
     #: time to wait for messages before giving up, in seconds
-    timeout: int = Field(1, gt=0)
+    timeout: Annotated[int, Gt(0)] = 1
     #: extra configuration to pass to confluent_kafka.Consumer
     kafka_consumer_properties: dict[str, Any] = {}
 
