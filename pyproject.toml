@@ -133,7 +133,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["RUF018"]
+"tests/*" = ["RUF018", "SLF001"]
 
 [tool.ruff.lint.flake8-unused-arguments]
 ignore-variadic-names = true
