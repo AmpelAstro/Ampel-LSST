@@ -24,6 +24,16 @@ class DIAObjectMissingError(Exception):
     ...
 
 
+# Translate 2022-era field names to schema 7.x
+_field_upgrades: dict[str, str] = {
+    "midPointTai": "midpointMjdTai",
+    "psFlux": "psfFlux",
+    "psFluxErr": "psfFluxErr",
+    "filterName": "band",
+    "decl": "dec",
+}
+
+
 class LSSTAlertSupplier(BaseAlertSupplier):
     """
     Iterable class that, for each alert payload provided by the underlying alert_loader,
@@ -34,11 +44,17 @@ class LSSTAlertSupplier(BaseAlertSupplier):
     deserialize: None | Literal["avro", "json"] = "avro"
 
     @staticmethod
-    def _shape(d: dict) -> AmpelAlertProtocol:
+    def _shape_dp(d: dict) -> ReadOnlyDict:
+        return ReadOnlyDict(
+            {_field_upgrades.get(k, k): v for k, v in d.items()}
+        )
+
+    @classmethod
+    def _shape(cls, d: dict) -> AmpelAlertProtocol:
         if d["diaObject"]:
             diaObjectId = d["diaObject"]["diaObjectId"]
             dps = tuple(
-                ReadOnlyDict(dp)
+                cls._shape_dp(dp)
                 for dp in chain(
                     (d["diaSource"],),
                     d.get("prvDiaSources") or (),

@@ -30,7 +30,7 @@ class ReallySimpleLSSTFilter(AbsAlertFilter):
 
         # To make this tenable we should create this list dynamically depending on what entries are required
         # by the filter. Now deciding not to include drb in this list, eg.
-        self.keys_to_check = ("midPointTai",)
+        self.keys_to_check = ("midpointMjdTai",)
 
     def _alert_has_keys(self, photop) -> bool:
         """
@@ -66,12 +66,12 @@ class ReallySimpleLSSTFilter(AbsAlertFilter):
             return None
 
         # cut on length of detection history
-        detections_jds = [el["midPointTai"] for el in pps]
+        detections_jds = [el["midpointMjdTai"] for el in pps]
         last_det = max(detections_jds)
         det_tspan = last_det - min(detections_jds)
         if not (self.min_tspan <= det_tspan <= self.max_tspan):
             self.logger.info(None, extra={"tSpan": det_tspan})
             return None
 
-        self.logger.debug("Alert accepted", extra={"midPointTai": last_det})
+        self.logger.debug("Alert accepted", extra={"midpointMjdTai": last_det})
         return True

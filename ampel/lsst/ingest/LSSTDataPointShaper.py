@@ -40,11 +40,9 @@ class LSSTDataPointShaper(AbsT0Unit):
 
         for photo_dict in arg:
             tags = ["LSST"]
-            if "filterName" in photo_dict:
-                setitem(
-                    photo_dict, "filterName", photo_dict["filterName"].lower()
-                )
-                tags.append("LSST_" + photo_dict["filterName"].upper())
+            if "band" in photo_dict:
+                setitem(photo_dict, "band", photo_dict["band"].lower())
+                tags.append("LSST_" + photo_dict["band"].upper())
             """
             Non detection limit don't have an identifier.
             """

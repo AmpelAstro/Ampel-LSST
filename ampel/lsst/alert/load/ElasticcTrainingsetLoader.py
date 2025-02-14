@@ -333,10 +333,10 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[Table]):
     ]
     decode_col: Sequence[str] = ["BAND"]
     change_col: dict[str, str] = {
-        "MJD": "midPointTai",
-        "BAND": "filterName",
-        "FLUXCAL": "psFlux",
-        "FLUXCALERR": "psFluxErr",
+        "MJD": "midpointMjdTai",
+        "BAND": "band",
+        "FLUXCAL": "psfFlux",
+        "FLUXCALERR": "psfFluxErr",
     }
 
     def __init__(self, **kwargs) -> None:
