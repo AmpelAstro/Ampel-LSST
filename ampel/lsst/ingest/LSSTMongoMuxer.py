@@ -52,9 +52,9 @@ class LSSTMongoMuxer(AbsT0Muxer):
         "channel": 1,
         "excl": 1,
         "stock": 1,
-        "body.midPointTai": 1,
-        "body.filterName": 1,
-        "body.psFlux": 1,
+        "body.midpointMjdTai": 1,
+        "body.band": 1,
+        "body.psfFlux": 1,
         "body.diaObjectId": 1,
     }
 

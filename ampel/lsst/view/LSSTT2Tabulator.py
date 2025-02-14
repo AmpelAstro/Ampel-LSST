@@ -36,7 +36,7 @@ class LSSTT2Tabulator(AbsT2Tabulator):
         dps: Iterable[DataPoint],
     ) -> Table:
         flux, fluxerr, filtername, tai = self.get_values(
-            dps, ["psFlux", "psFluxErr", "filterName", "midPointTai"]
+            dps, ["psfFlux", "psfFluxErr", "band", "midpointMjdTai"]
         )
         if self.convert2jd:
             tai = self._to_jd(tai)
@@ -61,13 +61,13 @@ class LSSTT2Tabulator(AbsT2Tabulator):
         return tuple(
             zip(
                 self.get_jd(dps),
-                *self.get_values(dps, ["ra", "decl"]),
+                *self.get_values(dps, ["ra", "dec"]),
                 strict=False,
             )
         )
 
     def get_jd(self, dps: Iterable[DataPoint]) -> Sequence[float]:
-        return self._to_jd(self.get_values(dps, ["midPointTai"])[0])
+        return self._to_jd(self.get_values(dps, ["midpointMjdTai"])[0])
 
     @staticmethod
     def _to_jd(dates: Sequence[Any]) -> Sequence[Any]:

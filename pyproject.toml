@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ampel-lsst"
-version = "0.10.0a4"
+version = "0.10.0a5"
 description = "Legacy Survey of Space and Time support for the Ampel system"
 authors = [
     "Marcus Fenner <mf@physik.hu-berlinn.de>",
@@ -133,7 +133,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["RUF018"]
+"tests/*" = ["RUF018", "SLF001"]
 
 [tool.ruff.lint.flake8-unused-arguments]
 ignore-variadic-names = true

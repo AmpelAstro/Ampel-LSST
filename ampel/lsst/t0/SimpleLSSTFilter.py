@@ -59,10 +59,9 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
         # To make this tenable we should create this list dynamically depending on what entries are required
         # by the filter. Now deciding not to include drb in this list, eg.
         self.keys_to_check = (
-            "midPointTai",
+            "midpointMjdTai",
             "ra",
             "decl",
-            "nobs",
         )
 
     def _alert_has_keys(self, photop) -> bool:
@@ -195,7 +194,7 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
             return None
 
         # cut on length of detection history
-        detections_jds = [el["midPointTai"] for el in pps]
+        detections_jds = [el["midpointMjdTai"] for el in pps]
         det_tspan = max(detections_jds) - min(detections_jds)
         if not (self.min_tspan <= det_tspan <= self.max_tspan):
             # self.logger.debug("rejected: detection history is %.3f d long, \
