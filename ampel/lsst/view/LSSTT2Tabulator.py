@@ -88,14 +88,21 @@ class LSSTT2Tabulator(AbsT2Tabulator):
     def get_values(
         dps: Iterable[DataPoint], params: Sequence[str]
     ) -> tuple[Sequence[Any], ...]:
+        # prefer forced photometry over difference photometry
+        prio_dps = {}
+        for el in dps:
+            if "LSST_FP" in el["tag"] or (
+                "LSST_DP" in el["tag"] and el["body"]["visit"] not in prio_dps
+            ):
+                prio_dps[el["body"]["visit"]] = el
+
         if tup := tuple(
             map(
                 list,
                 zip(
                     *(
                         [el["body"][param] for param in params]
-                        for el in dps
-                        if ("LSST_DP" in el["tag"] or "LSST_FP" in el["tag"])
+                        for el in prio_dps.values()
                     ),
                     strict=False,
                 ),
