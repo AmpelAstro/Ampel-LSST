@@ -6,7 +6,8 @@
 # Last Modified Date: 05.05.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
-from collections.abc import Iterable, Sequence
+import sys
+from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
 from astropy.table import Table
@@ -29,14 +30,24 @@ LSST_BANDPASSES = {
 class LSSTT2Tabulator(AbsT2Tabulator):
     convert2jd: bool = True
     zp: float
+    # tag priority: lower index -> higher priority
+    tags: Sequence[str | int] = ["LSST_FP", "LSST_DP"]
     """ """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._tag_priority = {
+            tag: index for index, tag in enumerate(self.tags)
+        }
 
     def get_flux_table(
         self,
         dps: Iterable[DataPoint],
     ) -> Table:
         flux, fluxerr, filtername, tai = self.get_values(
-            dps, ["psfFlux", "psfFluxErr", "band", "midpointMjdTai"]
+            dps,
+            ["psfFlux", "psfFluxErr", "band", "midpointMjdTai"],
+            self._tag_priority,
         )
         if self.convert2jd:
             tai = self._to_jd(tai)
@@ -61,13 +72,15 @@ class LSSTT2Tabulator(AbsT2Tabulator):
         return tuple(
             zip(
                 self.get_jd(dps),
-                *self.get_values(dps, ["ra", "dec"]),
+                *self.get_values(dps, ["ra", "dec"], self._tag_priority),
                 strict=False,
             )
         )
 
     def get_jd(self, dps: Iterable[DataPoint]) -> Sequence[float]:
-        return self._to_jd(self.get_values(dps, ["midpointMjdTai"])[0])
+        return self._to_jd(
+            self.get_values(dps, ["midpointMjdTai"], self._tag_priority)[0]
+        )
 
     @staticmethod
     def _to_jd(dates: Sequence[Any]) -> Sequence[Any]:
@@ -86,16 +99,30 @@ class LSSTT2Tabulator(AbsT2Tabulator):
 
     @staticmethod
     def get_values(
-        dps: Iterable[DataPoint], params: Sequence[str]
+        dps: Iterable[DataPoint],
+        params: Sequence[str],
+        tag_priority: Mapping[str | int, int],
     ) -> tuple[Sequence[Any], ...]:
+        # select one datapoint per visit with highest tag priority
+        selected_dps: dict[int, DataPoint] = {}
+        for el in dps:
+            if (tag_priority.keys() & el["tag"]) and (
+                (key := el["body"]["visit"]) not in selected_dps
+                or min(tag_priority.get(t, sys.maxsize) for t in el["tag"])
+                < min(
+                    tag_priority.get(t, sys.maxsize)
+                    for t in selected_dps[key]["tag"]
+                )
+            ):
+                selected_dps[key] = el
+
         if tup := tuple(
             map(
                 list,
                 zip(
                     *(
                         [el["body"][param] for param in params]
-                        for el in dps
-                        if ("LSST_DP" in el["tag"] or "LSST_FP" in el["tag"])
+                        for el in selected_dps.values()
                     ),
                     strict=False,
                 ),
