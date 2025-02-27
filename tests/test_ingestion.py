@@ -129,9 +129,9 @@ def test_duplicate_datapoints(mock_context: DevAmpelContext):
     assert processor.run() == 1
 
     assert (t1 := mock_context.db.get_collection("t1").find_one())
-    assert len(t1["dps"]) == len(
-        set(t1["dps"])
-    ), "datapoints in state are unique"
-    assert (
-        len(t1["dps"]) < len(alert.datapoints) - 1
-    ), "some alert datapoints eliminated"
+    assert len(t1["dps"]) == len(set(t1["dps"])), (
+        "datapoints in state are unique"
+    )
+    assert len(t1["dps"]) < len(alert.datapoints) - 1, (
+        "some alert datapoints eliminated"
+    )
