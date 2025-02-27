@@ -70,6 +70,13 @@ build-backend = "poetry.core.masonry.api"
 [tool.coverage.run]
 relative_files = true
 
+[tool.pytest.ini_options]
+addopts = "--showlocals -ra"
+filterwarnings = [
+    "error",
+    "ignore:pkg_resources is deprecated:DeprecationWarning",
+]
+
 [tool.mypy]
 namespace_packages = true
 plugins = [

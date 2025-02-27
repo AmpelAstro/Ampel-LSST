@@ -107,7 +107,7 @@ class LSSTT2Tabulator(AbsT2Tabulator):
         selected_dps: dict[int, DataPoint] = {}
         for el in dps:
             if (tag_priority.keys() & el["tag"]) and (
-                (key := el["body"]["visit"]) not in selected_dps
+                (key := el["body"]["midpointMjdTai"]) not in selected_dps
                 or min(tag_priority.get(t, sys.maxsize) for t in el["tag"])
                 < min(
                     tag_priority.get(t, sys.maxsize)
