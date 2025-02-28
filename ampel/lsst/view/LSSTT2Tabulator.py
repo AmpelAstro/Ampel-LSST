@@ -30,6 +30,7 @@ LSST_BANDPASSES = {
 class LSSTT2Tabulator(AbsT2Tabulator):
     convert2jd: bool = True
     zp: float
+    allow_nan_flux: bool = False
     # tag priority: lower index -> higher priority
     tags: Sequence[str | int] = ["LSST_FP", "LSST_DP"]
     """ """
@@ -53,7 +54,7 @@ class LSSTT2Tabulator(AbsT2Tabulator):
             tai = self._to_jd(tai)
         filters = list(map(LSST_BANDPASSES.get, filtername))
 
-        return Table(
+        table = Table(
             {
                 "time": tai,
                 "flux": flux,
@@ -65,6 +66,10 @@ class LSSTT2Tabulator(AbsT2Tabulator):
             },
             dtype=("float64", "float64", "float64", "str", "float64", "str"),
         )
+
+        if self.allow_nan_flux:
+            return table
+        return table[[f is not None for f in flux]]
 
     def get_positions(
         self, dps: Iterable[DataPoint]
