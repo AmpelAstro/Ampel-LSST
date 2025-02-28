@@ -10,6 +10,7 @@ import sys
 from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
+import numpy as np
 from astropy.table import Table
 
 from ampel.abstract.AbsT2Tabulator import AbsT2Tabulator
@@ -69,7 +70,7 @@ class LSSTT2Tabulator(AbsT2Tabulator):
 
         if self.allow_nan_flux:
             return table
-        return table[[f is not None for f in flux]]
+        return table[np.isfinite(table["flux"])]
 
     def get_positions(
         self, dps: Iterable[DataPoint]
