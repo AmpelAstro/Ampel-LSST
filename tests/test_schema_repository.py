@@ -1,6 +1,6 @@
 import fastavro
 
-from ampel.lsst.alert.load.HttpSchemaRepository import HttpSchemaRepostory
+from ampel.lsst.kafka.HttpSchemaRepository import HttpSchemaRepostory
 
 DEFAULT_SCHEMA = {
     "type": "record",
