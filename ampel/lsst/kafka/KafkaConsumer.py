@@ -1,3 +1,5 @@
+from collections.abc import Iterable
+
 import bson
 import confluent_kafka
 
@@ -14,17 +16,22 @@ class KafkaConsumer(KafkaConsumerBase, AbsConsumer[QueueItem]):
             return None
         item: QueueItem = bson.decode(message.value())  # type: ignore[assignment]
         item["_meta"] = confluent_kafka.TopicPartition(  # type: ignore[typeddict-unknown-key]
-            message.topic(), message.partition(), message.offset()
+            message.topic(), message.partition(), message.offset() + 1
         )
         return item
 
-    def acknowledge(self, message: QueueItem) -> None:
+    def acknowledge(self, messages: Iterable[QueueItem]) -> None:
         """
         Store offsets of fully-processed messages
         """
-        meta: confluent_kafka.TopicPartition = message["_meta"]  # type: ignore[typeddict-item]
+        offsets: dict[tuple[str, int], confluent_kafka.TopicPartition] = dict()
+        for message in messages:
+            meta: confluent_kafka.TopicPartition = message["_meta"]  # type: ignore[typeddict-item]
+            key = (meta.topic, meta.partition)
+            if key not in offsets or meta.offset > offsets[key].offset:
+                offsets[key] = meta
         try:
-            self._consumer.store_offsets([meta])
+            self._consumer.store_offsets(offsets=list(offsets.values()))
         except confluent_kafka.KafkaException as exc:
             # librdkafka will refuse to store offsets on a partition that is not
             # currently assigned. this can happen if the group is rebalanced
