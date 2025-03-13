@@ -9,8 +9,11 @@ from io import BytesIO, StringIO
 import fastavro
 
 from ampel.alert.load.DirAlertLoader import DirAlertLoader
-
-from .HttpSchemaRepository import DEFAULT_SCHEMA, Schema, parse_schema
+from ampel.lsst.kafka.HttpSchemaRepository import (
+    DEFAULT_SCHEMA,
+    Schema,
+    parse_schema,
+)
 
 log = logging.getLogger(__name__)
 
