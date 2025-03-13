@@ -25,6 +25,7 @@ class KafkaConsumerBase(AmpelUnit):
     kafka_consumer_properties: dict[str, Any] = {}
 
     def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         config = (
             {
                 "bootstrap.servers": self.bootstrap,
@@ -67,26 +68,27 @@ class KafkaConsumerBase(AmpelUnit):
         Poll for a message, ignoring nonfatal errors
         """
         message = None
+        # wake up occasionally to catch SIGINT
         for _ in range(self._poll_attempts):
-            # wake up occasionally to catch SIGINT
-            message = self._consumer.poll(self._poll_interval)
-            if message is not None:
-                if err := message.error():
-                    if (
-                        err.code()
-                        == confluent_kafka.KafkaError.UNKNOWN_TOPIC_OR_PART
-                    ):
-                        # ignore unknown topic messages
-                        continue
-                    if err.code() in (
-                        confluent_kafka.KafkaError._TIMED_OUT,  # noqa: SLF001
-                        confluent_kafka.KafkaError._MAX_POLL_EXCEEDED,  # noqa: SLF001
-                    ):
-                        # bail on timeouts
-                        return None
-                break
-        if message is None:
-            return message
-        if message.error():
-            raise message.error()
+            try:
+                if message := self._consumer.poll(self._poll_interval):
+                    break
+            except confluent_kafka.KafkaError as exc:
+                if (
+                    exc.code()
+                    == confluent_kafka.KafkaError.UNKNOWN_TOPIC_OR_PART
+                ):
+                    # ignore unknown topic messages
+                    continue
+                if exc.code() in (
+                    confluent_kafka.KafkaError._TIMED_OUT,  # noqa: SLF001
+                    confluent_kafka.KafkaError._MAX_POLL_EXCEEDED,  # noqa: SLF001
+                ):
+                    # bail on timeouts
+                    return None
+                raise
         return message
+
+    def __del__(self):
+        self._consumer.commit()
+        self._consumer.close()
