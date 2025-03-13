@@ -7,7 +7,7 @@ from ampel.t2.T2QueueWorker import QueueItem
 from .KafkaConsumerBase import KafkaConsumerBase
 
 
-class KafkaConsumer(AbsConsumer[QueueItem], KafkaConsumerBase):
+class KafkaConsumer(KafkaConsumerBase, AbsConsumer[QueueItem]):
     def consume(self) -> None | QueueItem:
         message = self._poll()
         if message is None:
