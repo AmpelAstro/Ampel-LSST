@@ -1,4 +1,5 @@
 import uuid
+from contextlib import suppress
 from typing import Annotated, Any
 
 import confluent_kafka
@@ -91,4 +92,5 @@ class KafkaConsumerBase(AmpelUnit):
 
     def __del__(self):
         self._consumer.commit()
-        self._consumer.close()
+        with suppress(confluent_kafka.KafkaError):
+            self._consumer.close()
