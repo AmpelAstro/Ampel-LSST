@@ -2,29 +2,29 @@
 
 [[package]]
 name = "ampel-alerts"
-version = "0.10.1"
+version = "0.10.3a1"
 description = "Alert support for the Ampel system"
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "ampel_alerts-0.10.1-py3-none-any.whl", hash = "sha256:3e7d38812d7c233d17007c17d18253d9d4259a154f0d9e2b8f8d24b3debeb73a"},
-    {file = "ampel_alerts-0.10.1.tar.gz", hash = "sha256:046d4761ace652164d0659cc7ec5df4623485966484e74a1d3863b0eb3818e05"},
+    {file = "ampel_alerts-0.10.3a1-py3-none-any.whl", hash = "sha256:84b478feae35cd13032c2b8903cdfb57ae3dadaf6b177049918fe070603a63c6"},
+    {file = "ampel_alerts-0.10.3a1.tar.gz", hash = "sha256:dde971e6d81450ad99814355a110ace60c2b80d4218ff710aecdc10e312b5510"},
 ]
 
 [package.dependencies]
-ampel-core = ">=0.10.0a0,<0.11"
+ampel-core = ">=0.10.6a0,<0.11"
 
 [[package]]
 name = "ampel-core"
-version = "0.10.6a0"
+version = "0.10.6a1"
 description = "Alice in Modular Provenance-Enabled Land"
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "ampel_core-0.10.6a0-py3-none-any.whl", hash = "sha256:4f985b321cd8487af6822d3b129c37af95fdc736c4545f2092718d4aaa653b5b"},
-    {file = "ampel_core-0.10.6a0.tar.gz", hash = "sha256:40b76853d5e357ef92ceb44a8affb7f85bdac627a75080ddafa4b483ebe23100"},
+    {file = "ampel_core-0.10.6a1-py3-none-any.whl", hash = "sha256:5ad8e2a0c4ab642cefb5fb9373c2931cda68770587dc6fc7cad9a29bd539a2de"},
+    {file = "ampel_core-0.10.6a1.tar.gz", hash = "sha256:d485d511802769f7699e26102727e77bff7f32f92fcd4ecc09292f3dedf6a7d4"},
 ]
 
 [package.dependencies]
@@ -2353,4 +2353,4 @@ kafka = ["confluent-kafka"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "5f4d63198c54561656636c0fdfe69a13a49b3388aa32eb86199657678f1c78bc"
+content-hash = "7b34a1c165a173fe71dd8480e518ff395dba94c112924f92e08916c4deaec26d"
