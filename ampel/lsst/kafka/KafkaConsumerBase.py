@@ -1,3 +1,4 @@
+import os
 import uuid
 from contextlib import suppress
 from typing import Annotated, Any
@@ -22,6 +23,8 @@ class KafkaConsumerBase(AmpelUnit):
     group_name: None | str = None
     #: time to wait for messages before giving up, in seconds
     timeout: Annotated[int, Gt(0)] = 1
+    #: environment variable to use as group.instance.id. If None, disable static membership
+    instance_id_env_var: None | str = "HOSTNAME"
     #: extra configuration to pass to confluent_kafka.Consumer
     kafka_consumer_properties: dict[str, Any] = {}
 
@@ -51,6 +54,13 @@ class KafkaConsumerBase(AmpelUnit):
                     if self.group_name
                     else f"{self.auth.username.get()}-{uuid.uuid1()}",
                 }
+            )
+            # allow process to restart without triggering a rebalance
+            | (
+                {"group.instance.id": os.getenv(self.instance_id_env_var)}
+                if self.instance_id_env_var
+                and os.getenv(self.instance_id_env_var)
+                else {}
             )
             | self.kafka_consumer_properties
         )
