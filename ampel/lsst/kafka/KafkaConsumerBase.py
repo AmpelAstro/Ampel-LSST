@@ -1,18 +1,18 @@
 import os
 import uuid
-from contextlib import suppress
-from typing import Annotated, Any
+from typing import Annotated, Any, Self
 
 import confluent_kafka
 from annotated_types import Gt, MinLen
 from confluent_kafka.deserializing_consumer import DeserializingConsumer
 
+from ampel.abstract.AbsContextManager import AbsContextManager
 from ampel.base.AmpelUnit import AmpelUnit
 
 from .SASLAuthentication import SASLAuthentication
 
 
-class KafkaConsumerBase(AmpelUnit):
+class KafkaConsumerBase(AbsContextManager, AmpelUnit):
     #: Address of Kafka broker
     bootstrap: str
     #: Optional authentication
@@ -66,7 +66,6 @@ class KafkaConsumerBase(AmpelUnit):
         )
 
         self._consumer = DeserializingConsumer(config)
-        self._consumer.subscribe(self.topics)
 
         self._poll_interval = max((1, min((3, self.timeout))))
         self._poll_attempts = max((1, int(self.timeout / self._poll_interval)))
@@ -100,7 +99,10 @@ class KafkaConsumerBase(AmpelUnit):
                 raise
         return message
 
-    def __del__(self):
+    def __enter__(self) -> Self:
+        self._consumer.subscribe(self.topics)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
         self._consumer.commit()
-        with suppress(confluent_kafka.KafkaError):
-            self._consumer.close()
+        self._consumer.unsubscribe()

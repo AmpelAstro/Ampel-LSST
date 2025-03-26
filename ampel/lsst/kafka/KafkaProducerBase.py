@@ -4,7 +4,7 @@ from typing import Any, Generic, TypeVar
 
 from confluent_kafka import KafkaException, Producer
 
-from ampel.base.AmpelABC import AmpelABC
+from ampel.abstract.AbsContextManager import AbsContextManager
 from ampel.base.decorator import abstractmethod
 
 from .SASLAuthentication import SASLAuthentication
@@ -12,7 +12,7 @@ from .SASLAuthentication import SASLAuthentication
 _T = TypeVar("_T")
 
 
-class KafkaProducerBase(AmpelABC, Generic[_T], abstract=True):
+class KafkaProducerBase(AbsContextManager, Generic[_T], abstract=True):
     bootstrap: str
     topic: str
     auth: None | SASLAuthentication = None
@@ -54,7 +54,7 @@ class KafkaProducerBase(AmpelABC, Generic[_T], abstract=True):
         )
         self._producer.poll(0)
 
-    def flush(self):
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
         if (in_queue := self._producer.flush(self.delivery_timeout)) > 0:
             raise TimeoutError(
                 f"{in_queue} messages still in queue after {self.delivery_timeout} s"

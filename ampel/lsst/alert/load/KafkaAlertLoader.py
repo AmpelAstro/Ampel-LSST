@@ -17,7 +17,7 @@ _get_schema: Callable[[Any], AvroSchema] = TypeAdapter(
 ).validate_python
 
 
-class KafkaAlertLoader(AbsAlertLoader[dict], KafkaConsumerBase):
+class KafkaAlertLoader(KafkaConsumerBase, AbsAlertLoader[dict]):
     """
     Load alerts from one or more Kafka topics
     """
