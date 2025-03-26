@@ -1,5 +1,6 @@
 import os
 import uuid
+from threading import Event
 from typing import Annotated, Any, Self
 
 import confluent_kafka
@@ -73,7 +74,7 @@ class KafkaConsumerBase(AbsContextManager, AmpelUnit):
     def _raise_errors(self, exc: Exception) -> None:
         raise exc
 
-    def _poll(self) -> confluent_kafka.Message | None:
+    def _poll(self, stop: Event) -> confluent_kafka.Message | None:
         """
         Poll for a message, ignoring nonfatal errors
         """
@@ -81,7 +82,9 @@ class KafkaConsumerBase(AbsContextManager, AmpelUnit):
         # wake up occasionally to catch SIGINT
         for _ in range(self._poll_attempts):
             try:
-                if message := self._consumer.poll(self._poll_interval):
+                if stop.is_set() or (
+                    message := self._consumer.poll(self._poll_interval)
+                ):
                     break
             except confluent_kafka.KafkaError as exc:
                 if (
@@ -97,6 +100,8 @@ class KafkaConsumerBase(AbsContextManager, AmpelUnit):
                     # bail on timeouts
                     return None
                 raise
+            except KeyboardInterrupt:
+                stop.set()
         return message
 
     def __enter__(self) -> Self:

@@ -2,6 +2,7 @@
 
 import itertools
 from collections.abc import Callable, Iterable, Iterator
+from threading import Event
 from typing import Any
 
 import confluent_kafka
@@ -91,8 +92,9 @@ class KafkaAlertLoader(KafkaConsumerBase, AbsAlertLoader[dict]):
                 raise
 
     def _consume(self) -> Iterator[dict]:
-        while True:
-            message = self._poll()
+        stop = Event()
+        while not stop.is_set():
+            message = self._poll(stop)
             if message is None:
                 return
             else:
