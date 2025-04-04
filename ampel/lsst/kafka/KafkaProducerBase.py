@@ -77,7 +77,12 @@ class KafkaProducerBase(AbsContextManager, Generic[_T], abstract=True):
         self._stop_thread.set()
         self._thread.join()
         self._thread = None
-        # ensure enqueued messages are delivered
+        self.flush()
+
+    def flush(self) -> None:
+        """
+        Block until all messages are delivered
+        """
         if (in_queue := self._producer.flush(self.delivery_timeout)) > 0:
             raise TimeoutError(
                 f"{in_queue} messages still in queue after {self.delivery_timeout} s"
