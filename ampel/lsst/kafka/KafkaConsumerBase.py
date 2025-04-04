@@ -1,7 +1,9 @@
 import os
 import uuid
+from collections.abc import Callable, Generator
+from contextlib import contextmanager
 from threading import Event
-from typing import Annotated, Any, Self
+from typing import Annotated, Any, Literal, Self
 
 import confluent_kafka
 from annotated_types import Gt, MinLen
@@ -22,6 +24,10 @@ class KafkaConsumerBase(AbsContextManager, AmpelUnit):
     topics: Annotated[list[str], MinLen(1)]
     #: Consumer group name
     group_name: None | str = None
+    #: Partition assignment strategy
+    strategy: Literal["cooperative-sticky", "round-robin", "range"] = (
+        "cooperative-sticky"
+    )
     #: time to wait for messages before giving up, in seconds
     timeout: Annotated[int, Gt(0)] = 1
     #: environment variable to use as group.instance.id. If None, disable static membership
@@ -40,6 +46,7 @@ class KafkaConsumerBase(AbsContextManager, AmpelUnit):
                 "auto.commit.interval.ms": 10000,
                 "receive.message.max.bytes": 2**29,
                 "enable.partition.eof": False,  # don't emit messages on EOF
+                "partition.assignment.strategy": self.strategy,
                 "error_cb": self._raise_errors,
             }
             | (
@@ -70,6 +77,9 @@ class KafkaConsumerBase(AbsContextManager, AmpelUnit):
 
         self._poll_interval = max((1, min((3, self.timeout))))
         self._poll_attempts = max((1, int(self.timeout / self._poll_interval)))
+
+        self._flush_callback: None | Callable[[], None] = None
+        self._level = 0
 
     def _raise_errors(self, exc: Exception) -> None:
         raise exc
@@ -105,9 +115,45 @@ class KafkaConsumerBase(AbsContextManager, AmpelUnit):
         return message
 
     def __enter__(self) -> Self:
-        self._consumer.subscribe(self.topics)
+        if self._level == 0:
+            self._consumer.subscribe(self.topics, on_revoke=self._on_revoke)
+            self._level += 1
         return self
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:
+        self._level -= 1
+        if self._level > 0:
+            return
+        if self._flush_callback:
+            self._flush_callback()
         self._consumer.commit()
         self._consumer.unsubscribe()
+
+    def _on_revoke(
+        self, consumer: confluent_kafka.Consumer, partitions
+    ) -> None:
+        """
+        Called when partitions are revoked from this consumer
+        """
+        # force all in-flight messages to be processed, storing the offset
+        if self._flush_callback:
+            self._flush_callback()
+        if self.strategy == "cooperative-sticky":
+            consumer.incremental_unassign(partitions)
+        else:
+            consumer.unassign(partitions)
+
+    @contextmanager
+    def buffered(
+        self, flush_callback: Callable[[], None]
+    ) -> Generator[Self, None, None]:
+        """
+        Context manager to buffer messages and flush them at the end
+        """
+        prev = self._flush_callback
+        try:
+            self._flush_callback = flush_callback
+            with self as slf:
+                yield slf
+        finally:
+            self._flush_callback = prev
