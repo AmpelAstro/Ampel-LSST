@@ -16,6 +16,8 @@ from ampel.content.DataPoint import DataPoint
 from ampel.types import StockId
 from ampel.util.hash import hash_payload
 
+from .FieldSelection import FieldSelection, StringFilter
+
 
 class LSSTDataPointShaper(AbsT0Unit):
     """
@@ -24,6 +26,8 @@ class LSSTDataPointShaper(AbsT0Unit):
     """
 
     digest_size: int = 8  # Byte width of datapoint ids
+
+    fields: FieldSelection = FieldSelection.default()
     # Mandatory implementation
 
     def process(  # type: ignore[override]
@@ -47,24 +51,36 @@ class LSSTDataPointShaper(AbsT0Unit):
             Non detection limit don't have an identifier.
             """
 
-            id = hash_payload(
-                encode(dict(sorted(photo_dict.items()))),
-                size=-self.digest_size * 8,
-            )
+            selection: None | StringFilter = None
+
             if "diaSourceId" in photo_dict:
                 tags.append("LSST_DP")
                 sourceid_list.add(photo_dict["diaSourceId"])
+                selection = self.fields.diaSource
             elif "diaForcedSourceId" in photo_dict:
                 tags.append("LSST_FP")
+                selection = self.fields.diaForcedSource
             elif "diaObjectId" in photo_dict:  # DiaObject
                 # diaObjectId is also used in (prv)diaSource and diaForcedPhotometry
                 # if other fields are added, check if they contain diaObjectId
                 tags.append("LSST_OBJ")
+                selection = self.fields.diaObject
             else:
                 # Nondetection Limit
                 tags.append("LSST_ND")
+                selection = self.fields.diaNondetectionLimit
+
+            if selection:
+                body = {k: photo_dict[k] for k in selection.filter(photo_dict)}
+            else:
+                body = photo_dict
+
+            id = hash_payload(
+                encode(dict(sorted(body.items()))),
+                size=-self.digest_size * 8,
+            )
             ret_list.append(
-                {"id": id, "stock": stock, "tag": tags, "body": photo_dict}  # type: ignore[typeddict-item]
+                {"id": id, "stock": stock, "tag": tags, "body": body}  # type: ignore[typeddict-item]
             )
 
         # Current alert format allows for the same dp to be provided as

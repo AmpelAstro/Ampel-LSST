@@ -31,7 +31,6 @@ config:
               ingest:
                 filter: LSSTObjFilter
                 select: last
-                sort: diaObjectId
         combine:
           - unit: LSSTT1Combiner
   - channel: ElasticcShort
