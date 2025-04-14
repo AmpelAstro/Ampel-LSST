@@ -116,7 +116,9 @@ def test_duplicate_datapoints(mock_context: DevAmpelContext):
         model=UnitModel(**model.config["supplier"]), sub_type=LSSTAlertSupplier
     )
     alert = next(supplier)
-    assert len(alert.datapoints) == 20
+    assert len(alert.datapoints) == 17, (
+        "alert suppliert removed 3 duplicated datapoints"
+    )
 
     processor = mock_context.loader.new_context_unit(
         model=model,
@@ -125,13 +127,9 @@ def test_duplicate_datapoints(mock_context: DevAmpelContext):
         raise_exc=True,
     )
 
-    # insert datapoints from first alert into the database
     assert processor.run() == 1
 
     assert (t1 := mock_context.db.get_collection("t1").find_one())
     assert len(t1["dps"]) == len(set(t1["dps"])), (
         "datapoints in state are unique"
-    )
-    assert len(t1["dps"]) < len(alert.datapoints) - 1, (
-        "some alert datapoints eliminated"
     )

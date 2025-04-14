@@ -6,7 +6,7 @@
 # Last Modified Date: 21.03.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
-from collections.abc import Iterator
+from collections.abc import Generator, Iterator
 from itertools import chain
 from typing import Literal
 
@@ -31,6 +31,7 @@ _field_upgrades: dict[str, str] = {
     "psFluxErr": "psfFluxErr",
     "filterName": "band",
     "decl": "dec",
+    "ccdVisitId": "visit",
 }
 
 
@@ -43,6 +44,8 @@ class LSSTAlertSupplier(BaseAlertSupplier):
     # Override default
     deserialize: None | Literal["avro", "json"] = "avro"
 
+    max_history: float = float("inf")
+
     @staticmethod
     def _shape_dp(d: dict) -> ReadOnlyDict:
         return ReadOnlyDict(
@@ -50,23 +53,45 @@ class LSSTAlertSupplier(BaseAlertSupplier):
         )
 
     @classmethod
-    def _shape(cls, d: dict) -> AmpelAlertProtocol:
-        if d["diaObject"]:
-            diaObjectId = d["diaObject"]["diaObjectId"]
-            dps = tuple(
-                cls._shape_dp(dp)
-                for dp in chain(
-                    (d["diaSource"],),
-                    d.get("prvDiaSources") or (),
-                    d.get("prvDiaForcedSources") or (),
-                    d.get("diaNondetectionLimit") or (),
-                    ((d.get("diaObject"),) if d.get("diaObject") else ()),
-                )
+    def _get_sources(
+        cls, alert: dict, max_history: float
+    ) -> Generator[dict, None, None]:
+        """
+        yield one photometric point per visit, preferring forced photometry to
+        difference imaging and taking upper limits as a last resort
+        """
+        diaSource = cls._shape_dp(alert["diaSource"])
+        yield diaSource
+
+        visits: set[int] = set()
+        t0 = diaSource["midpointMjdTai"] - max_history
+        for dp in map(
+            cls._shape_dp,
+            chain(
+                alert.get("prvDiaForcedSources") or (),
+                alert.get("prvDiaSources") or (),
+                alert.get("diaNondetectionLimit") or (),
+            ),
+        ):
+            if (visit := dp["visit"]) not in visits and dp[
+                "midpointMjdTai"
+            ] >= t0:
+                yield dp
+                visits.add(visit)
+
+    @classmethod
+    def _shape(
+        cls, d: dict, max_history: float = float("inf")
+    ) -> AmpelAlertProtocol:
+        if diaObject := d.get("diaObject"):
+            dps = (
+                *cls._get_sources(d, max_history=max_history),
+                cls._shape_dp(diaObject),
             )
             return AmpelAlert(
                 id=d["alertId"],  # alert id
-                stock=diaObjectId,  # internal ampel id
-                datapoints=tuple(dps),
+                stock=diaObject["diaObjectId"],  # internal ampel id
+                datapoints=dps,
                 extra={"kafka": kafka}
                 if (kafka := d.get("__kafka"))
                 else None,
@@ -89,4 +114,4 @@ class LSSTAlertSupplier(BaseAlertSupplier):
         """
         d = self._deserialize(next(self.alert_loader))
 
-        return self._shape(d)
+        return self._shape(d, self.max_history)
