@@ -104,11 +104,9 @@ class LSSTT2Tabulator(AbsT2Tabulator):
         return [str(stock) for stock in self.get_stock_id(dps)]
 
     @staticmethod
-    def get_values(
-        dps: Iterable[DataPoint],
-        params: Sequence[str],
-        tag_priority: Mapping[str | int, int],
-    ) -> tuple[Sequence[Any], ...]:
+    def _select_dps(
+        dps: Iterable[DataPoint], tag_priority: Mapping[str | int, int]
+    ) -> Iterable[DataPoint]:
         # select one datapoint per visit with highest tag priority
         selected_dps: dict[int, DataPoint] = {}
         for el in dps:
@@ -121,14 +119,23 @@ class LSSTT2Tabulator(AbsT2Tabulator):
                 )
             ):
                 selected_dps[key] = el
+        return selected_dps.values()
 
+    @staticmethod
+    def get_values(
+        dps: Iterable[DataPoint],
+        params: Sequence[str],
+        tag_priority: Mapping[str | int, int],
+    ) -> tuple[Sequence[Any], ...]:
         if tup := tuple(
             map(
                 list,
                 zip(
                     *(
                         [el["body"][param] for param in params]
-                        for el in selected_dps.values()
+                        for el in LSSTT2Tabulator._select_dps(
+                            dps, tag_priority
+                        )
                     ),
                     strict=False,
                 ),
