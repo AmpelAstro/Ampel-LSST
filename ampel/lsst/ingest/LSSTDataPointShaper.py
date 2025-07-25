@@ -51,6 +51,11 @@ class LSSTDataPointShaper(AbsT0Unit):
             Non detection limit don't have an identifier.
             """
 
+            # The ELASTICC schema uses 'decl' for declination.
+            # Here copying the value to 'dec' for consistency and allowing tests with elasticc alerts.
+            if "decl" in photo_dict:
+                setitem(photo_dict, "dec", float(photo_dict["decl"]))
+
             selection: None | StringFilter = None
 
             if "diaSourceId" in photo_dict:
