@@ -6,10 +6,10 @@
 # Last Modified Date: 21.03.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
+import datetime
 from collections.abc import Generator, Iterator
 from itertools import chain
 from typing import Literal
-import datetime
 
 from ampel.alert.AmpelAlert import AmpelAlert
 from ampel.alert.BaseAlertSupplier import BaseAlertSupplier
@@ -51,9 +51,9 @@ class LSSTAlertSupplier(BaseAlertSupplier):
 
     @staticmethod
     def _shape_dp(d: dict) -> ReadOnlyDict:
-        # Convert process time from datetime objects 
+        # Convert process time from datetime objects
         for time_field in ("validityStart", "time_processed"):
-            if ( dt := d.get(time_field)) and isinstance(dt, datetime.datetime):
+            if (dt := d.get(time_field)) and isinstance(dt, datetime.datetime):
                 d[time_field] = dt.timestamp()
         return ReadOnlyDict(
             {_field_upgrades.get(k, k): v for k, v in d.items()}
@@ -88,27 +88,30 @@ class LSSTAlertSupplier(BaseAlertSupplier):
 
     @classmethod
     def _shape(
-        cls, d: dict, max_history: float = float("inf"), alert_identifier: Literal["diaSourceId", "alertId"] = "diaSourceId"
+        cls,
+        d: dict,
+        max_history: float = float("inf"),
+        alert_identifier: Literal["diaSourceId", "alertId"] = "diaSourceId",
     ) -> AmpelAlertProtocol:
         if diaObject := d.get("diaObject"):
             dps = (
                 *cls._get_sources(d, max_history=max_history),
                 cls._shape_dp(diaObject),
             )
-            # Add base alert information to extras field 
+            # Add base alert information to extras field
             extras = {}
             for alertprop in ["observation_reason", "target_name"]:
-                if (val := d.get(alertprop)):
+                if val := d.get(alertprop):
                     extras[alertprop] = val
-            if (kafka := d.get("__kafka")):
+            if kafka := d.get("__kafka"):
                 extras["kafka"] = kafka
             return AmpelAlert(
-                id=d[alert_identifier],  # ID of the triggering DiaSource - use as alert id?
+                id=d[
+                    alert_identifier
+                ],  # ID of the triggering DiaSource - use as alert id?
                 stock=diaObject["diaObjectId"],  # internal ampel id
                 datapoints=dps,
-                extra=extras
-                if len(extras)>0
-                else None,
+                extra=extras if len(extras) > 0 else None,
             )
         raise DIAObjectMissingError
 
