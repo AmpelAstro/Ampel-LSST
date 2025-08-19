@@ -73,6 +73,7 @@ def test_loader_ack(
 
     supplier = LSSTAlertSupplier(
         deserialize=None,
+        alert_identifier="alertId",
         loader=UnitModel(
             unit="KafkaAlertLoader",
             config={
