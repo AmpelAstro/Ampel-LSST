@@ -22,7 +22,7 @@ def alert_consumer(mock_context: DevAmpelContext) -> AlertConsumer:
         "rb"
     ) as f:
         alerts = list(fastavro.reader(f))[:2]
-    model.config["supplier"]["config"]["alert_identfier"] = "alertId"
+    model.config["supplier"]["config"]["alert_identifier"] = "alertId"
     model.config["supplier"]["config"]["loader"] = UnitModel(
         unit="MockAlertLoader", config={"alerts": alerts}
     ).dict()
