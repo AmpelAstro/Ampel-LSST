@@ -1,6 +1,8 @@
-[tool.poetry]
+[project]
 name = "ampel-lsst"
-version = "0.10.1a4"
+
+[tool.poetry]
+version = "0.10.1a6"
 description = "Legacy Survey of Space and Time support for the Ampel system"
 authors = [
     "Marcus Fenner <mf@physik.hu-berlinn.de>",
@@ -52,7 +54,7 @@ ampel-alerts = {version = ">=0.10.3a6,<0.11"}
 [tool.poetry.extras]
 kafka = ["confluent-kafka"]
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^8.0.2"
 pytest-cov = "^7.0.0"
 pytest-mock = "^3.12.0"
