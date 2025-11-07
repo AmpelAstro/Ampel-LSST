@@ -81,6 +81,9 @@ filterwarnings = [
 
 [tool.mypy]
 namespace_packages = true
+packages = [
+  "ampel"
+]
 plugins = [
   "pydantic.mypy",
   "numpy.typing.mypy_plugin"
@@ -126,6 +129,9 @@ ignore = [
     "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
                # fine for AmpelUnit, actually (ruff has a special case for pydantic)
 ]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ampel"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["RUF018", "SLF001"]
