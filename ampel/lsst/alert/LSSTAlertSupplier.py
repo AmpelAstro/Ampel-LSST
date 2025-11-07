@@ -6,7 +6,6 @@
 # Last Modified Date: 21.03.2022
 # Last Modified By  : Marcus Fenner <mf@physik.hu-berlin.de>
 
-import datetime
 from collections.abc import Generator, Iterator
 from itertools import chain
 from typing import Literal
@@ -51,10 +50,6 @@ class LSSTAlertSupplier(BaseAlertSupplier):
 
     @staticmethod
     def _shape_dp(d: dict) -> ReadOnlyDict:
-        # Convert process time from datetime objects
-        for time_field in ("validityStart", "time_processed"):
-            if (dt := d.get(time_field)) and isinstance(dt, datetime.datetime):
-                d[time_field] = dt.timestamp()
         return ReadOnlyDict(
             {_field_upgrades.get(k, k): v for k, v in d.items()}
         )
