@@ -81,6 +81,9 @@ filterwarnings = [
 
 [tool.mypy]
 namespace_packages = true
+packages = [
+  "ampel"
+]
 plugins = [
   "pydantic.mypy",
   "numpy.typing.mypy_plugin"
