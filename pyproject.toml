@@ -47,7 +47,7 @@ confluent-kafka = {version = "^2.6.1", optional = true, extras = ["schemaregistr
 fastavro = "^1.3.2"
 ampel-ztf = {version = ">=0.10.3a0,<0.11"}
 ampel-core = {version = ">=0.10.6a7,<0.11"}
-ampel-alerts = {version = ">=0.10.3a4,<0.11"}
+ampel-alerts = {version = ">=0.10.3a6,<0.11"}
 
 [tool.poetry.extras]
 kafka = ["confluent-kafka"]

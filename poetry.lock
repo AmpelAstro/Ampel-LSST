@@ -2,18 +2,18 @@
 
 [[package]]
 name = "ampel-alerts"
-version = "0.10.3a5"
+version = "0.10.3a6"
 description = "Alert support for the Ampel system"
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "ampel_alerts-0.10.3a5-py3-none-any.whl", hash = "sha256:1a97685a6f55e53b90aa8dde0420d07c4fc1d48445a087412ec7c3abf91de3d6"},
-    {file = "ampel_alerts-0.10.3a5.tar.gz", hash = "sha256:21ab98b878043b6c5d721ff328eb5187db23dfb1d89aa1cca6613724fbc898f4"},
+    {file = "ampel_alerts-0.10.3a6-py3-none-any.whl", hash = "sha256:193af767616bea4f0cbcc1d9991cd2c2dfc06a906fccdc13efd5a31570dcf9f2"},
+    {file = "ampel_alerts-0.10.3a6.tar.gz", hash = "sha256:b509b775c4171bcdfb2d06bad1ca034d24c8bda0583a3525e32b457e533ee2cf"},
 ]
 
 [package.dependencies]
-ampel-core = ">=0.10.6a8,<0.11"
+ampel-core = ">=0.10.6a12,<0.11"
 
 [[package]]
 name = "ampel-core"
@@ -2767,4 +2767,4 @@ kafka = ["confluent-kafka"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "2b9aa5ec12ab692fe59007712aae2ea9936c7684953a352ef958a34bc63a5038"
+content-hash = "0f9650de27670654a7eb49fc7f338261664c81e33bcc1b4fd2dd519141e5880f"
