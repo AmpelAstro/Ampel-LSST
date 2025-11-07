@@ -127,6 +127,9 @@ ignore = [
                # fine for AmpelUnit, actually (ruff has a special case for pydantic)
 ]
 
+[tool.ruff.lint.isort]
+known-first-party = ["ampel"]
+
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["RUF018", "SLF001"]
 
