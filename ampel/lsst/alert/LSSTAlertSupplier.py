@@ -46,6 +46,8 @@ class LSSTAlertSupplier(BaseAlertSupplier):
 
     max_history: float = float("inf")
 
+    alert_identifier: Literal["diaSourceId", "alertId"] = "diaSourceId"
+
     @staticmethod
     def _shape_dp(d: dict) -> ReadOnlyDict:
         return ReadOnlyDict(
@@ -81,20 +83,30 @@ class LSSTAlertSupplier(BaseAlertSupplier):
 
     @classmethod
     def _shape(
-        cls, d: dict, max_history: float = float("inf")
+        cls,
+        d: dict,
+        max_history: float = float("inf"),
+        alert_identifier: Literal["diaSourceId", "alertId"] = "diaSourceId",
     ) -> AmpelAlertProtocol:
         if diaObject := d.get("diaObject"):
             dps = (
                 *cls._get_sources(d, max_history=max_history),
                 cls._shape_dp(diaObject),
             )
+            # Add base alert information to extras field
+            extras = {}
+            for alertprop in ["observation_reason", "target_name"]:
+                if val := d.get(alertprop):
+                    extras[alertprop] = val
+            if kafka := d.get("__kafka"):
+                extras["kafka"] = kafka
             return AmpelAlert(
-                id=d["alertId"],  # alert id
+                id=d[
+                    alert_identifier
+                ],  # ID of the triggering DiaSource - use as alert id?
                 stock=diaObject["diaObjectId"],  # internal ampel id
                 datapoints=dps,
-                extra={"kafka": kafka}
-                if (kafka := d.get("__kafka"))
-                else None,
+                extra=extras if len(extras) > 0 else None,
             )
         raise DIAObjectMissingError
 
@@ -112,6 +124,11 @@ class LSSTAlertSupplier(BaseAlertSupplier):
         :raises StopIteration: when alert_loader dries out.
         :raises AttributeError: if alert_loader was not set properly before this method is called
         """
-        d = self._deserialize(next(self.alert_loader))
+        while True:
+            d = self._deserialize(next(self.alert_loader))
 
-        return self._shape(d, self.max_history)
+            try:
+                return self._shape(d, self.max_history, self.alert_identifier)
+            except DIAObjectMissingError:
+                # silently skip over SSObjects
+                continue

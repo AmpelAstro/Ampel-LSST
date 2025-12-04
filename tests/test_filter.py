@@ -1,4 +1,4 @@
-from pathlib import Path
+from urllib.request import urlopen
 
 import fastavro
 import numpy as np
@@ -11,8 +11,8 @@ from ampel.lsst.t0.ReallySimpleLSSTFilter import ReallySimpleLSSTFilter
 
 @pytest.fixture
 def alerts():
-    with open(
-        Path(__file__).parent / "test-data" / "schema_701.avro", "rb"
+    with urlopen(
+        "https://raw.githubusercontent.com/lsst/alert_packet/b1ecb9c006d211d8117f4672d4044ff8fca22d7e/python/lsst/alert/packet/schema/9/0/sample_data/fakeAlert.avro"
     ) as f:
         return [LSSTAlertSupplier._shape(a) for a in fastavro.reader(f)]
 

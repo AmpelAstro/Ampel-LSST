@@ -8,6 +8,7 @@ config:
     unit: LSSTAlertSupplier
     config:
       deserialize: null
+      alert_identifier: alertId
       loader:
         unit: KafkaAlertLoader
         config:
