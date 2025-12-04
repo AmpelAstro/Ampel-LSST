@@ -33,7 +33,7 @@ class FieldSelection(AmpelBaseModel):
                 include={
                     "band",
                     "dec",
-                    "is_negative",
+                    "isNegative",
                     "midpointMjdTai",
                     "psfFlux",
                     "psfFluxErr",
