@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ampel-lsst"
-version = "0.10.1a3"
+version = "0.10.1a4"
 description = "Legacy Survey of Space and Time support for the Ampel system"
 authors = [
     "Marcus Fenner <mf@physik.hu-berlinn.de>",
