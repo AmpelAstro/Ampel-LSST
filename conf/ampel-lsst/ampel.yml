@@ -24,6 +24,7 @@ unit:
     - ampel.lsst.t2.T2GetDiaObject
     - ampel.lsst.t2.T2GetAlertJournal
     - ampel.lsst.t2.T2GetAlertId
+    - ampel.lsst.t3.complement.LSSTCutoutImages
 
 alias:
   t2:
