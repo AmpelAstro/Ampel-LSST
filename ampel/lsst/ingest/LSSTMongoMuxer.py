@@ -105,16 +105,15 @@ class LSSTMongoMuxer(AbsT0Muxer):
 
         # Difference between candids from the alert and candids present in DB
         ids_dps_to_insert = ids_dps_alert.keys() - ids_dps_db.keys()
+        ids_dps_to_combine = ids_dps_alert.keys() | ids_dps_db.keys()
 
-        # Emit datapoints in the order given in the alert, but prefer content
+        # Emit union of datapoints from alert and database, prefering content
         # from the database. This allows the ingestion handler to detect when an
         # additional channel accepts a datapoint that was already in the
         # database.
         dps_combine = [
-            ids_dps_db[dp["id"]]
-            if dp["id"] in ids_dps_db
-            else self._project(ids_dps_alert[dp["id"]], self.projection)
-            for dp in dps_al
+            ids_dps_db[dp_id] if dp_id in ids_dps_db else ids_dps_alert[dp_id]
+            for dp_id in ids_dps_to_combine
         ]
 
         return [
