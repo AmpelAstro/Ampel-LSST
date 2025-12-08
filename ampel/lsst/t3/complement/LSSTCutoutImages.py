@@ -11,29 +11,32 @@ from typing import Literal
 
 import backoff
 import requests
-from requests_toolbelt.sessions import BaseUrlSession
+from requests_toolbelt.sessions import (  # type: ignore[import-untyped]
+    BaseUrlSession,
+)
 
 from ampel.abstract.AbsBufferComplement import AbsBufferComplement
 from ampel.struct.AmpelBuffer import AmpelBuffer
 from ampel.struct.T3Store import T3Store
 
 
-class ZTFCutoutImages(AbsBufferComplement):
+class LSSTCutoutImages(AbsBufferComplement):
     """
-    Add cutout images from ZTF archive database
+    Add cutout images from LSST archive database
     """
 
     #: Which detection to retrieve cutouts for
     eligible: Literal["first", "last", "brightest", "all"] = "last"
 
+    archive_url: str = (
+        "https://ampel-dev.ia.zeuthen.desy.de/api/lsst/archive/v1/"
+    )
+    insecure: bool = False
+
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
-        self.session = BaseUrlSession(
-            base_url=self.context.config.get(
-                "resource.ampel-ztf/archive", str, raise_exc=True
-            )
-        )
+        self.session = BaseUrlSession(base_url=self.archive_url)
 
     @backoff.on_exception(
         backoff.expo,
@@ -49,14 +52,17 @@ class ZTFCutoutImages(AbsBufferComplement):
         or e.response.status_code not in {502, 503, 504, 429, 408},
         max_time=60,
     )
-    def get_cutout(self, candid: int) -> None | dict[str, bytes]:
-        response = self.session.get(f"alert/{candid}/cutouts")
+    def get_cutout(self, diaSourceId: int) -> None | dict[str, bytes]:
+        response = self.session.get(
+            f"alert/{diaSourceId}/cutouts", verify=not self.insecure
+        )
         if response.status_code == 404:
             return None
 
         response.raise_for_status()
+        json = response.json()
         return {
-            k: b64decode(response.json()[k]["stampData"])
+            k: b64decode(json[k])
             for k in ["cutoutScience", "cutoutTemplate", "cutoutDifference"]
         }
 
@@ -65,8 +71,8 @@ class ZTFCutoutImages(AbsBufferComplement):
             if (photopoints := record.get("t0")) is None:
                 raise ValueError(f"{type(self).__name__} requires t0 records")
             pps = sorted(
-                [pp for pp in photopoints if pp["id"] > 0],
-                key=lambda pp: pp["body"]["jd"],
+                [pp for pp in photopoints if "LSST_DP" in pp.get("tag", [])],
+                key=lambda pp: pp["body"]["midpointMjdTai"],
             )
             if not pps:
                 return
@@ -76,8 +82,10 @@ class ZTFCutoutImages(AbsBufferComplement):
             elif self.eligible == "first":
                 candids = [pps[0]["id"]]
             elif self.eligible == "brightest":
-                candids = [min(pps, key=lambda pp: pp["body"]["magpsf"])["id"]]
-            elif self.eligible == "all":
+                candids = [
+                    min(pps, key=lambda pp: pp["body"]["psfFlux"])["id"]
+                ]
+            else:  # all
                 candids = [pp["id"] for pp in pps]
             cutouts = {candid: self.get_cutout(candid) for candid in candids}
 
