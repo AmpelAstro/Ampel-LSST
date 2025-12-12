@@ -11,7 +11,6 @@ from collections.abc import Callable, Mapping, Sequence
 from itertools import islice
 from typing import Any, cast
 
-import sncosmo
 from astropy.table import Table
 
 from ampel.abstract.AbsAlertLoader import AbsAlertLoader
@@ -334,6 +333,8 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[Table]):
     }
 
     def __init__(self, **kwargs) -> None:
+        import sncosmo  # noqa: PLC0415
+
         super().__init__(**kwargs)
         self.lightcurves = iter(
             cast(
