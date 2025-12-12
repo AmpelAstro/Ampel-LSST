@@ -144,7 +144,7 @@ if __name__ == "__main__":
     group.add_argument(
         "--date",
         type=lambda s: datetime.datetime.strptime(s, "%Y-%m-%d").replace(
-            tzinfo=datetime.timezone.utc
+            tzinfo=datetime.UTC
         ),
     )
     args = parser.parse_args()
@@ -184,8 +184,8 @@ if __name__ == "__main__":
     topic = args.topic
     start = (
         datetime.datetime(
-            *datetime.datetime.now(datetime.timezone.utc).timetuple()[:3],
-            tzinfo=datetime.timezone.utc,
+            *datetime.datetime.now(datetime.UTC).timetuple()[:3],
+            tzinfo=datetime.UTC,
         )
         - datetime.timedelta(days=args.days_ago)
         if args.days_ago is not None

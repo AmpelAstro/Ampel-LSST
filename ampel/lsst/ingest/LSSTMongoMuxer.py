@@ -86,7 +86,7 @@ class LSSTMongoMuxer(AbsT0Muxer):
         if self.min_ttl is not None:
             filter["expiry"] = {
                 "$not": {
-                    "$lt": datetime.datetime.now(tz=datetime.timezone.utc)
+                    "$lt": datetime.datetime.now(tz=datetime.UTC)
                     + datetime.timedelta(seconds=self.min_ttl)
                 }
             }

@@ -20,7 +20,7 @@ class MockMessage:
         self._offset = offset
         self._timestamp = (
             confluent_kafka.TIMESTAMP_CREATE_TIME,
-            int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp() * 1000),
+            int(datetime.datetime.now(tz=datetime.UTC).timestamp() * 1000),
         )
 
     def value(self):

@@ -44,10 +44,7 @@ class ElasticcDirAlertLoader(DirAlertLoader):
             self.logger.debug("Loading " + fpath)
 
         # Assuming one alert per file and either compressed (gz) or binary uncompressed
-        if os.path.splitext(fpath)[1] == ".gz":
-            alertopener = gzip.open
-        else:
-            alertopener = open  # type: ignore[assignment]
+        alertopener = gzip.open if os.path.splitext(fpath)[1] == ".gz" else open
 
         with alertopener(fpath, self._open_mode) as alert_file:
             return fastavro.schemaless_reader(  # type: ignore[return-value]
