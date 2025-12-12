@@ -1,0 +1,10 @@
+# Changes here will be overwritten by Copier
+_commit: v0.0.11
+_src_path: gh:AmpelAstro/copier-ampel
+author_email: jakob.van.santen@desy.de
+author_name: Jakob van Santen
+plugin_description: Legacy Survey of Space and Time support for the Ampel system
+plugin_name: LSST
+plugin_org: AmpelAstro
+plugin_version: 0.10.1a6
+version_cap: <0.11
