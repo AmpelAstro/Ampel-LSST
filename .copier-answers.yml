@@ -6,5 +6,5 @@ author_name: Jakob van Santen
 plugin_description: Legacy Survey of Space and Time support for the Ampel system
 plugin_name: LSST
 plugin_org: AmpelAstro
-plugin_version: 0.10.1a6
+plugin_version: 0.10.1a7
 version_cap: <0.11
