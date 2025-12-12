@@ -90,9 +90,7 @@ class LSSTMongoMuxer(AbsT0Muxer):
                     + datetime.timedelta(seconds=self.min_ttl)
                 }
             }
-        dps_db: list[DataPoint] = list(
-            self._photo_col.find(filter, self.projection)
-        )
+        dps_db: list[DataPoint] = list(self._photo_col.find(filter, self.projection))
 
         # Create set with datapoint ids from alert
         ids_dps_alert = {el["id"]: el for el in dps_al}
@@ -116,9 +114,7 @@ class LSSTMongoMuxer(AbsT0Muxer):
             for dp_id in ids_dps_to_combine
         ]
 
-        return [
-            dp for dp in dps_al if dp["id"] in ids_dps_to_insert
-        ], dps_combine
+        return [dp for dp in dps_al if dp["id"] in ids_dps_to_insert], dps_combine
 
     def _project(self, doc, projection):
         out: dict[str, Any] = {}

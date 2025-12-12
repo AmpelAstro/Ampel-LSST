@@ -62,9 +62,7 @@ class KafkaProducerBase(AbsContextManager, Generic[_T], abstract=True):
         )
 
     def __enter__(self) -> "Self":
-        assert self._thread is None, (
-            f"{self.__class__.__qualname__} is not reentrant"
-        )
+        assert self._thread is None, f"{self.__class__.__qualname__} is not reentrant"
         # start the delivery callback thread
         self._stop_thread.clear()
         self._thread = Thread(target=self._poll)

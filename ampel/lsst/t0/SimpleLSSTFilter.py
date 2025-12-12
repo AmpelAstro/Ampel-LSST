@@ -30,25 +30,31 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
     min_ndet: int  # number of previous detections
     min_tspan: float  # minimum duration of alert detection history [days]
     max_tspan: float  # maximum duration of alert detection history [days]
-    min_archive_tspan: float = (
-        0.0  # minimum duration of alert detection history [days]
-    )
+    min_archive_tspan: float = 0.0  # minimum duration of alert detection history [days]
     max_archive_tspan: float = (
         10**5.0
     )  # maximum duration of alert detection history [days]
 
     # Astro
     #    min_sso_dist: float  # distance to nearest solar system object [arcsec]
-    min_gal_lat: float  # minium distance from galactic plane. Set to negative to disable cut.
+    min_gal_lat: (
+        float  # minium distance from galactic plane. Set to negative to disable cut.
+    )
 
     # Gaia
     gaia_rs: float  # search radius for GAIA DR2 matching [arcsec]
-    gaia_pm_signif: float  # significance of proper motion detection of GAIA counterpart [sigma]
+    gaia_pm_signif: (
+        float  # significance of proper motion detection of GAIA counterpart [sigma]
+    )
     gaia_plx_signif: (
         float  # significance of parallax detection of GAIA counterpart [sigma]
     )
-    gaia_veto_gmag_min: float  # min gmag for normalized distance cut of GAIA counterparts [mag]
-    gaia_veto_gmag_max: float  # max gmag for normalized distance cut of GAIA counterparts [mag]
+    gaia_veto_gmag_min: (
+        float  # min gmag for normalized distance cut of GAIA counterparts [mag]
+    )
+    gaia_veto_gmag_max: (
+        float  # max gmag for normalized distance cut of GAIA counterparts [mag]
+    )
     gaia_excessnoise_sig_max: float  # maximum allowed noise (expressed as significance) for Gaia match to be trusted.
 
     def post_init(self):
@@ -116,10 +122,7 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
         if srcs:
             gaia_tab = Table(
                 [
-                    {
-                        k: np.nan if v is None else v
-                        for k, v in src["body"].items()
-                    }
+                    {k: np.nan if v is None else v for k, v in src["body"].items()}
                     for src in srcs
                 ]
             )
@@ -132,24 +135,19 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
             )
             gaia_tab["FLAG_PROX"] = [
                 x["DISTANCE_NORM"]
-                and self.gaia_veto_gmag_min
-                <= x["Mag_G"]
-                <= self.gaia_veto_gmag_max
+                and self.gaia_veto_gmag_min <= x["Mag_G"] <= self.gaia_veto_gmag_max
                 for x in gaia_tab
             ]
 
             # check for proper motion and parallax conditioned to distance
             gaia_tab["FLAG_PMRA"] = (
-                abs(gaia_tab["PMRA"] / gaia_tab["ErrPMRA"])
-                > self.gaia_pm_signif
+                abs(gaia_tab["PMRA"] / gaia_tab["ErrPMRA"]) > self.gaia_pm_signif
             )
             gaia_tab["FLAG_PMDec"] = (
-                abs(gaia_tab["PMDec"] / gaia_tab["ErrPMDec"])
-                > self.gaia_pm_signif
+                abs(gaia_tab["PMDec"] / gaia_tab["ErrPMDec"]) > self.gaia_pm_signif
             )
             gaia_tab["FLAG_Plx"] = (
-                abs(gaia_tab["Plx"] / gaia_tab["ErrPlx"])
-                > self.gaia_plx_signif
+                abs(gaia_tab["Plx"] / gaia_tab["ErrPlx"]) > self.gaia_plx_signif
             )
 
             # take into account precison of the astrometric solution via the ExcessNoise key
@@ -185,9 +183,7 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
         # CUT ON THE HISTORY OF THE ALERT
         #################################
 
-        pps = [
-            el for el in alert.datapoints if el.get("diaSourceId") is not None
-        ]
+        pps = [el for el in alert.datapoints if el.get("diaSourceId") is not None]
         if len(pps) < self.min_ndet:
             # self.logger.debug("rejected: %d photopoints in alert (minimum required %d)"% (npp, self.min_ndet))
             self.logger.info(None, extra={"nDet": len(pps)})
@@ -226,9 +222,7 @@ class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
             return None
 
         # self.logger.debug("Alert %s accepted. Latest pp ID: %d"%(alert.tran_id, latest['candid']))
-        self.logger.debug(
-            "Alert accepted", extra={"latestPpId": latest["diaSourceId"]}
-        )
+        self.logger.debug("Alert accepted", extra={"latestPpId": latest["diaSourceId"]})
 
         # for key in self.keys_to_check:
         # 	self.logger.debug("{}: {}".format(key, latest[key]))

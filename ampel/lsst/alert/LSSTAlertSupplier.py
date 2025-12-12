@@ -50,9 +50,7 @@ class LSSTAlertSupplier(BaseAlertSupplier):
 
     @staticmethod
     def _shape_dp(d: dict) -> ReadOnlyDict:
-        return ReadOnlyDict(
-            {_field_upgrades.get(k, k): v for k, v in d.items()}
-        )
+        return ReadOnlyDict({_field_upgrades.get(k, k): v for k, v in d.items()})
 
     @classmethod
     def _get_sources(
@@ -75,9 +73,7 @@ class LSSTAlertSupplier(BaseAlertSupplier):
                 alert.get("diaNondetectionLimit") or (),
             ),
         ):
-            if (visit := dp["visit"]) not in visits and dp[
-                "midpointMjdTai"
-            ] >= t0:
+            if (visit := dp["visit"]) not in visits and dp["midpointMjdTai"] >= t0:
                 yield dp
                 visits.add(visit)
 

@@ -28,9 +28,7 @@ class LSSTCutoutImages(AbsBufferComplement):
     #: Which detection to retrieve cutouts for
     eligible: Literal["first", "last", "brightest", "all"] = "last"
 
-    archive_url: str = (
-        "https://ampel-dev.ia.zeuthen.desy.de/api/lsst/archive/v1/"
-    )
+    archive_url: str = "https://ampel-dev.ia.zeuthen.desy.de/api/lsst/archive/v1/"
     insecure: bool = False
 
     def __init__(self, **kwargs) -> None:
@@ -82,9 +80,7 @@ class LSSTCutoutImages(AbsBufferComplement):
             elif self.eligible == "first":
                 candids = [pps[0]["id"]]
             elif self.eligible == "brightest":
-                candids = [
-                    min(pps, key=lambda pp: pp["body"]["psfFlux"])["id"]
-                ]
+                candids = [min(pps, key=lambda pp: pp["body"]["psfFlux"])["id"]]
             else:  # all
                 candids = [pp["id"] for pp in pps]
             cutouts = {candid: self.get_cutout(candid) for candid in candids}

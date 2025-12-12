@@ -20,10 +20,7 @@ class MockMessage:
         self._offset = offset
         self._timestamp = (
             confluent_kafka.TIMESTAMP_CREATE_TIME,
-            int(
-                datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
-                * 1000
-            ),
+            int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp() * 1000),
         )
 
     def value(self):
@@ -51,13 +48,11 @@ class MockMessage:
 @pytest.fixture
 def test_alerts():
     """Turn alerts back into Kafka messages"""
-    with (
-        Path(__file__).parent / "test-data" / "fakeAlert_schema80.avro"
-    ).open("rb") as f:
+    with (Path(__file__).parent / "test-data" / "fakeAlert_schema80.avro").open(
+        "rb"
+    ) as f:
         reader = fastavro.reader(f)
-        return [
-            MockMessage(record, offset) for offset, record in enumerate(reader)
-        ]
+        return [MockMessage(record, offset) for offset, record in enumerate(reader)]
 
 
 @pytest.mark.usefixtures("mock_context")

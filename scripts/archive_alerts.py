@@ -106,9 +106,7 @@ def consume_range(
             if msg.offset() >= end_offset[msg.topic(), msg.partition()] - 1:
                 tp = TopicPartition(msg.topic(), msg.partition())
                 consumer.incremental_unassign([tp])
-                log.debug(
-                    f"Finished {tp}, {len(consumer.assignment())} remaining"
-                )
+                log.debug(f"Finished {tp}, {len(consumer.assignment())} remaining")
     finally:
         dt = time.time() - t0
         log.info(
@@ -217,9 +215,7 @@ if __name__ == "__main__":
 
     with tarfile.open(output, "w:gz") as tar:
         for msg in consume_range(consumer, toppars, start, end, timeout=30):
-            ctx = SerializationContext(
-                msg.topic(), MessageField.VALUE, msg.headers()
-            )
+            ctx = SerializationContext(msg.topic(), MessageField.VALUE, msg.headers())
             magic, schema_id = struct.unpack(">bI", msg.value()[:5])
             if schema_id != last_schema_id:
                 last_schema_id = schema_id

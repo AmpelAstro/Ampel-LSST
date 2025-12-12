@@ -10,9 +10,7 @@ from ampel.lsst.view.LSSTT2Tabulator import LSSTT2Tabulator
 @pytest.fixture
 def datapoints():
     return bson.decode(
-        (
-            Path(__file__).parent / "test-data" / "25409136044802058.bson"
-        ).read_bytes()
+        (Path(__file__).parent / "test-data" / "25409136044802058.bson").read_bytes()
     )["datapoints"]
 
 
