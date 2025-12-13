@@ -27,9 +27,7 @@ class T2GetAlertId(AbsTiedPointT2Unit):
     )
     t2_dependency: Sequence[UnitModel[Literal["T2GetAlertJournal"]]]
 
-    def process(
-        self, datapoint: DataPoint, t2_views: Sequence[T2DocView]
-    ) -> UBson:
+    def process(self, datapoint: DataPoint, t2_views: Sequence[T2DocView]) -> UBson:
         sourceid = datapoint["body"]["diaSourceId"]
         t0journals: list[dict] = []
         for t2_view in t2_views:
@@ -45,9 +43,7 @@ class T2GetAlertId(AbsTiedPointT2Unit):
         t0journals.sort(key=lambda x: x["ts"])
         runids = set([t0journal["run"] for t0journal in t0journals])
         if len(runids) > 1:
-            self.logger.warn(
-                f"Multiple runids found {runids}, assuming latest"
-            )
+            self.logger.warn(f"Multiple runids found {runids}, assuming latest")
             t0journals = [
                 journal
                 for journal in t0journals

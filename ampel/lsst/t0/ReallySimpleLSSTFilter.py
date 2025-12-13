@@ -55,9 +55,7 @@ class ReallySimpleLSSTFilter(AbsAlertFilter):
         * or a custom combination of T2 unit names
         """
 
-        pps = [
-            el for el in alert.datapoints if el.get("diaSourceId") is not None
-        ]
+        pps = [el for el in alert.datapoints if el.get("diaSourceId") is not None]
         if len(pps) < self.min_ndet:
             self.logger.info(None, extra={"nDet": len(pps)})
             return None

@@ -11,7 +11,6 @@ from collections.abc import Callable, Mapping, Sequence
 from itertools import islice
 from typing import Any, cast
 
-import sncosmo
 from astropy.table import Table
 
 from ampel.abstract.AbsAlertLoader import AbsAlertLoader
@@ -258,25 +257,19 @@ class ElasticcLcIterator:
         change_col: None | Mapping[str, str] = None,
     ):
         self.lightcurve = lightcurve
-        self.lightcurve.sort(
-            "MJD"
-        )  # Prob already done, but critical for usage.
+        self.lightcurve.sort("MJD")  # Prob already done, but critical for usage.
         self.lightcurve.remove_columns(cut_col or [])
         for dcol in decode_col or []:
             # self.lightcurve[dcol] = self.lightcurve[dcol].astype(str)
             # Reading fits like this also cause trailing whitespaces, so instead
-            self.lightcurve[dcol] = [
-                str(s).rstrip() for s in self.lightcurve[dcol]
-            ]
+            self.lightcurve[dcol] = [str(s).rstrip() for s in self.lightcurve[dcol]]
         if change_col:
             for oldname, newname in change_col.items():
                 self.lightcurve.rename_column(oldname, newname)
 
         # Typecast meta and change to lower case
         self.lightcurve.meta = {
-            k.lower(): meta_dcast[k](v)
-            if (k in meta_dcast and v is not None)
-            else v
+            k.lower(): meta_dcast[k](v) if (k in meta_dcast and v is not None) else v
             for k, v in self.lightcurve.meta.items()
         }
 
@@ -340,6 +333,8 @@ class ElasticcTrainingsetLoader(AbsAlertLoader[Table]):
     }
 
     def __init__(self, **kwargs) -> None:
+        import sncosmo  # noqa: PLC0415
+
         super().__init__(**kwargs)
         self.lightcurves = iter(
             cast(

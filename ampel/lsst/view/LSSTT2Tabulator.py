@@ -38,9 +38,7 @@ class LSSTT2Tabulator(AbsT2Tabulator):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._tag_priority = {
-            tag: index for index, tag in enumerate(self.tags)
-        }
+        self._tag_priority = {tag: index for index, tag in enumerate(self.tags)}
 
     def get_flux_table(
         self,
@@ -114,8 +112,7 @@ class LSSTT2Tabulator(AbsT2Tabulator):
                 (key := el["body"]["midpointMjdTai"]) not in selected_dps
                 or min(tag_priority.get(t, sys.maxsize) for t in el["tag"])
                 < min(
-                    tag_priority.get(t, sys.maxsize)
-                    for t in selected_dps[key]["tag"]
+                    tag_priority.get(t, sys.maxsize) for t in selected_dps[key]["tag"]
                 )
             ):
                 selected_dps[key] = el
@@ -133,9 +130,7 @@ class LSSTT2Tabulator(AbsT2Tabulator):
                 zip(
                     *(
                         [el["body"][param] for param in params]
-                        for el in LSSTT2Tabulator._select_dps(
-                            dps, tag_priority
-                        )
+                        for el in LSSTT2Tabulator._select_dps(dps, tag_priority)
                     ),
                     strict=False,
                 ),

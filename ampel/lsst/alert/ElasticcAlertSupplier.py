@@ -38,9 +38,7 @@ class ElasticcAlertSupplier(BaseAlertSupplier):
         lc = cast(Table, self._deserialize(next(self.alert_loader)))
 
         # Are these actually unique?
-        sntype = lc.meta[
-            "sim_type_index"
-        ]  # Again do not know how consistent these are
+        sntype = lc.meta["sim_type_index"]  # Again do not know how consistent these are
         # Try to generate a unique stock. Not sure how well this will work.
         # Lets see whether we still get dubplicates...
         if lc.meta["ra"] == 0.0:  # Unclear why this happens
@@ -60,14 +58,10 @@ class ElasticcAlertSupplier(BaseAlertSupplier):
             # We will call this a diaSourceId if it is associated with a detection
             # Only these are asigned and obsvered magn
             if d["cause_alert"]:
-                d["diaSourceId"] = int.from_bytes(
-                    d_hash, byteorder=sys.byteorder
-                )
+                d["diaSourceId"] = int.from_bytes(d_hash, byteorder=sys.byteorder)
             else:
                 # Take this to be forced photometry
-                d["diaForcedSourceId"] = int.from_bytes(
-                    d_hash, byteorder=sys.byteorder
-                )
+                d["diaForcedSourceId"] = int.from_bytes(d_hash, byteorder=sys.byteorder)
             all_ids += d_hash
             dps.append(ReadOnlyDict(d))
 

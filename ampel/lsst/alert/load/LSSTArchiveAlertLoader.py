@@ -16,16 +16,12 @@ class LSSTArchiveAlertLoader(AbsAlertLoader[dict]):
     Load alerts from LSST alert archive
     """
 
-    archive_url: str = (
-        "https://ampel-dev.ia.zeuthen.desy.de/api/lsst/archive/v1/"
+    archive_url: str = "https://ampel-dev.ia.zeuthen.desy.de/api/lsst/archive/v1/"
+    insecure: Annotated[bool, Field(description="Do not verify HTTPS certificates")] = (
+        False
     )
-    insecure: Annotated[
-        bool, Field(description="Do not verify HTTPS certificates")
-    ] = False
 
-    condition: Annotated[
-        str, Field(description="SQL condition for alert query")
-    ]
+    condition: Annotated[str, Field(description="SQL condition for alert query")]
     order_by: Annotated[
         None | str, Field(description="Order by clause for alert query")
     ] = None
@@ -41,9 +37,7 @@ class LSSTArchiveAlertLoader(AbsAlertLoader[dict]):
     def session(self) -> BaseUrlSession:
         return BaseUrlSession(base_url=self.archive_url)
 
-    def _build_query(
-        self, condition: str, limit: None | int = None
-    ) -> dict[str, Any]:
+    def _build_query(self, condition: str, limit: None | int = None) -> dict[str, Any]:
         exclude = [
             "cutoutTemplate",
             "cutoutScience",
@@ -71,9 +65,7 @@ class LSSTArchiveAlertLoader(AbsAlertLoader[dict]):
         try:
             response.raise_for_status()
         except Exception:
-            self.logger.error(
-                f"Error querying LSST alert archive: {response.json()}"
-            )
+            self.logger.error(f"Error querying LSST alert archive: {response.json()}")
             raise
 
         yield from response.json()

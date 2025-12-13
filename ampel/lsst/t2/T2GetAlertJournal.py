@@ -18,6 +18,4 @@ class T2GetAlertJournal(AbsStockT2Unit):
     """
 
     def process(self, stock_doc: StockDocument) -> UBson:
-        return [
-            journal for journal in stock_doc["journal"] if journal["tier"] == 0
-        ]
+        return [journal for journal in stock_doc["journal"] if journal["tier"] == 0]

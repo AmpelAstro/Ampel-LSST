@@ -1,80 +1,64 @@
 [project]
 name = "ampel-lsst"
-
-[tool.poetry]
-version = "0.10.1a6"
+version = "0.10.1a7"
 description = "Legacy Survey of Space and Time support for the Ampel system"
+requires-python = ">=3.11, <4"
 authors = [
-    "Marcus Fenner <mf@physik.hu-berlinn.de>",
-    "Valery Brinnel",
-    "Jakob van Santen <jakob.van.santen@desy.de>",
-    "Jakob Nordin",
+    { name = "Marcus Fenner", email = "mf@physik-hu-berlin.de" },
+    { name = "Valery Brinnel" },
+    { name = "Jakob van Santen", email = "jakob.van.santen@desy.de" },
+    { name = "Jakob Nordin" },
 ]
 maintainers = [
-    "Marcus Fenner <mf@physik.hu-berlinn.de>"
+    { name = "Jakob van Santen", email = "jakob.van.santen@desy.de" },
 ]
 license = "BSD-3-Clause"
 readme = "README.md"
-homepage = "https://ampelproject.github.io"
-repository = "https://github.com/AmpelProject/Ampel-LSST"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Information Analysis",
     "Topic :: Scientific/Engineering :: Astronomy",
     "Typing :: Typed",
 ]
+dependencies = [
+    "ampel-interface (>=0.10.4.post2,<0.11)",
+    "ampel-catalogmatch (>=0.10.0a2,<0.11.0)",
+    "ampel-alerts (>=0.10.3,<0.11.0)",
+    "ampel-photometry (>=0.10.1,<0.11.0)",
+    "fastavro (>=1.12.1,<2.0.0)",
+    "confluent-kafka[schemaregistry] (>=2.12.2,<3.0.0)",
+    "requests (>=2.32.5,<3.0.0)",
+]
+
+[dependency-groups]
+dev = [
+    "pytest-ampel-core (>=0.10.0a4,<0.11)",
+    "mypy (>=1.13,<2.0)",
+    "types-requests (>=2.32.4.20250913,<3.0.0.0)",
+    "pytest-mock (>=3.15.1,<4.0.0)",
+]
+
+[tool.poetry]
 packages = [
-    {include = "ampel"}
-]
-exclude = [
-    "ampel/py.typed",
-]
-include = [
-    'conf/*/*.json',
-    'conf/*/*/*.json',
-    'conf/*/*.yaml',
-    'conf/*/*/*.yaml',
-    'conf/*/*.yml',
-    'conf/*/*/*.yml',
+    {include = "ampel"},
+    {include = "ampel/conf/**/*.yml"},
 ]
 
-
-[tool.poetry.dependencies]
-python = "^3.11"
-astropy = ">=5"
-confluent-kafka = {version = "^2.6.1", optional = true, extras = ["schemaregistry"]}
-fastavro = "^1.3.2"
-ampel-ztf = {version = ">=0.10.3a0,<0.11"}
-ampel-core = {version = ">=0.10.6a7,<0.11"}
-ampel-alerts = {version = ">=0.10.3a6,<0.11"}
-
-[tool.poetry.extras]
-kafka = ["confluent-kafka"]
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.0.2"
-pytest-cov = "^7.0.0"
-pytest-mock = "^3.12.0"
-mongomock = "^4.1.2"
-# mongomock uses pkg_resources
-setuptools = {version = "*", python = ">=3.12"}
-mypy = "^1.6.1"
-pytest-timeout = "^2.2.0"
-pytest-asyncio = "^1.0.0"
-types-requests = "^2.25.9"
-before_after = "^1.0.1"
+[project.urls]
+homepage = "https://ampelproject.github.io"
+repository = "https://github.com/AmpelAstro/Ampel-LSST"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "setuptools >= 40.6.0", "wheel"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.coverage.run]
-relative_files = true
-
 [tool.pytest.ini_options]
+minversion = "6.0"
 addopts = "--showlocals -ra"
 filterwarnings = [
     "error",
@@ -88,9 +72,9 @@ packages = [
 ]
 plugins = [
   "pydantic.mypy",
-  "numpy.typing.mypy_plugin"
 ]
 show_error_codes = true
+warn_unused_ignores = true
 check_untyped_defs = true
 
 [[tool.mypy.overrides]]
@@ -103,8 +87,8 @@ module = [
 ignore_missing_imports = true
 
 [tool.ruff]
-line-length = 79
-target-version = "py310"
+line-length = 88
+target-version = "py312"
 
 [tool.ruff.lint]
 select = [
@@ -136,7 +120,11 @@ ignore = [
 known-first-party = ["ampel"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["RUF018", "SLF001"]
+"tests/*" = [
+    "RUF018",  # assignment in assert is just fine in tests
+    "SLF001",  # allow private member access
+    "T201",    # allow print()
+]
 
 [tool.ruff.lint.flake8-unused-arguments]
 ignore-variadic-names = true
