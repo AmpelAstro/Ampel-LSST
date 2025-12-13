@@ -9,8 +9,6 @@ from base64 import b64decode
 from collections.abc import Iterable
 from typing import Literal
 
-import backoff
-import requests
 from requests_toolbelt.sessions import (  # type: ignore[import-untyped]
     BaseUrlSession,
 )
@@ -18,6 +16,7 @@ from requests_toolbelt.sessions import (  # type: ignore[import-untyped]
 from ampel.abstract.AbsBufferComplement import AbsBufferComplement
 from ampel.struct.AmpelBuffer import AmpelBuffer
 from ampel.struct.T3Store import T3Store
+from ampel.ztf.base.CatalogMatchUnit import retry_transient_errors
 
 
 class LSSTCutoutImages(AbsBufferComplement):
@@ -36,20 +35,7 @@ class LSSTCutoutImages(AbsBufferComplement):
 
         self.session = BaseUrlSession(base_url=self.archive_url)
 
-    @backoff.on_exception(
-        backoff.expo,
-        requests.ConnectionError,
-        max_tries=5,
-        factor=10,
-    )
-    @backoff.on_exception(
-        backoff.expo,
-        requests.HTTPError,
-        giveup=lambda e: not isinstance(e, requests.HTTPError)
-        or e.response is None
-        or e.response.status_code not in {502, 503, 504, 429, 408},
-        max_time=60,
-    )
+    @retry_transient_errors()
     def get_cutout(self, diaSourceId: int) -> None | dict[str, bytes]:
         response = self.session.get(
             f"alert/{diaSourceId}/cutouts", verify=not self.insecure
