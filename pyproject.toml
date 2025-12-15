@@ -1,6 +1,6 @@
 [project]
 name = "ampel-lsst"
-version = "0.10.1a7"
+version = "0.10.1a8"
 description = "Legacy Survey of Space and Time support for the Ampel system"
 requires-python = ">=3.11, <4"
 authors = [
@@ -46,8 +46,8 @@ dev = [
 [tool.poetry]
 packages = [
     {include = "ampel"},
-    {include = "ampel/conf/**/*.yml"},
 ]
+exclude = ["ampel/py.typed"]
 
 [project.urls]
 homepage = "https://ampelproject.github.io"
