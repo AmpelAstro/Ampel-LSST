@@ -63,6 +63,7 @@ addopts = "--showlocals -ra"
 filterwarnings = [
     "error",
     "ignore:pkg_resources is deprecated:DeprecationWarning",
+    "default::urllib3.exceptions.InsecureRequestWarning",
 ]
 
 [tool.mypy]
