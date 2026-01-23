@@ -61,14 +61,24 @@ class LSSTCutoutImages(AbsBufferComplement):
             if not pps:
                 return
 
+            def _diasource_id(pp) -> int:
+                body = pp.get("body", {})
+                dsid = body.get("diaSourceId")
+                if dsid is None:
+                    raise KeyError(
+                        f"No diaSourceId in photopoint body keys={list(body.keys())}"
+                    )
+                return int(dsid)
+
             if self.eligible == "last":
-                candids = [pps[-1]["id"]]
+                candids = [_diasource_id(pps[-1])]
             elif self.eligible == "first":
-                candids = [pps[0]["id"]]
+                candids = [_diasource_id(pps[0])]
             elif self.eligible == "brightest":
-                candids = [max(pps, key=lambda pp: pp["body"]["psfFlux"])["id"]]
+                candids = [_diasource_id(max(pps, key=lambda pp: pp["body"]["psfFlux"]))]
             else:  # all
-                candids = [pp["id"] for pp in pps]
+                candids = [_diasource_id(pp) for pp in pps]
+
             cutouts = {candid: self.get_cutout(candid) for candid in candids}
 
             if "extra" not in record or record["extra"] is None:
