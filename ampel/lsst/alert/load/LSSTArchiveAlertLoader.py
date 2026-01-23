@@ -65,7 +65,12 @@ class LSSTArchiveAlertLoader(AbsAlertLoader[dict]):
         try:
             response.raise_for_status()
         except Exception:
-            self.logger.error(f"Error querying LSST alert archive: {response.json()}")
+            message = (
+                response.json()
+                if response.headers.get("content-type") == "application/json"
+                else response.text
+            )
+            self.logger.error(f"Error querying LSST alert archive: {message}")
             raise
 
         yield from response.json()
