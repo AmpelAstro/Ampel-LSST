@@ -75,7 +75,9 @@ class LSSTCutoutImages(AbsBufferComplement):
             elif self.eligible == "first":
                 candids = [_diasource_id(pps[0])]
             elif self.eligible == "brightest":
-                candids = [_diasource_id(max(pps, key=lambda pp: pp["body"]["psfFlux"]))]
+                candids = [
+                    _diasource_id(max(pps, key=lambda pp: pp["body"]["psfFlux"]))
+                ]
             else:  # all
                 candids = [_diasource_id(pp) for pp in pps]
 
