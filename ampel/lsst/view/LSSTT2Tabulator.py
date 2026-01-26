@@ -30,7 +30,7 @@ LSST_BANDPASSES = {
 
 class LSSTT2Tabulator(AbsT2Tabulator):
     convert2jd: bool = True
-    zp: float
+    zp: float = 31.4  # AB magnitude for nJy (LSST standard)
     allow_nan_flux: bool = False
     # tag priority: lower index -> higher priority
     tags: Sequence[str | int] = ["LSST_FP", "LSST_DP"]
@@ -59,7 +59,6 @@ class LSSTT2Tabulator(AbsT2Tabulator):
                 "flux": flux,
                 "fluxerr": fluxerr,
                 "band": filters,
-                # ZP for ELAsTiCC, might need to be corrected for LSST!
                 "zp": [self.zp] * len(filters),
                 "zpsys": ["ab"] * len(filters),
             },
