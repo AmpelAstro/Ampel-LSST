@@ -1,10 +1,13 @@
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
+from functools import cache
+from importlib import import_module
 from typing import Annotated, Any, overload
 
 from annotated_types import MinLen
 from pydantic import model_validator
 
 from ampel.abstract.AbsConfigMorpher import AbsConfigMorpher
+from ampel.abstract.AbsTiedT2Unit import AbsTiedT2Unit
 from ampel.base.AmpelBaseModel import AmpelBaseModel
 from ampel.log.AmpelLogger import AmpelLogger
 from ampel.model.ingest.CompilerOptions import CompilerOptions
@@ -12,7 +15,7 @@ from ampel.model.ingest.FilterModel import FilterModel
 from ampel.model.ingest.T2Compute import T2Compute
 from ampel.model.UnitModel import UnitModel
 from ampel.template.AbsEasyChannelTemplate import AbsEasyChannelTemplate
-from ampel.types import ChannelId
+from ampel.types import ChannelId, JDict
 
 
 class DirectiveTemplate(AmpelBaseModel):
@@ -67,17 +70,84 @@ class MultiChannelAlertConsumerTemplate(AbsConfigMorpher):
             return {"directives": [directive], **v}
         return v
 
+    @staticmethod
+    def _as_unitmodel(t2_unit_model: T2Compute) -> UnitModel:
+        return UnitModel(
+            **{
+                k: v
+                for k, v in t2_unit_model.dict().items()
+                if k in UnitModel.get_model_keys()
+            }
+        )
+
+    @classmethod
+    def _inject_depedencies(
+        cls,
+        t2_compute: Sequence[T2Compute],
+        get_default_dependencies: Callable[[str], list[JDict]],
+        get_bases: Callable[[str], set[str]],
+    ) -> list[T2Compute]:
+        """Inject dependencies of tied T2 units into t2_compute list"""
+
+        all_t2_units: list[T2Compute] = []
+        for el in t2_compute:
+            if "AbsTiedT2Unit" in get_bases(el.unit):
+                t2_deps = (
+                    (el.config if isinstance(el.config, dict) else {})
+                    | (el.override or {})
+                ).get("t2_dependency") or get_default_dependencies(el.unit)
+                for t2_dep in t2_deps:
+                    dependency_config: UnitModel[str] = UnitModel(
+                        **{
+                            k: v
+                            for k, v in t2_dep.items()
+                            if k in UnitModel.get_model_keys()
+                        }
+                    )
+                    if any(
+                        cls._as_unitmodel(unit) == dependency_config
+                        for unit in all_t2_units
+                    ):
+                        # dependency already added; do nothing
+                        continue
+                    args = dependency_config.model_dump(exclude_unset=True)
+                    # if link_override specified for point T2 dependency, request ingest filter
+                    if "link_override" in t2_dep and "AbsPointT2Unit" in get_bases(
+                        dependency_config.unit
+                    ):
+                        args["ingest"] = t2_dep["link_override"]
+                    # add dependency
+                    all_t2_units.append(T2Compute(**args))
+            all_t2_units.append(el)
+        return all_t2_units
+
     def morph(
         self,
         ampel_config: dict[str, Any],
         logger: AmpelLogger,  # noqa: ARG002
     ) -> dict[str, Any]:
+        @cache
+        def get_default_dependencies(unit: str) -> list[JDict]:
+            klass: type[AbsTiedT2Unit] = getattr(
+                import_module(ampel_config["unit"][unit]["fqn"]), unit
+            )
+            return [dep.dict() for dep in klass.t2_dependency]
+
+        @cache
+        def get_bases(unit: str) -> set[str]:
+            return set(ampel_config["unit"][unit]["base"])
+
         # Build complete AlertConsumer config around each channel
         alertconsumer_configs = [
             AbsEasyChannelTemplate.craft_t0_processor_config(
                 channel=directive.channel,
                 alconf=ampel_config,
-                t2_compute=directive.t2_compute,
+                # NB: craft_t0_processor_config validates t2_compute entries
+                t2_compute=self._inject_depedencies(
+                    directive.t2_compute,
+                    get_default_dependencies,
+                    get_bases,
+                ),
                 supplier=self._get_supplier(),
                 shaper=self._config_as_dict(self.shaper),
                 combiner=self._config_as_dict(directive.combiner),
