@@ -1,16 +1,29 @@
+from collections.abc import Sequence
+from typing import Annotated
+
+from annotated_types import MinLen
+
 from ampel.lsst.ingest.LSSTCompilerOptions import (
     CompilerOptions,
     LSSTCompilerOptions,
 )
 from ampel.model.UnitModel import UnitModel
-from ampel.template.EasyAlertConsumerTemplate import EasyAlertConsumerTemplate
+
+from .MultiChannelAlertConsumerTemplate import (
+    DirectiveTemplate,
+    MultiChannelAlertConsumerTemplate,
+)
 
 
-class LSSTAlertConsumerTemplate(EasyAlertConsumerTemplate):
+class LSSTDirecitiveTemplate(DirectiveTemplate):
+    muxer: None | str | UnitModel = "LSSTMongoMuxer"
+    combiner: str | UnitModel = "LSSTT1Combiner"
+
+
+class LSSTAlertConsumerTemplate(MultiChannelAlertConsumerTemplate):
     supplier: str | UnitModel = UnitModel(
         unit="LSSTAlertSupplier", config={"deserialize": None}
     )
     shaper: str | UnitModel = "LSSTDataPointShaper"
-    combiner: str | UnitModel = "LSSTT1Combiner"
     compiler_opts: CompilerOptions = LSSTCompilerOptions()
-    muxer: None | str | UnitModel = "LSSTMongoMuxer"
+    directives: Annotated[Sequence[LSSTDirecitiveTemplate], MinLen(1)]
