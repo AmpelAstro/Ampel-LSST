@@ -1,6 +1,11 @@
-from typing import Any, overload
+from collections.abc import Sequence
+from typing import Annotated, Any, overload
+
+from annotated_types import MinLen
+from pydantic import model_validator
 
 from ampel.abstract.AbsConfigMorpher import AbsConfigMorpher
+from ampel.base.AmpelBaseModel import AmpelBaseModel
 from ampel.log.AmpelLogger import AmpelLogger
 from ampel.model.ingest.CompilerOptions import CompilerOptions
 from ampel.model.ingest.FilterModel import FilterModel
@@ -10,11 +15,23 @@ from ampel.template.AbsEasyChannelTemplate import AbsEasyChannelTemplate
 from ampel.types import ChannelId
 
 
+class DirectiveTemplate(AmpelBaseModel):
+    #: Channel tag for any documents created
+    channel: ChannelId
+    #: Alert filter. None disables filtering
+    filter: None | str | FilterModel
+    #: Augment alerts with external content before ingestion
+    muxer: None | str | UnitModel
+    # Combine datapoints into states
+    combiner: str | UnitModel
+    #: T2 units to trigger when stock is updated. Dependencies of tied
+    #: units will be added automatically.
+    t2_compute: list[T2Compute] = []
+
+
 class MultiChannelAlertConsumerTemplate(AbsConfigMorpher):
     """Configure an AlertConsumer (or subclass) for one or more channels"""
 
-    #: Channel tag for any documents created
-    channel: ChannelId
     #: Alert supplier unit
     supplier: str | UnitModel
     #: Optional override for alert loader
@@ -23,41 +40,50 @@ class MultiChannelAlertConsumerTemplate(AbsConfigMorpher):
     shaper: str | UnitModel
     #: Document creation options
     compiler_opts: CompilerOptions
-    #: Alert filter. None disables filtering
-    filter: None | str | FilterModel
-    #: Augment alerts with external content before ingestion
-    muxer: None | str | UnitModel
-    # Combine datapoints into states
-    combiner: str | UnitModel
-
-    #: T2 units to trigger when stock is updated. Dependencies of tied
-    #: units will be added automatically.
-    t2_compute: list[T2Compute] = []
+    #: Directives for each channel
+    directives: Annotated[Sequence[DirectiveTemplate], MinLen(1)]
 
     #: Unit to synthesize config for
     unit: str = "AlertConsumer"
 
     extra: dict = {}
 
+    @model_validator(mode="before")
+    @classmethod
+    def _migrate_single_directive(cls, v: Any) -> Any:
+        if isinstance(v, dict):
+            directive = {k: v.pop(k) for k in DirectiveTemplate.model_fields if k in v}
+            return {"directives": [directive], **v}
+        return v
+
     def morph(
         self,
         ampel_config: dict[str, Any],
         logger: AmpelLogger,  # noqa: ARG002
     ) -> dict[str, Any]:
-        return UnitModel(
-            unit=self.unit,
-            config=self.extra
-            | AbsEasyChannelTemplate.craft_t0_processor_config(
-                channel=self.channel,
+        # Build complete AlertConsumer config around each channel
+        alertconsumer_configs = [
+            AbsEasyChannelTemplate.craft_t0_processor_config(
+                channel=directive.channel,
                 alconf=ampel_config,
-                t2_compute=self.t2_compute,
+                t2_compute=directive.t2_compute,
                 supplier=self._get_supplier(),
                 shaper=self._config_as_dict(self.shaper),
-                combiner=self._config_as_dict(self.combiner),
-                filter_dict=self._config_as_dict(self.filter),
-                muxer=self._config_as_dict(self.muxer),
+                combiner=self._config_as_dict(directive.combiner),
+                filter_dict=self._config_as_dict(directive.filter),
+                muxer=self._config_as_dict(directive.muxer),
                 compiler_opts=self.compiler_opts.dict(),
-            ),
+            )
+            for directive in self.directives
+        ]
+        # Flatten into single AlertConsumer with multiple directives
+        flattened_config = alertconsumer_configs[0] | {
+            "directives": [config["directives"][0] for config in alertconsumer_configs]
+        }
+
+        return UnitModel(
+            unit=self.unit,
+            config=self.extra | flattened_config,
         ).dict(exclude_unset=True)
 
     @overload
