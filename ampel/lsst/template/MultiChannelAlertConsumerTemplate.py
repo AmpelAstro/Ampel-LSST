@@ -46,7 +46,18 @@ class MultiChannelAlertConsumerTemplate(AbsConfigMorpher):
     #: Unit to synthesize config for
     unit: str = "AlertConsumer"
 
+    #: Arbitrary extra fields to add to the final config
     extra: dict = {}
+
+    # target may be UnitModel or JobTaskModel
+    model_config = {
+        "extra": "allow",
+    }
+
+    # template may be JobTaskModel.template, str, or list[str]. Let caller take care of it.
+    template: Any = None
+    # ensure that JobTaksModel doesn't try to set its own config
+    config: None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -81,10 +92,14 @@ class MultiChannelAlertConsumerTemplate(AbsConfigMorpher):
             "directives": [config["directives"][0] for config in alertconsumer_configs]
         }
 
-        return UnitModel(
-            unit=self.unit,
-            config=self.extra | flattened_config,
-        ).dict(exclude_unset=True)
+        return (
+            UnitModel(
+                unit=self.unit,
+                config=self.extra | flattened_config,
+            ).dict(exclude_unset=True)
+            | (self.model_extra or {})
+            | {"template": self.template}
+        )
 
     @overload
     @staticmethod
