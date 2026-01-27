@@ -66,6 +66,7 @@ class FieldSelection(AmpelBaseModel):
                     "radecMjdTai",
                     "raErr",
                     "diaObjectId",
+                    "nDiaSources",
                 },
                 exclude=None,
             ),
