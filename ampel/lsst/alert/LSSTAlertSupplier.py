@@ -48,6 +48,10 @@ class LSSTAlertSupplier(BaseAlertSupplier):
 
     alert_identifier: Literal["diaSourceId", "alertId"] = "diaSourceId"
 
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self._emitted_any = False
+
     @staticmethod
     def _shape_dp(d: dict) -> ReadOnlyDict:
         return ReadOnlyDict({_field_upgrades.get(k, k): v for k, v in d.items()})
@@ -124,7 +128,17 @@ class LSSTAlertSupplier(BaseAlertSupplier):
             d = self._deserialize(next(self.alert_loader))
 
             try:
-                return self._shape(d, self.max_history, self.alert_identifier)
+                alert = self._shape(d, self.max_history, self.alert_identifier)
+                self._emitted_any = True
+                return alert
             except DIAObjectMissingError:
                 # silently skip over SSObjects
+                if not self._emitted_any:
+                    # if we have not yet emitted any alerts, we can be sure that
+                    # all previous messages were handled, and acknowledge
+                    # immediately. this avoids an edge case where the source
+                    # partition only contains SSObject messages that will never
+                    # be acknowledged, and so consumed over and over until a
+                    # different message arrives
+                    self.alert_loader.acknowledge(iter([d]))  # type: ignore[list-item]
                 continue
