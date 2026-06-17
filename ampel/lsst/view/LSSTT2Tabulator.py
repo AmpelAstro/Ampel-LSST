@@ -44,10 +44,19 @@ class LSSTT2Tabulator(AbsT2Tabulator):
         self,
         dps: Iterable[DataPoint],
     ) -> Table:
-        flux, fluxerr, filtername, tai = self.get_values(
-            dps,
-            ["psfFlux", "psfFluxErr", "band", "midpointMjdTai"],
-            self._tag_priority,
+        diaSourceId, diaForcedSourceId, flux, fluxerr, filtername, tai = (
+            self.get_values(
+                dps,
+                [
+                    "diaSourceId",
+                    "diaForcedSourceId",
+                    "psfFlux",
+                    "psfFluxErr",
+                    "band",
+                    "midpointMjdTai",
+                ],
+                self._tag_priority,
+            )
         )
         if self.convert2jd:
             tai = self._to_jd(tai)
@@ -55,6 +64,13 @@ class LSSTT2Tabulator(AbsT2Tabulator):
 
         table = Table(
             {
+                "id": [
+                    d if d is not None else f
+                    for d, f in zip(diaSourceId, diaForcedSourceId, strict=True)
+                ],
+                "source": [
+                    "LSST_DP" if d is not None else "LSST_FP" for d in diaSourceId
+                ],
                 "time": tai,
                 "flux": flux,
                 "fluxerr": fluxerr,
@@ -62,7 +78,16 @@ class LSSTT2Tabulator(AbsT2Tabulator):
                 "zp": [self.zp] * len(filters),
                 "zpsys": ["ab"] * len(filters),
             },
-            dtype=("float64", "float64", "float64", "str", "float64", "str"),
+            dtype=(
+                "int64",
+                "str",
+                "float64",
+                "float64",
+                "float64",
+                "str",
+                "float64",
+                "str",
+            ),
         )
 
         if self.allow_nan_flux:
@@ -122,13 +147,14 @@ class LSSTT2Tabulator(AbsT2Tabulator):
         dps: Iterable[DataPoint],
         params: Sequence[str],
         tag_priority: Mapping[str | int, int],
+        sentinel: Any = None,
     ) -> tuple[Sequence[Any], ...]:
         if tup := tuple(
             map(
                 list,
                 zip(
                     *(
-                        [el["body"][param] for param in params]
+                        [el["body"].get(param, sentinel) for param in params]
                         for el in LSSTT2Tabulator._select_dps(dps, tag_priority)
                     ),
                     strict=False,

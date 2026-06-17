@@ -1,3 +1,4 @@
+from collections import Counter
 from pathlib import Path
 
 import bson
@@ -28,3 +29,10 @@ def test_tabulator(datapoints):
     assert len(tab) < len(datapoints)
     assert len(np.unique(tab["time"])) == len(tab["time"])
     assert tab["flux"][np.argsort(tab["time"])].tolist() == dp_if_not_fp
+
+    # source column is assigned
+    source_counts = Counter(tab["source"])
+    assert source_counts["LSST_FP"] == 4
+    assert source_counts["LSST_DP"] == len(tab) - 4
+    # id column is assigned and unique
+    assert len(np.unique(tab["id"])) == len(tab)
