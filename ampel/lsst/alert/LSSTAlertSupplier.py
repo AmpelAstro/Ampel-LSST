@@ -44,8 +44,15 @@ class LSSTAlertSupplier(BaseAlertSupplier):
     # Override default
     deserialize: None | Literal["avro", "json"] = "avro"
 
+    # how far back in time to look for photometric points, in days
     max_history: float = float("inf")
-
+    # if True, only one photometric point per visit will be emitted
+    # (preferentially forced photometry, then difference imaging, then upper
+    # limits). if False, all photometric points will be emitted, even if multiple
+    # points from the same visit are present.
+    one_datapoint_per_visit: bool = True
+    # which field to use as the alert identifier (diaSourceId for real Rubin
+    # alerts, alertId in ELASTiCC simualted alerts)
     alert_identifier: Literal["diaSourceId", "alertId"] = "diaSourceId"
 
     def __init__(self, **kwargs) -> None:
@@ -58,7 +65,7 @@ class LSSTAlertSupplier(BaseAlertSupplier):
 
     @classmethod
     def _get_sources(
-        cls, alert: dict, max_history: float
+        cls, alert: dict, max_history: float, one_datapoint_per_visit: bool = True
     ) -> Generator[dict, None, None]:
         """
         yield one photometric point per visit, preferring forced photometry to
@@ -79,18 +86,25 @@ class LSSTAlertSupplier(BaseAlertSupplier):
         ):
             if (visit := dp["visit"]) not in visits and dp["midpointMjdTai"] >= t0:
                 yield dp
-                visits.add(visit)
+                if one_datapoint_per_visit:
+                    visits.add(visit)
 
     @classmethod
     def _shape(
         cls,
         d: dict,
+        *,
         max_history: float = float("inf"),
+        one_datapoint_per_visit: bool = True,
         alert_identifier: Literal["diaSourceId", "alertId"] = "diaSourceId",
     ) -> AmpelAlertProtocol:
         if diaObject := d.get("diaObject"):
             dps = (
-                *cls._get_sources(d, max_history=max_history),
+                *cls._get_sources(
+                    d,
+                    max_history=max_history,
+                    one_datapoint_per_visit=one_datapoint_per_visit,
+                ),
                 cls._shape_dp(diaObject),
             )
             # Add base alert information to extras field
@@ -128,7 +142,12 @@ class LSSTAlertSupplier(BaseAlertSupplier):
             d = self._deserialize(next(self.alert_loader))
 
             try:
-                alert = self._shape(d, self.max_history, self.alert_identifier)
+                alert = self._shape(
+                    d,
+                    max_history=self.max_history,
+                    one_datapoint_per_visit=self.one_datapoint_per_visit,
+                    alert_identifier=self.alert_identifier,
+                )
                 self._emitted_any = True
                 return alert
             except DIAObjectMissingError:
