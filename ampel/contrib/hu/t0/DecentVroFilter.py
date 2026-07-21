@@ -11,12 +11,11 @@ from typing import Annotated, Any, Literal
 import numpy as np
 from astropy.coordinates import SkyCoord
 from astropy.table import Table
+from pydantic import BeforeValidator
 
 from ampel.abstract.AbsAlertFilter import AbsAlertFilter
 from ampel.protocol.AmpelAlertProtocol import AmpelAlertProtocol
 from ampel.ztf.base.CatalogMatchUnit import CatalogMatchUnit
-
-from pydantic import BeforeValidator
 
 RUBIN_ALERT_FLAGS = [
     "centroid_flag",
@@ -66,9 +65,13 @@ def validate_flags(value: Literal["all"] | list[str] | None) -> list[str] | None
     if isinstance(value, list):
         invalid_flags = [el for el in value if el not in RUBIN_ALERT_FLAGS]
         if invalid_flags:
-            raise ValueError(f"Invalid values for check_flags: {invalid_flags}! Valid choices are: {', '.join(RUBIN_ALERT_FLAGS)}")
+            raise ValueError(
+                f"Invalid values for check_flags: {invalid_flags}! Valid choices are: {', '.join(RUBIN_ALERT_FLAGS)}"
+            )
         return value
-    raise ValueError(f"Invalid value for check_flags: {value}! Valid choices are: {', '.join(RUBIN_ALERT_FLAGS)} or 'all'")
+    raise ValueError(
+        f"Invalid value for check_flags: {value}! Valid choices are: {', '.join(RUBIN_ALERT_FLAGS)} or 'all'"
+    )
 
 
 class DecentVroFilter(CatalogMatchUnit, AbsAlertFilter):
@@ -91,7 +94,9 @@ class DecentVroFilter(CatalogMatchUnit, AbsAlertFilter):
     min_ndet_snr: float | None = (
         None  # minimum SNR for previous detections to be counted
     )
-    count_only_positive: bool = False  # require positive detection, count only positive detections in history
+    count_only_positive: bool = (
+        False  # require positive detection, count only positive detections in history
+    )
     min_tspan: float  # minimum duration of alert detection history [days]
     max_tspan: float  # maximum duration of alert detection history [days]
 
@@ -113,7 +118,9 @@ class DecentVroFilter(CatalogMatchUnit, AbsAlertFilter):
 
     # Image quality, including Real-Bogus equivalents
     min_reliability: float = 0.0  # deep learning real bogus score
-    min_reliability_per_source: float = 0.0   # minimum reliability for previous detections to be counted
+    min_reliability_per_source: float = (
+        0.0  # minimum reliability for previous detections to be counted
+    )
     # min_rb: float  # real bogus score
     # max_fwhm: float  # sexctrator FWHM (assume Gaussian) [pix]
     # max_elong: float  # Axis ratio of image: aimage / bimage
@@ -121,8 +128,12 @@ class DecentVroFilter(CatalogMatchUnit, AbsAlertFilter):
     # max_nbad: int  # number of bad pixels in a 5 x 5 pixel stamp
 
     # check datapoint flags
-    check_flags: Annotated[Literal["all"] | list[str] | None, BeforeValidator(validate_flags)] = None
-    check_flags_per_source: Annotated[Literal["all"] | list[str] | None, BeforeValidator(validate_flags)] = None
+    check_flags: Annotated[
+        Literal["all"] | list[str] | None, BeforeValidator(validate_flags)
+    ] = None
+    check_flags_per_source: Annotated[
+        Literal["all"] | list[str] | None, BeforeValidator(validate_flags)
+    ] = None
 
     # Astro
     # min_sso_dist: float  # distance to nearest solar system object [arcsec]
@@ -293,8 +304,12 @@ class DecentVroFilter(CatalogMatchUnit, AbsAlertFilter):
             )
             return None
 
-        if (self.check_flags is not None) and any([latest[f] for f in self.check_flags]):
-            self.logger.debug(None, extra={"set_flags": [f for f in self.check_flags if latest[f]]})
+        if (self.check_flags is not None) and any(
+            [latest[f] for f in self.check_flags]
+        ):
+            self.logger.debug(
+                None, extra={"set_flags": [f for f in self.check_flags if latest[f]]}
+            )
             return None
 
         if self.count_only_positive and latest["isNegative"]:
@@ -323,16 +338,18 @@ class DecentVroFilter(CatalogMatchUnit, AbsAlertFilter):
             ]
         if self.min_reliability_per_source is not None:
             thinned_pps = [
-                pp for pp in thinned_pps if pp.get("reliability", 0) >= self.min_reliability_per_source
+                pp
+                for pp in thinned_pps
+                if pp.get("reliability", 0) >= self.min_reliability_per_source
             ]
         if self.check_flags_per_source is not None:
             thinned_pps = [
-                pp for pp in thinned_pps if not any([pp[f] for f in self.check_flags_per_source])
+                pp
+                for pp in thinned_pps
+                if not any([pp[f] for f in self.check_flags_per_source])
             ]
         if self.count_only_positive:
-            thinned_pps = [
-                pp for pp in thinned_pps if not pp["isNegative"]
-            ]
+            thinned_pps = [pp for pp in thinned_pps if not pp["isNegative"]]
 
         if len(thinned_pps) < self.min_ndet:
             self.logger.debug(None, extra={"nDet": len(thinned_pps)})
