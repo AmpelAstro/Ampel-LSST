@@ -6,7 +6,6 @@ unit:
 # Aux units
     - ampel.lsst.alert.LSSTAlertSupplier
     - ampel.lsst.alert.ElasticcAlertSupplier
-    - ampel.lsst.alert.load.MultiAvroAlertLoader
     - ampel.lsst.alert.load.ElasticcTrainingsetLoader
     - ampel.lsst.alert.load.LSSTArchiveAlertLoader
     - ampel.lsst.ingest.LSSTCompilerOptions
