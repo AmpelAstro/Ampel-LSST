@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # File:                ampel/contrib/hu/alert/load/ParquetAlertLoader.py
 # License:             BSD-3-Clause
-# Author:              Jakob van Santen 
+# Author:              Jakob van Santen
 # Date:                23.02.2026
 # Last Modified Date:  02.04.2026
 # Last Modified By:    Felix Fischer <felix.martin.fischer@desy.de>
