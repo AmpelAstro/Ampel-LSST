@@ -10,7 +10,7 @@ import re
 from collections.abc import Iterator
 from typing import Any
 
-import pyarrow.dataset as ds
+import pyarrow.dataset as ds  # type: ignore[import-untyped]
 
 from ampel.abstract.AbsAlertLoader import AbsAlertLoader
 
