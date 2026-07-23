@@ -1,6 +1,6 @@
 [project]
 name = "ampel-lsst"
-version = "0.10.1a23"
+version = "0.10.1a24"
 description = "Legacy Survey of Space and Time support for the Ampel system"
 requires-python = ">=3.11, <4"
 authors = [
@@ -30,10 +30,10 @@ dependencies = [
     "ampel-catalogmatch (>=0.10.0a2,<0.11.0)",
     "ampel-alerts (>=0.10.3,<0.11.0)",
     "ampel-photometry (>=0.10.1,<0.11.0)",
+    "pyarrow (>=25.0.0,<26.0.0)",
 ]
 
 [project.optional-dependencies]
-arrow = ["pyarrow (>=25.0.0,<26.0.0)"]
 cache = ["valkey-glide-sync (>=2.5.0,<3.0.0)"]
 [dependency-groups]
 dev = [
@@ -43,6 +43,7 @@ dev = [
     "pytest-mock (>=3.15.1,<4.0.0)",
     "fastavro (>=1.12.2,<2.0.0)",
     "ampel-kafka[hop] (>=0.10.0a0,<0.11.0)",
+    "pyarrow-stubs (>=20.0.0.20260625,<21.0.0.0)",
 ]
 
 [tool.poetry]
