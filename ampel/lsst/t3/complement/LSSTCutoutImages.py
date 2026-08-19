@@ -14,9 +14,9 @@ from requests_toolbelt.sessions import (  # type: ignore[import-untyped]
 )
 
 from ampel.abstract.AbsBufferComplement import AbsBufferComplement
+from ampel.catalogmatch.base.CatalogMatchUnit import retry_transient_errors
 from ampel.struct.AmpelBuffer import AmpelBuffer
 from ampel.struct.T3Store import T3Store
-from ampel.ztf.base.CatalogMatchUnit import retry_transient_errors
 
 
 class LSSTCutoutImages(AbsBufferComplement):
