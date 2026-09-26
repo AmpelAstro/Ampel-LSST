@@ -20,6 +20,8 @@ on:
 jobs:
   ci:
     uses: AmpelProject/Ampel-interface/.github/workflows/ci.yml@c855e93ae95c955ba292f88413455462398a8c9a # ci-py12-v10
+    permissions:
+      contents: write
     with:
       mongo: true
       format: true
@@ -47,4 +49,4 @@ jobs:
         with:
           name: Packages
           path: dist
-      - uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # release/v1
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1

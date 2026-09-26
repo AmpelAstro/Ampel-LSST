@@ -14,8 +14,8 @@ from astropy.table import Table
 from pydantic import BeforeValidator
 
 from ampel.abstract.AbsAlertFilter import AbsAlertFilter
+from ampel.catalogmatch.base.CatalogMatchUnit import CatalogMatchUnit
 from ampel.protocol.AmpelAlertProtocol import AmpelAlertProtocol
-from ampel.ztf.base.CatalogMatchUnit import CatalogMatchUnit
 
 RUBIN_ALERT_FLAGS = [
     "centroid_flag",

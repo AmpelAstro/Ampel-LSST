@@ -13,8 +13,8 @@ from astropy.coordinates import SkyCoord
 from astropy.table import Table
 
 from ampel.abstract.AbsAlertFilter import AbsAlertFilter
+from ampel.catalogmatch.base.CatalogMatchUnit import CatalogMatchUnit
 from ampel.protocol.AmpelAlertProtocol import AmpelAlertProtocol
-from ampel.ztf.base.CatalogMatchUnit import CatalogMatchUnit
 
 
 class SimpleLSSTFilter(CatalogMatchUnit, AbsAlertFilter):
