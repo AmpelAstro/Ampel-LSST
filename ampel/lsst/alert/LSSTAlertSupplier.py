@@ -46,6 +46,7 @@ class LSSTAlertSupplier(BaseAlertSupplier):
 
     # how far back in time to look for photometric points, in days
     max_history: float = float("inf")
+    min_mjd: float = -float("inf")
     # if True, only one photometric point per visit will be emitted
     # (preferentially forced photometry, then difference imaging, then upper
     # limits). if False, all photometric points will be emitted, even if multiple
@@ -65,7 +66,7 @@ class LSSTAlertSupplier(BaseAlertSupplier):
 
     @classmethod
     def _get_sources(
-        cls, alert: dict, max_history: float, one_datapoint_per_visit: bool = True
+        cls, alert: dict, max_history: float, min_mjd: float, one_datapoint_per_visit: bool = True
     ) -> Generator[dict, None, None]:
         """
         yield one photometric point per visit, preferring forced photometry to
@@ -75,7 +76,7 @@ class LSSTAlertSupplier(BaseAlertSupplier):
         yield diaSource
 
         visits: set[int] = set()
-        t0 = diaSource["midpointMjdTai"] - max_history
+        t0_max_hist = diaSource["midpointMjdTai"] - max_history
         for dp in map(
             cls._shape_dp,
             chain(
@@ -84,7 +85,11 @@ class LSSTAlertSupplier(BaseAlertSupplier):
                 alert.get("diaNondetectionLimit") or (),
             ),
         ):
-            if (visit := dp["visit"]) not in visits and dp["midpointMjdTai"] >= t0:
+            if (
+                (visit := dp["visit"]) not in visits
+                and dp["midpointMjdTai"] >= t0_max_hist
+                and dp["midpointMjdTai"] >= min_mjd
+            ):
                 yield dp
                 if one_datapoint_per_visit:
                     visits.add(visit)
@@ -95,6 +100,7 @@ class LSSTAlertSupplier(BaseAlertSupplier):
         d: dict,
         *,
         max_history: float = float("inf"),
+        min_mjd: float = -float("inf"),
         one_datapoint_per_visit: bool = True,
         alert_identifier: Literal["diaSourceId", "alertId"] = "diaSourceId",
     ) -> AmpelAlertProtocol:
@@ -103,6 +109,7 @@ class LSSTAlertSupplier(BaseAlertSupplier):
                 *cls._get_sources(
                     d,
                     max_history=max_history,
+                    min_mjd=min_mjd,
                     one_datapoint_per_visit=one_datapoint_per_visit,
                 ),
                 cls._shape_dp(diaObject),
@@ -145,6 +152,7 @@ class LSSTAlertSupplier(BaseAlertSupplier):
                 alert = self._shape(
                     d,
                     max_history=self.max_history,
+                    min_mjd=self.min_mjd,
                     one_datapoint_per_visit=self.one_datapoint_per_visit,
                     alert_identifier=self.alert_identifier,
                 )
