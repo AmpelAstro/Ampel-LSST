@@ -30,8 +30,6 @@ class LSSTDataPointShaper(AbsT0Unit):
     fields: FieldSelection = FieldSelection.default()
     # Mandatory implementation
 
-    combine_flags: dict[str, list[str]] | None = None
-
     def process(  # type: ignore[override]
         self, arg: Iterable[dict[str, Any]], stock: StockId
     ) -> list[DataPoint]:
@@ -71,13 +69,6 @@ class LSSTDataPointShaper(AbsT0Unit):
                 # Nondetection Limit
                 tags.append("LSST_ND")
                 selection = self.fields.diaNondetectionLimit
-
-            if self.combine_flags:
-                photo_dict = dict(photo_dict)
-                for combined_flag, flag_combination in self.combine_flags.items():
-                    combination_values = [photo_dict.pop(flag) for flag in flag_combination if flag in photo_dict]
-                    if len(combination_values) > 0:
-                        photo_dict[combined_flag] = any(combination_values)
 
             if selection:
                 body = {k: photo_dict[k] for k in selection.filter(photo_dict)}
