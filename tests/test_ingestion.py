@@ -1,3 +1,4 @@
+import math
 from itertools import cycle
 from pathlib import Path
 
@@ -39,13 +40,14 @@ class MockFilter(AbsAlertFilter):
 
 
 @pytest.fixture
-def alert_consumer(mock_context: DevAmpelContext) -> AlertConsumer:
+def alert_consumer(dev_context: DevAmpelContext) -> AlertConsumer:
     with (Path(__file__).parent / "test-data" / "elasticc-consumer.yml").open() as f:
         model = UnitModel(**yaml.safe_load(f))
     # alerts from a single diaObject
     with (Path(__file__).parent / "test-data" / "11290844.avro").open("rb") as f:
         alerts = list(fastavro.reader(f))[:2]
     model.config["supplier"]["config"]["alert_identifier"] = "alertId"
+    model.config["supplier"]["config"]["include_body"] = True
     model.config["supplier"]["config"]["loader"] = UnitModel(
         unit="MockAlertLoader", config={"alerts": alerts}
     ).dict()
@@ -58,18 +60,27 @@ def alert_consumer(mock_context: DevAmpelContext) -> AlertConsumer:
     ).dict()
 
     for c in "ElasticcLong", "ElasticcShort":
-        mock_context.add_channel(c)
-    mock_context.register_unit(MockAlertLoader)
-    mock_context.register_unit(MockFilter)
+        dev_context.add_channel(c)
+    dev_context.register_unit(MockAlertLoader)
+    dev_context.register_unit(MockFilter)
 
-    return mock_context.loader.new_context_unit(
+    return dev_context.loader.new_context_unit(
         model=model,
-        context=mock_context,
+        context=dev_context,
         sub_type=AlertConsumer,
     )
 
 
-def test_muxer(mock_context: DevAmpelContext, alert_consumer: AlertConsumer):
+# instantiate a test only with the mock context
+mock_context = pytest.mark.parametrize("dev_context", ["mock_context"], indirect=True)
+# instantiate a test only with the integration context
+integration_context = pytest.mark.parametrize(
+    "dev_context", ["integration_context"], indirect=True
+)
+
+
+@mock_context
+def test_muxer(alert_consumer: AlertConsumer):
     """
     A point T2 bound to a specific datapoint appears for both channels, even
     when the alert where the target datapoint first appeared was accepted by
@@ -83,13 +94,16 @@ def test_muxer(mock_context: DevAmpelContext, alert_consumer: AlertConsumer):
     # inserts datapoints unique to second alert
     assert alert_consumer.run() == 1
 
-    assert len(mock_context.db.get_collection("stock").find_one()["channel"]) == 2, (
-        "stock in both channels"
-    )
+    assert (
+        len(alert_consumer.context.db.get_collection("stock").find_one()["channel"])
+        == 2
+    ), "stock in both channels"
     assert (
         len(
             docs := list(
-                mock_context.db.get_collection("t2").find({"unit": "T2GetDiaObject"})
+                alert_consumer.context.db.get_collection("t2").find(
+                    {"unit": "T2GetDiaObject"}
+                )
             )
         )
         == 1
@@ -97,6 +111,7 @@ def test_muxer(mock_context: DevAmpelContext, alert_consumer: AlertConsumer):
     assert len(set(docs[0]["channel"])) == 2, "t2 doc in both channels"
 
 
+@mock_context
 def test_message_ack(alert_consumer: AlertConsumer, mocker):
     """
     Alerts are explicitly acknowledged back to the loader
@@ -115,3 +130,43 @@ def test_message_ack(alert_consumer: AlertConsumer, mocker):
         {"__kafka": {"alertId": alert["alertId"]}}
         for alert in alert_consumer.alert_supplier.alert_loader.alerts
     ], "alerts acked"
+
+
+@integration_context
+def test_stock_body(alert_consumer: AlertConsumer):
+    """
+    The stock body is included in the alert.extra field when include_body is True
+    """
+    object.__setattr__(alert_consumer, "iter_max", 1)
+
+    assert alert_consumer.run() == 1
+
+    col = alert_consumer.context.db.get_collection("stock")
+    stock = col.find_one()
+    assert stock is not None, "stock doc found"
+    assert "body" in stock, "stock body included"
+
+    col.create_index([("body._loc", "2dsphere")])
+
+    def find_near():
+        return col.find_one(
+            {
+                "body._loc": {
+                    "$geoWithin": {
+                        "$centerSphere": [
+                            stock["body"]["_loc"]["coordinates"],
+                            math.pi * (1 / 3600) / 180,
+                        ]
+                    }
+                }
+            }
+        )
+
+    assert find_near() is not None, "stock body loc is valid"
+
+    # skootch the ra of the second alert's diaObject by 3 arcseconds, so that it is outside the original stock body loc
+    alert_consumer.alert_supplier.alert_loader.alerts[1]["diaObject"]["ra"] += 3 / 3600
+
+    assert alert_consumer.run() == 1
+
+    assert find_near() is None, "stock loc moved"
