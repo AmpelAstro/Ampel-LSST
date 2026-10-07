@@ -1,11 +1,23 @@
 from collections.abc import Generator, Iterable
+from typing import Annotated
+
+from pydantic import PlainSerializer
 
 from ampel.base.AmpelBaseModel import AmpelBaseModel
 
 
+def _serialize_set(v: set[str] | None) -> list[str] | None:
+    if v is None:
+        return None
+    return list(v)
+
+
+StringSet = Annotated[set[str], PlainSerializer(_serialize_set)]
+
+
 class StringFilter(AmpelBaseModel):
-    include: None | set[str] = None
-    exclude: None | set[str] = None
+    include: StringSet | None = None
+    exclude: StringSet | None = None
 
     def filter(self, fields: Iterable[str]) -> Generator[str, None, None]:
         for field in fields:
