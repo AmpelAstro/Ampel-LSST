@@ -132,6 +132,25 @@ def test_message_ack(alert_consumer: AlertConsumer, mocker):
     ], "alerts acked"
 
 
+@mock_context
+def test_alertconsumer_traceid(alert_consumer: AlertConsumer):
+    """
+    The stock body is included in the alert.extra field when include_body is True
+    """
+    object.__setattr__(alert_consumer, "iter_max", 1)
+
+    assert alert_consumer.run() == 1
+
+    db = alert_consumer.context.db
+    assert (stock := db.get_collection("stock").find_one()) is not None, (
+        "stock doc found"
+    )
+    traceid = stock["journal"][0]["traceid"]["alertconsumer"]
+    assert db.get_collection("trace").find_one({"_id": traceid}) is not None, (
+        "trace doc found"
+    )
+
+
 @integration_context
 def test_stock_body(alert_consumer: AlertConsumer):
     """
