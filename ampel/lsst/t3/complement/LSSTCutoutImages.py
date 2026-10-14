@@ -27,7 +27,7 @@ class LSSTCutoutImages(AbsBufferComplement):
     #: Which detection to retrieve cutouts for
     eligible: Literal["first", "last", "brightest", "all"] = "last"
 
-    archive_url: str = "https://ampel-dev.ia.zeuthen.desy.de/api/lsst/archive/v1/"
+    archive_url: str = "https://lsst-archive.ampel.zeuthen.desy.de/api/lsst/archive/v1/"
     insecure: bool = False
 
     def __init__(self, **kwargs) -> None:
