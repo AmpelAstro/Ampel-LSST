@@ -30,7 +30,7 @@ dependencies = [
     "ampel-catalogmatch (>=0.10.0a5,<0.11.0)",
     "ampel-alerts (>=0.10.3,<0.11.0)",
     "ampel-photometry (>=0.10.1,<0.11.0)",
-    "pyarrow (>=25.0.0,<26.0.0)",
+    "pyarrow (>=26.0.1,<26.1.0)",
 ]
 
 [project.optional-dependencies]
