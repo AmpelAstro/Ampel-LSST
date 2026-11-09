@@ -68,7 +68,11 @@ class LSSTAlertSupplier(BaseAlertSupplier):
 
     @classmethod
     def _get_sources(
-        cls, alert: dict, max_history: float, min_mjd: float, one_datapoint_per_visit: bool = True
+        cls,
+        alert: dict,
+        max_history: float,
+        min_mjd: float,
+        one_datapoint_per_visit: bool = True,
     ) -> Generator[dict, None, None]:
         """
         yield one photometric point per visit, preferring forced photometry to
