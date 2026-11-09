@@ -47,16 +47,25 @@ def test_lsstcutoutimages(
             "t0": [
                 DataPoint(
                     {
-                        "id": 169738308673863748,
+                        "id": 170243999884378139,
                         "tag": ["LSST_DP"],
-                        "body": {"midpointMjdTai": 60000.0, "psfFlux": 1500.0},
+                        "body": {
+                            "diaSourceId": 170243999884378139,
+                            "midpointMjdTai": 60000.0,
+                            "psfFlux": 1500.0,
+                        },
                     }
                 ),
                 DataPoint(
                     {
-                        "id": 169676640861290517,
+                        # NB: this diaSourceId must exist in the LSST archive for this test to pass
+                        "id": 170336356424745224,
                         "tag": ["LSST_DP"],
-                        "body": {"midpointMjdTai": 60001.0, "psfFlux": 1400.0},
+                        "body": {
+                            "diaSourceId": 170336356424745224,
+                            "midpointMjdTai": 60001.0,
+                            "psfFlux": 1400.0,
+                        },
                     }
                 ),
             ],
@@ -65,10 +74,10 @@ def test_lsstcutoutimages(
     unit.complement([buf], T3Store())
     assert (extra := buf.get("extra")) is not None
     assert (cutouts := extra.get("LSSTCutoutImages")) is not None
-    assert set(cutouts.keys()) == {169676640861290517}, (
+    assert set(cutouts.keys()) == {170336356424745224}, (
         "only one cutout should be retrieved"
     )
-    assert (cutout := cutouts.get(169676640861290517)) is not None
+    assert (cutout := cutouts.get(170336356424745224)) is not None
     assert all(
         key in cutout for key in ["cutoutScience", "cutoutTemplate", "cutoutDifference"]
     )

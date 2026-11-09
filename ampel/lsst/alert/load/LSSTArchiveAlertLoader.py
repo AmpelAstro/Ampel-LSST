@@ -16,7 +16,7 @@ class LSSTArchiveAlertLoader(AbsAlertLoader[dict]):
     Load alerts from LSST alert archive
     """
 
-    archive_url: str = "https://ampel-dev.ia.zeuthen.desy.de/api/lsst/archive/v1/"
+    archive_url: str = "https://lsst-archive.ampel.zeuthen.desy.de/api/lsst/archive/v1/"
     insecure: Annotated[bool, Field(description="Do not verify HTTPS certificates")] = (
         False
     )
@@ -25,6 +25,7 @@ class LSSTArchiveAlertLoader(AbsAlertLoader[dict]):
     order_by: Annotated[
         None | str, Field(description="Order by clause for alert query")
     ] = None
+    limit: Annotated[None | int, Field(description="Limit for alert query")] = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -59,7 +60,7 @@ class LSSTArchiveAlertLoader(AbsAlertLoader[dict]):
 
         response = self.session.post(
             "display/alerts/query",
-            json=self._build_query(self.condition, limit=limit),
+            json=self._build_query(self.condition, limit=limit or self.limit),
             verify=not self.insecure,
         )
         try:

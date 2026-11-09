@@ -55,6 +55,8 @@ class LSSTAlertSupplier(BaseAlertSupplier):
     # which field to use as the alert identifier (diaSourceId for real Rubin
     # alerts, alertId in ELASTiCC simualted alerts)
     alert_identifier: Literal["diaSourceId", "alertId"] = "diaSourceId"
+    # synthesize a stock body from the diaObject record
+    include_body: bool = False
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -102,6 +104,7 @@ class LSSTAlertSupplier(BaseAlertSupplier):
         max_history: float = float("inf"),
         min_mjd: float = -float("inf"),
         one_datapoint_per_visit: bool = True,
+        include_body: bool = False,
         alert_identifier: Literal["diaSourceId", "alertId"] = "diaSourceId",
     ) -> AmpelAlertProtocol:
         if diaObject := d.get("diaObject"):
@@ -121,6 +124,13 @@ class LSSTAlertSupplier(BaseAlertSupplier):
                     extras[alertprop] = val
             if kafka := d.get("__kafka"):
                 extras["kafka"] = kafka
+            if include_body:
+                extras["stock"] = {
+                    "_loc": {
+                        "type": "Point",
+                        "coordinates": [dps[-1]["ra"] - 180.0, dps[-1]["dec"]],
+                    }
+                }
             return AmpelAlert(
                 id=d[
                     alert_identifier
@@ -155,6 +165,7 @@ class LSSTAlertSupplier(BaseAlertSupplier):
                     min_mjd=self.min_mjd,
                     one_datapoint_per_visit=self.one_datapoint_per_visit,
                     alert_identifier=self.alert_identifier,
+                    include_body=self.include_body,
                 )
                 self._emitted_any = True
                 return alert

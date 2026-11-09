@@ -19,6 +19,81 @@ config:
           timeout: 60
   shaper:
     unit: LSSTDataPointShaper
+    config:
+      fields:
+        diaForcedSource:
+          include:
+          - band
+          - dec
+          - midpointMjdTai
+          - psfFlux
+          - psfFluxErr
+          - ra
+          - visit
+          - diaForcedSourceId
+          - diaObjectId
+        diaObject:
+          include:
+          - dec
+          - decErr
+          - ra_dec_Cov
+          - ra
+          - radecMjdTai
+          - raErr
+          - diaObjectId
+          - nDiaSources
+        diaSource:
+          include:
+          - band
+          - dec
+          - decErr
+          - isNegative
+          - midpointMjdTai
+          - psfFlux
+          - psfFluxErr
+          - ra
+          - raErr
+          - ra_dec_Cov
+          - snr
+          - visit
+          - diaSourceId
+          - templateFlux
+          - templateFluxErr
+          - reliability
+          - centroid_flag
+          - apFlux_flag
+          - apFlux_flag_apertureTruncated
+          - psfFlux_flag
+          - psfFlux_flag_edge
+          - psfFlux_flag_noGoodPixels
+          - trail_flag_edge
+          - forced_PsfFlux_flag
+          - forced_PsfFlux_flag_edge
+          - forced_PsfFlux_flag_noGoodPixels
+          - shape_flag
+          - shape_flag_no_pixels
+          - shape_flag_not_contained
+          - shape_flag_parent_source
+          - pixelFlags
+          - pixelFlags_bad
+          - pixelFlags_cr
+          - pixelFlags_crCenter
+          - pixelFlags_edge
+          - pixelFlags_nodata
+          - pixelFlags_nodataCenter
+          - pixelFlags_interpolated
+          - pixelFlags_interpolatedCenter
+          - pixelFlags_offimage
+          - pixelFlags_saturated
+          - pixelFlags_saturatedCenter
+          - pixelFlags_suspect
+          - pixelFlags_suspectCenter
+          - pixelFlags_streak
+          - pixelFlags_streakCenter
+          - pixelFlags_injected
+          - pixelFlags_injectedCenter
+          - pixelFlags_injected_template
+          - pixelFlags_injected_templateCenter
   include_alert_extra_with_keys:
     alert_ts: kafka.timestamp.create
   directives:
